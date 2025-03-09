@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4c20aea558a5c445b593f4643b5b014, type: 3}
+  m_Name: MeshStorage
+  m_EditorClassIdentifier: 
+  SDefaultMaterial: {fileID: 2100000, guid: 1c3a3d0e0511e2040b890f0394e9788b, type: 2}
+  SMaterials:
+  - {fileID: 2100000, guid: 1c3a3d0e0511e2040b890f0394e9788b, type: 2}
+  - {fileID: 2100000, guid: 8d8b53d36be30ea4195cb67a9f4dbb5d, type: 2}
+  - {fileID: 2100000, guid: b6fd599956ab09946a9e48b33cedd701, type: 2}
+  - {fileID: 2100000, guid: 84aa7a58524f4b648afb615f28a671bd, type: 2}
+  - {fileID: 2100000, guid: 74920177fe0542a49a9efc700ad5f688, type: 2}
+  - {fileID: 2100000, guid: 9237416891d0b114f867cc86014bec18, type: 2}
+  - {fileID: 2100000, guid: e5aa650ca6521c9468ccd8427d0efa93, type: 2}
+  - {fileID: 2100000, guid: 3cac209770d379e45a8e816ade769035, type: 2}
+  - {fileID: 2100000, guid: 15f0a1be3210c0540a479aa12c1ab5c5, type: 2}
+  - {fileID: 2100000, guid: cb27f0e5d2278e847bf3bba62264e6e8, type: 2}
+  - {fileID: 2100000, guid: d0c2a0c9d1d30194898a3e4e8909b4e7, type: 2}
+  - {fileID: 2100000, guid: 270dd3d66e14e5c468bfb13ad91e6bd6, type: 2}
