@@ -89,10 +89,12 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
-        // 플레이어 정보를 서버에 전송하기
+        // 방에 성공적으로 접속 시, 플레이어 정보를 서버에 전송하기
         if (PhotonNetwork.IsConnected)
         {
             sConnectState = ConnectState.Room;
+
+            // 이벤트를 실행한다 
             OnRoomEntered?.Invoke();
             OnRoomPlayerEntered?.Invoke();
         }

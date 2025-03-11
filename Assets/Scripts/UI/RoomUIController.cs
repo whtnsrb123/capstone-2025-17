@@ -34,7 +34,7 @@ public class RoomUIController : MonoBehaviour
         // join view 이벤트 등록
         roomView.j_confirmBtn.onClick.AddListener(() => OnClickJoinConfirmBtn());
 
-        // Game Lanucher 이벤트 등록 
+        // NetworkManager 이벤트 등록 
         NetworkManager.OnRoomPlayerEntered += RenderPlayers;
         NetworkManager.OnRoomPlayerLeaved += RemoveRenderedPlayers;
         NetworkManager.OnRoomEntered += OnEnteredRoom;
@@ -43,6 +43,7 @@ public class RoomUIController : MonoBehaviour
     // =================== Lobby Buttons =====================
     void OnClickRandomBtn()
     {
+        // 랜덤 매치 버튼 클릭 시 
         SaveProfileInfo();
 
         roomModel.RoomType = ServerInfo.RoomTypes.Random;
@@ -51,6 +52,7 @@ public class RoomUIController : MonoBehaviour
 
     void OnClickCreateConfirmBtn()
     {
+        // 방 생성 확인 버튼 클릭 시 
         SaveProfileInfo();
 
         string roomCode =$"{Random.Range(10000, 99999)}";
@@ -65,6 +67,7 @@ public class RoomUIController : MonoBehaviour
 
     void OnClickJoinConfirmBtn()
     {
+        // 방 참가하기 버튼 클릭 시 
         SaveProfileInfo();
 
         roomModel.RoomType = ServerInfo.RoomTypes.Join;
@@ -92,6 +95,7 @@ public class RoomUIController : MonoBehaviour
 
     public void SaveProfileInfo()
     {
+        // 룸에 접속 시 클라이언트의 정보를 전송한다
         string nickname = profileModel.Nickname;
         int characterId = profileModel.CharacterId;
 
@@ -101,7 +105,9 @@ public class RoomUIController : MonoBehaviour
     Dictionary<string, int> playersInfo = new Dictionary<string, int>();
 
     public void RenderPlayers()
-    { 
+    {
+        // RoomManager에게 플레이어 리스트를 요청해서 받아온 뒤,
+        // RoomUI 에게 전달하여 UI를 업데이트 시킨다
         playersInfo = roomManager.RenderPlayers();
 
         roomView.RenderPlayerUI(playersInfo);
@@ -109,7 +115,7 @@ public class RoomUIController : MonoBehaviour
 
     public void RemoveRenderedPlayers(string nickname)
     {
-
+        // 방을 나간 플레이어 UI에서 삭제하기 
         roomView.RemovePlayerUI(nickname);
     }
 

@@ -27,11 +27,14 @@ public class RoomUI : MonoBehaviour
     public Button j_confirmBtn;
     public Button j_cancelBtn;
 
+    // 캐릭터 모델의 메시가 저장된 Scriptable Object 변수 
     [SerializeField]
     MaterialStorage storage;
 
     static Dictionary<string, int> viewPlayerList;
 
+
+    // 대기 방에서 플레이어를 표시한다 
     public void RenderPlayerUI(Dictionary<string, int> players)
     {
 
@@ -54,6 +57,8 @@ public class RoomUI : MonoBehaviour
             playerIdx++;
         }
     }
+
+    // 대기 방을 떠난 플레이어를 UI에서 제거한다
 
     public void RemovePlayerUI(string nickname)
     {
