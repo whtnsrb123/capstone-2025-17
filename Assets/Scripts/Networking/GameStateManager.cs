@@ -6,9 +6,10 @@ using UnityEngine;
 public class GameStateManager : MonoBehaviourPun
 {
     public static GameStateManager Instance { get; private set; }
+    public static bool isServerTest = false; //서버or클라 테스트 구분용 bool 변수
     
-    //게임 시작 상태
-    private bool isGameStarted = false;
+    private bool isGameStarted = false; // 게임이 시작 했는지 (미션이 시작할때 true, 미션이 끝나면 false)
+    private int currentMission; // 현재 미션을 나타내는 변수(미션 1, 미션2...)
     
     //싱글톤
     private void Awake()

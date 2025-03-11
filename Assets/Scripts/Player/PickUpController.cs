@@ -1,7 +1,8 @@
+using Photon.Pun;
 using UnityEngine;
 using TMPro;
 
-public class PickUpController : MonoBehaviour
+public class PickUpController : MonoBehaviourPun
 {
     public Transform holdPosition; // 물체를 들고 있을 위치
     public TMP_Text interactionText; // 상호작용 UI 텍스트
@@ -24,6 +25,9 @@ public class PickUpController : MonoBehaviour
 
     void Update()
     {
+        //서버테스트중이 아니거나 로컬캐릭터일때만 이동처리
+        if( GameStateManager.isServerTest && !photonView.IsMine ) return;
+        
         DetectPickableObject(); // 주변에서 집을 수 있는 물체 감지
 
         // 물체를 들고 있으면 상호작용 텍스트 변경
