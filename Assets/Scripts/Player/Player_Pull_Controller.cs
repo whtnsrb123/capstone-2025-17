@@ -11,14 +11,13 @@ public class Player_Pull_Controller : MonoBehaviourPun
     void Update()
     {
         //서버테스트중이 아니거나 로컬캐릭터일때만 이동처리
-        if (!GameStateManager.isServerTest || (GameStateManager.isServerTest && photonView.IsMine))
+        if( GameStateManager.isServerTest && !photonView.IsMine ) return;
+        
+        if (Input.GetMouseButtonDown(0)) // 마우스 왼쪽 버튼 클릭 감지
         {
-            if (Input.GetMouseButtonDown(0)) // 마우스 왼쪽 버튼 클릭 감지
-            {
-                Debug.Log("마우스 왼쪽 클릭 감지됨"); // 클릭 시 로그 출력
-                PushPlayer();
-            }   
-        }
+            Debug.Log("마우스 왼쪽 클릭 감지됨"); // 클릭 시 로그 출력
+            PushPlayer();
+        }   
     }
 
     void PushPlayer()

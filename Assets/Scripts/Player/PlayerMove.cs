@@ -35,14 +35,12 @@ public class CharacterController : MonoBehaviourPun
 
     void Update()
     {
+        if( GameStateManager.isServerTest && !photonView.IsMine ) return;
         //서버테스트중이 아니거나 로컬캐릭터일때만 이동처리
-        if (!GameStateManager.isServerTest || (GameStateManager.isServerTest && photonView.IsMine))
-        {
-            MoveCharacter();  // 캐릭터 이동 처리
-            UpdateRotate();   // 마우스 회전에 따른 캐릭터 회전
-            HandleJump();     // 점프 처리
-            CheckGrounded();  // 땅에 닿아 있는지 감지
-        }
+        MoveCharacter();  // 캐릭터 이동 처리
+        UpdateRotate();   // 마우스 회전에 따른 캐릭터 회전
+        HandleJump();     // 점프 처리
+        CheckGrounded();  // 땅에 닿아 있는지 감지
     }
 
     // 캐릭터 이동 처리
