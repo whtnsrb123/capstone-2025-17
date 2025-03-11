@@ -46,6 +46,7 @@ GameObject:
   - component: {fileID: 8466689762904302079}
   - component: {fileID: 8051167283941596819}
   - component: {fileID: 7649671672246846584}
+  - component: {fileID: 864941719338418275}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -183,6 +184,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animators: []
+--- !u!114 &864941719338418275
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4498984936144442706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 0
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &6410173723025588219
 GameObject:
   m_ObjectHideFlags: 0
