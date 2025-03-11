@@ -1,6 +1,7 @@
+using Photon.Pun;
 using UnityEngine;
 
-public class Player_Pull_Controller : MonoBehaviour
+public class Player_Pull_Controller : MonoBehaviourPun
 {
     public Transform holdPosition; // 손 위치 (선택 사항)
     public float rayDistance = 10f; // 레이캐스트 사정거리
@@ -9,10 +10,14 @@ public class Player_Pull_Controller : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0)) // 마우스 왼쪽 버튼 클릭 감지
+        //서버테스트중이 아니거나 로컬캐릭터일때만 이동처리
+        if (!GameStateManager.isServerTest || (GameStateManager.isServerTest && photonView.IsMine))
         {
-            Debug.Log("마우스 왼쪽 클릭 감지됨"); // 클릭 시 로그 출력
-            PushPlayer();
+            if (Input.GetMouseButtonDown(0)) // 마우스 왼쪽 버튼 클릭 감지
+            {
+                Debug.Log("마우스 왼쪽 클릭 감지됨"); // 클릭 시 로그 출력
+                PushPlayer();
+            }   
         }
     }
 
