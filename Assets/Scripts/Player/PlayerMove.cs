@@ -1,6 +1,7 @@
+using Photon.Pun;
 using UnityEngine;
 
-public class CharacterController : MonoBehaviour
+public class CharacterController : MonoBehaviourPun
 {
     public float moveSpeed = 3f;            // 걷기 속도
     public float sprintSpeed = 5f;         // 달리기 속도
@@ -34,15 +35,19 @@ public class CharacterController : MonoBehaviour
 
     void Update()
     {
-        MoveCharacter();  // 캐릭터 이동 처리
-        UpdateRotate();   // 마우스 회전에 따른 캐릭터 회전
-        HandleJump();     // 점프 처리
-        CheckGrounded();  // 땅에 닿아 있는지 감지
+        //서버테스트중이 아니거나 로컬캐릭터일때만 이동처리
+        if (!GameStateManager.isServerTest || (GameStateManager.isServerTest && photonView.IsMine))
+        {
+            MoveCharacter();  // 캐릭터 이동 처리
+            UpdateRotate();   // 마우스 회전에 따른 캐릭터 회전
+            HandleJump();     // 점프 처리
+            CheckGrounded();  // 땅에 닿아 있는지 감지
+        }
     }
 
     // 캐릭터 이동 처리
     void MoveCharacter()
-    {
+    {   
         float horizontal = Input.GetAxis("Horizontal"); // A, D 또는 좌우 방향키 입력 값
         float vertical = Input.GetAxis("Vertical");     // W, S 또는 상하 방향키 입력 값
 
