@@ -25,7 +25,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public static Action OnRequestFailed;
 
     // =================== int로 변경해야 한다 : ActorNumber 사용 ===============
-    public static Action<string> OnRoomPlayerLeaved;
+    public static Action<int> OnRoomPlayerLeaved;
 
 
     void Start()
@@ -134,9 +134,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
 
-        string nickname = (string)otherPlayer.CustomProperties["Nickname"];
-        Debug.Log("NetworkManager - 나간 새끼 : " + nickname);
-        OnRoomPlayerLeaved?.Invoke(nickname);
+        int actorNumber = otherPlayer.ActorNumber;
+        OnRoomPlayerLeaved?.Invoke(actorNumber);
     }
     #endregion
 

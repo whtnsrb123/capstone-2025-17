@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Realtime;
+using System.Collections;
 
 // Controller
 public class RoomUIController : MonoBehaviour
@@ -102,7 +103,7 @@ public class RoomUIController : MonoBehaviour
         roomManager.SendClientInfo(nickname, characterId);
     }
 
-    Dictionary<string, int> playersInfo = new Dictionary<string, int>();
+    Dictionary<int, Hashtable> playersInfo = new Dictionary<int, System.Collections.Hashtable>();
 
     public void RenderPlayers()
     {
@@ -113,10 +114,10 @@ public class RoomUIController : MonoBehaviour
         roomView.RenderPlayerUI(playersInfo);
     }
 
-    public void RemoveRenderedPlayers(string nickname)
+    public void RemoveRenderedPlayers(int actorNumber)
     {
         // 방을 나간 플레이어 UI에서 삭제하기 
-        roomView.RemovePlayerUI(nickname);
+        roomView.RemovePlayerUI(actorNumber);
     }
 
 }

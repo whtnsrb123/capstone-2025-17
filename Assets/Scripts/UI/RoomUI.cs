@@ -31,28 +31,31 @@ public class RoomUI : MonoBehaviour
     [SerializeField]
     MaterialStorage storage;
 
-    static Dictionary<string, int> viewPlayerList;
+    static Dictionary<int, Hashtable> viewPlayerList;
 
 
     // 대기 방에서 플레이어를 표시한다 
-    public void RenderPlayerUI(Dictionary<string, int> players)
+    public void RenderPlayerUI(Dictionary<int, Hashtable> players)
     {
 
         viewPlayerList = players;
 
         int playerIdx = 0;
 
-        foreach(KeyValuePair<string, int> kvp in players)
+        foreach(KeyValuePair<int, Hashtable> kvp in players)
         {
-            Debug.Log($"{playerIdx} 번째 플레이어의 닉네임 : {kvp.Key}, 아이디 : {kvp.Value}");
+            Debug.Log($"{playerIdx} 번째 플레이어의 고유 아이디 : {kvp.Key}");
 
             playersUI[playerIdx].SetActive(true);
             playersRawImage[playerIdx].SetActive(true);
 
             SkinnedMeshRenderer sm = playersUI[playerIdx].GetComponentInChildren<SkinnedMeshRenderer>();
 
-            sm.material = storage.GetMesh(kvp.Value);
-            nicknamesUI[playerIdx].text = kvp.Key;
+            int characterId = (int) kvp.Value["CharacterId"];
+            string nickname = (string)kvp.Value["Nickname"];
+
+            sm.material = storage.GetMesh(characterId);
+            nicknamesUI[playerIdx].text = nickname;
 
             playerIdx++;
         }
@@ -60,14 +63,13 @@ public class RoomUI : MonoBehaviour
 
     // 대기 방을 떠난 플레이어를 UI에서 제거한다
 
-    public void RemovePlayerUI(string nickname)
+    public void RemovePlayerUI(int actorNumber)
     {
         int playerIdx = 0;
 
-        foreach (KeyValuePair<string, int> p in viewPlayerList)
+        foreach (KeyValuePair<int, Hashtable> p in viewPlayerList)
         {
-            Debug.Log($"키 : {p.Key}, 닉네임 : {nickname}이니까, {p.Key == nickname}" );
-            if (p.Key == nickname)
+            if (p.Key == actorNumber)
             {
                 playersUI[playerIdx].SetActive (false);
                 nicknamesUI[playerIdx].text = string.Empty;
