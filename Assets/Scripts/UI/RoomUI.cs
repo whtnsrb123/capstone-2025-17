@@ -13,6 +13,7 @@ public class RoomUI : MonoBehaviour
     // room panel
     public Button leaveBtn;
     public TextMeshProUGUI roomCode;
+
     public GameObject[] playersUI;
     public TextMeshProUGUI[] nicknamesUI;
     public GameObject[] playersRawImage;
@@ -31,8 +32,14 @@ public class RoomUI : MonoBehaviour
     [SerializeField]
     MaterialStorage storage;
 
+    SkinnedMeshRenderer[] smRenderers;
     static Dictionary<int, Hashtable> viewPlayerList;
     static int[] viewSeats;
+
+    private void Start()
+    {
+        SetSkinnedMeshRenderers();
+    }
 
     public void GetPlayerSeats(int[] para)
     {
@@ -40,6 +47,14 @@ public class RoomUI : MonoBehaviour
         viewSeats = para;
     }
 
+    void SetSkinnedMeshRenderers()
+    {
+        smRenderers = new SkinnedMeshRenderer[4];
+        for (int i = 0; i < 4; i++)
+        {
+            smRenderers[i] = playersUI[i].GetComponentInChildren<SkinnedMeshRenderer>();
+        }
+    }
 
 
     public void UpdatePlayerUI(Dictionary<int, Hashtable> updatedPlayers)
@@ -60,15 +75,13 @@ public class RoomUI : MonoBehaviour
                 {
                     if(kvp.Key == viewSeats[i])
                     {
-                        playersUI[i].SetActive(true);
-                        playersRawImage[i].SetActive(true);
-
-                        SkinnedMeshRenderer sm = playersUI[i].GetComponentInChildren<SkinnedMeshRenderer>();
-
                         int characterId = (int)kvp.Value["CharacterId"];
                         string nickname = (string)kvp.Value["Nickname"];
 
-                        sm.material = storage.GetMesh(characterId);
+                        playersUI[i].SetActive(true);
+                        playersRawImage[i].SetActive(true);
+
+                        smRenderers[i].material = storage.GetMesh(characterId);
                         nicknamesUI[i].text = nickname;
                     }
                 }
