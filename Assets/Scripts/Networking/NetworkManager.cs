@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using ExitGames.Client.Photon;
 
 public enum ConnectState
 {
@@ -14,18 +15,17 @@ public enum ConnectState
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
+    public static Action OnConnectedToServer; // 마스터 서버에 접속했을 때
+    public static Action OnRoomEntered; // 룸에 입장했을 때
+    public static Action OnRequestFailed; // 네트워크 요청이 실패했을 때
+    public static Action OnRoomSeatsUpdated; // Seats 정보가 갱신될 때 
+    public static Action<int, bool> OnRoomPlayerUpdated; // 룸 플레이어 리스트가 변동됐을 때
+
     // 플레이어의 연결 상태
     static ConnectState sConnectState;
 
-    static string _gameVersion = "1";
-
-    public static Action OnConnectedToServer;
-    public static Action OnRoomPlayerEntered;
-    public static Action OnRoomEntered;
-    public static Action OnRequestFailed;
-
-    // =================== int로 변경해야 한다 : ActorNumber 사용 ===============
-    public static Action<int> OnRoomPlayerLeaved;
+    const string _gameVersion = "1";
+    const bool PlayerEntered = true;
 
 
     void Start()
@@ -49,10 +49,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             PhotonNetwork.ConnectUsingSettings();
         }
     }
-
+   
 
     #region Callbacks
-
     public override void OnConnectedToMaster()
     {
         Debug.Log("NetworkManager.cs - On Connected To Master()");
@@ -96,14 +95,13 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
             // 이벤트를 실행한다 
             OnRoomEntered?.Invoke();
-            OnRoomPlayerEntered?.Invoke();
         }
         else
         {
             // 연결 실패 처리
         }
-        
     }
+
     public override void OnLeftRoom()
     {
         Debug.Log("On Left Room()");
@@ -112,6 +110,13 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
         // 룸 연결 실패 처리
+    }
+
+    public override void OnJoinRoomFailed(short returnCode, string message)
+    {
+        base.OnJoinRoomFailed(returnCode, message);
+        Debug.Log(returnCode);
+        Debug.Log(message);
     }
 
     public override void OnCreatedRoom()
@@ -127,16 +132,26 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
-        OnRoomPlayerEntered?.Invoke();
-        Debug.Log("Entered Player");
+        // 다른 플레이어가 방에 입장한 경우
+        OnRoomPlayerUpdated?.Invoke(newPlayer.ActorNumber, PlayerEntered);
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
-
-        int actorNumber = otherPlayer.ActorNumber;
-        OnRoomPlayerLeaved?.Invoke(actorNumber);
+        // 다른 플레이어가 방을 나간 경우 
+        OnRoomPlayerUpdated?.Invoke(otherPlayer.ActorNumber, !PlayerEntered);
     }
+
+    public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
+    {
+        base.OnRoomPropertiesUpdate(propertiesThatChanged);
+
+        OnRoomSeatsUpdated?.Invoke();
+
+        Debug.Log("OnRoomPropertiesUpdate");
+    }
+
+
     #endregion
 
 }

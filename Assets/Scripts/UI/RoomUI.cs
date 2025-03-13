@@ -32,56 +32,49 @@ public class RoomUI : MonoBehaviour
     MaterialStorage storage;
 
     static Dictionary<int, Hashtable> viewPlayerList;
+    static int[] viewSeats;
 
-
-    // 대기 방에서 플레이어를 표시한다 
-    public void RenderPlayerUI(Dictionary<int, Hashtable> players)
+    public void GetPlayerSeats(int[] para)
     {
-
-        viewPlayerList = players;
-
-        int playerIdx = 0;
-
-        foreach(KeyValuePair<int, Hashtable> kvp in players)
-        {
-            Debug.Log($"{playerIdx} 번째 플레이어의 고유 아이디 : {kvp.Key}");
-
-            playersUI[playerIdx].SetActive(true);
-            playersRawImage[playerIdx].SetActive(true);
-
-            SkinnedMeshRenderer sm = playersUI[playerIdx].GetComponentInChildren<SkinnedMeshRenderer>();
-
-            int characterId = (int) kvp.Value["CharacterId"];
-            string nickname = (string)kvp.Value["Nickname"];
-
-            sm.material = storage.GetMesh(characterId);
-            nicknamesUI[playerIdx].text = nickname;
-
-            playerIdx++;
-        }
+        Debug.Log("GetPlayerSeats");
+        viewSeats = para;
     }
 
-    // 대기 방을 떠난 플레이어를 UI에서 제거한다
 
-    public void RemovePlayerUI(int actorNumber)
+
+    public void UpdatePlayerUI(Dictionary<int, Hashtable> updatedPlayers)
     {
-        int playerIdx = 0;
+        viewPlayerList = updatedPlayers;
 
-        foreach (KeyValuePair<int, Hashtable> p in viewPlayerList)
+        for (int i = 0; i < viewSeats.Length; i++)
         {
-            if (p.Key == actorNumber)
+            if (viewSeats[i] == -1)
             {
-                playersUI[playerIdx].SetActive (false);
-                nicknamesUI[playerIdx].text = string.Empty;
-                playersRawImage[playerIdx].SetActive(false);
-
-                viewPlayerList.Remove(p.Key);
-
-                return;
+                playersUI[i].SetActive(false);
+                nicknamesUI[i].text = string.Empty;
+                playersRawImage[i].SetActive(false);
             }
-            playerIdx++;
-        }
+            else
+            {
+                foreach (KeyValuePair<int, Hashtable> kvp in updatedPlayers)
+                {
+                    if(kvp.Key == viewSeats[i])
+                    {
+                        playersUI[i].SetActive(true);
+                        playersRawImage[i].SetActive(true);
 
+                        SkinnedMeshRenderer sm = playersUI[i].GetComponentInChildren<SkinnedMeshRenderer>();
+
+                        int characterId = (int)kvp.Value["CharacterId"];
+                        string nickname = (string)kvp.Value["Nickname"];
+
+                        sm.material = storage.GetMesh(characterId);
+                        nicknamesUI[i].text = nickname;
+                    }
+                }
+            }
+
+        }
     }
 
 }

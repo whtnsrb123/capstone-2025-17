@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Realtime;
 using System.Collections;
 
 // Controller
@@ -36,9 +35,10 @@ public class RoomUIController : MonoBehaviour
         roomView.j_confirmBtn.onClick.AddListener(() => OnClickJoinConfirmBtn());
 
         // NetworkManager 이벤트 등록 
-        NetworkManager.OnRoomPlayerEntered += RenderPlayers;
-        NetworkManager.OnRoomPlayerLeaved += RemoveRenderedPlayers;
+        NetworkManager.OnRoomPlayerUpdated += UpdatePlayerSeats;
+        NetworkManager.OnRoomSeatsUpdated += UpdatePlayersUI;
         NetworkManager.OnRoomEntered += OnEnteredRoom;
+
     }
 
     // =================== Lobby Buttons =====================
@@ -77,7 +77,7 @@ public class RoomUIController : MonoBehaviour
         roomManager.JoinRoom(code);
     }
 
-    // ================== In Room ===========================
+    // ========================= In Room ===========================
 
     void OnEnteredRoom()
     {
@@ -86,6 +86,9 @@ public class RoomUIController : MonoBehaviour
 
         string roomCode = roomManager.GetRoomCode();
         roomView.roomCode.text = $"Room Code : {roomCode}";
+
+        // MasterClient일 때, 나의 ActorNumber를 스스로 전송한다 
+        roomManager.UpdateEnteredPlayerSeats(roomManager.GetActorNumber());
     }
 
     void OnClickLeaveBtn()
@@ -103,21 +106,37 @@ public class RoomUIController : MonoBehaviour
         roomManager.SendClientInfo(nickname, characterId);
     }
 
-    Dictionary<int, Hashtable> playersInfo = new Dictionary<int, System.Collections.Hashtable>();
-
-    public void RenderPlayers()
+    void UpdatePlayerSeats(int actorNumber, bool isEntered)
     {
-        // RoomManager에게 플레이어 리스트를 요청해서 받아온 뒤,
-        // RoomUI 에게 전달하여 UI를 업데이트 시킨다
-        playersInfo = roomManager.RenderPlayers();
+        // RoomMananger는 현재 룸의 CustomProperties의 "Seats" 정보를 업데이트 한다.
 
-        roomView.RenderPlayerUI(playersInfo);
+        if (isEntered) 
+        {
+            // 입장한 경우
+            roomManager.UpdateEnteredPlayerSeats(actorNumber); // 입장한 플레이어의 actorNumber
+        }
+        else 
+        {
+            // 퇴장한 경우
+            roomManager.UpdateLeftPlayerSeats(actorNumber); // 나간 플레이어의 actorNumber
+        }
+            
     }
 
-    public void RemoveRenderedPlayers(int actorNumber)
+    void GetUpdatedPlayerSeats()
     {
-        // 방을 나간 플레이어 UI에서 삭제하기 
-        roomView.RemovePlayerUI(actorNumber);
+        int[] seats = roomManager.GetUpdatedPlayerSeats();
+        roomView.GetPlayerSeats(seats);
+    }
+
+    public void UpdatePlayersUI()
+    {
+        GetUpdatedPlayerSeats();
+
+        Dictionary<int, Hashtable> playersInfo = roomManager.RenderPlayersUI();
+
+        roomView.UpdatePlayerUI(playersInfo);
+
     }
 
 }
