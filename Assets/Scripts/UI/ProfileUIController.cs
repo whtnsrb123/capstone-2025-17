@@ -27,11 +27,11 @@ public class ProfileUIController : MonoBehaviour
         profileModel.CharacterIdUpdate += profileView.UpdateCharacterUI;
 
         profileView.nicknameTMP.text = profileModel.Nickname;
-        Debug.Log(profileView.nicknameTMP.text);
     }
 
     private void OnDestroy()
     {
+        // Destroy 시 이벤트 해제
         profileView.nicknameBtn.onClick.RemoveListener(OnClickNicknameBtn);
         profileView.nextBtn.onClick.RemoveListener(OnClickNextBtn);
         profileView.prevBtn.onClick.RemoveListener(OnClickPrevBtn);

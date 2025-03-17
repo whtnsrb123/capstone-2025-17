@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Realtime;
+using System.Collections;
 
 // Controller
 public class RoomUIController : MonoBehaviour
@@ -34,15 +34,17 @@ public class RoomUIController : MonoBehaviour
         // join view 이벤트 등록
         roomView.j_confirmBtn.onClick.AddListener(() => OnClickJoinConfirmBtn());
 
-        // Game Lanucher 이벤트 등록 
-        NetworkManager.OnRoomPlayerEntered += RenderPlayers;
-        NetworkManager.OnRoomPlayerLeaved += RemoveRenderedPlayers;
+        // NetworkManager 이벤트 등록 
+        NetworkManager.OnRoomPlayerUpdated += UpdatePlayerSeats;
+        NetworkManager.OnRoomSeatsUpdated += UpdatePlayersUI;
         NetworkManager.OnRoomEntered += OnEnteredRoom;
+
     }
 
     // =================== Lobby Buttons =====================
     void OnClickRandomBtn()
     {
+        // 랜덤 매치 버튼 클릭 시 
         SaveProfileInfo();
 
         roomModel.RoomType = ServerInfo.RoomTypes.Random;
@@ -51,6 +53,7 @@ public class RoomUIController : MonoBehaviour
 
     void OnClickCreateConfirmBtn()
     {
+        // 방 생성 확인 버튼 클릭 시 
         SaveProfileInfo();
 
         string roomCode =$"{Random.Range(10000, 99999)}";
@@ -65,6 +68,7 @@ public class RoomUIController : MonoBehaviour
 
     void OnClickJoinConfirmBtn()
     {
+        // 방 참가하기 버튼 클릭 시 
         SaveProfileInfo();
 
         roomModel.RoomType = ServerInfo.RoomTypes.Join;
@@ -73,7 +77,7 @@ public class RoomUIController : MonoBehaviour
         roomManager.JoinRoom(code);
     }
 
-    // ================== In Room ===========================
+    // ========================= In Room ===========================
 
     void OnEnteredRoom()
     {
@@ -82,6 +86,9 @@ public class RoomUIController : MonoBehaviour
 
         string roomCode = roomManager.GetRoomCode();
         roomView.roomCode.text = $"Room Code : {roomCode}";
+
+        // MasterClient일 때, 나의 ActorNumber를 스스로 전송한다 
+        roomManager.UpdateEnteredPlayerSeats(roomManager.GetActorNumber());
     }
 
     void OnClickLeaveBtn()
@@ -92,25 +99,44 @@ public class RoomUIController : MonoBehaviour
 
     public void SaveProfileInfo()
     {
+        // 룸에 접속 시 클라이언트의 정보를 전송한다
         string nickname = profileModel.Nickname;
         int characterId = profileModel.CharacterId;
 
         roomManager.SendClientInfo(nickname, characterId);
     }
 
-    Dictionary<string, int> playersInfo = new Dictionary<string, int>();
+    void UpdatePlayerSeats(int actorNumber, bool isEntered)
+    {
+        // RoomMananger는 현재 룸의 CustomProperties의 "Seats" 정보를 업데이트 한다.
 
-    public void RenderPlayers()
-    { 
-        playersInfo = roomManager.RenderPlayers();
-
-        roomView.RenderPlayerUI(playersInfo);
+        if (isEntered) 
+        {
+            // 입장한 경우
+            roomManager.UpdateEnteredPlayerSeats(actorNumber); // 입장한 플레이어의 actorNumber
+        }
+        else 
+        {
+            // 퇴장한 경우
+            roomManager.UpdateLeftPlayerSeats(actorNumber); // 나간 플레이어의 actorNumber
+        }
+            
     }
 
-    public void RemoveRenderedPlayers(string nickname)
+    void GetUpdatedPlayerSeats()
     {
+        int[] seats = roomManager.GetUpdatedPlayerSeats();
+        roomView.GetPlayerSeats(seats);
+    }
 
-        roomView.RemovePlayerUI(nickname);
+    public void UpdatePlayersUI()
+    {
+        GetUpdatedPlayerSeats();
+
+        Dictionary<int, Hashtable> playersInfo = roomManager.RenderPlayersUI();
+
+        roomView.UpdatePlayerUI(playersInfo);
+
     }
 
 }

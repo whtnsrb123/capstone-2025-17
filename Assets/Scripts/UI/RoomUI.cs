@@ -13,6 +13,7 @@ public class RoomUI : MonoBehaviour
     // room panel
     public Button leaveBtn;
     public TextMeshProUGUI roomCode;
+
     public GameObject[] playersUI;
     public TextMeshProUGUI[] nicknamesUI;
     public GameObject[] playersRawImage;
@@ -27,54 +28,66 @@ public class RoomUI : MonoBehaviour
     public Button j_confirmBtn;
     public Button j_cancelBtn;
 
+    // 캐릭터 모델의 메시가 저장된 Scriptable Object 변수 
     [SerializeField]
     MaterialStorage storage;
 
-    static Dictionary<string, int> viewPlayerList;
+    SkinnedMeshRenderer[] smRenderers;
+    static Dictionary<int, Hashtable> viewPlayerList;
+    static int[] viewSeats;
 
-    public void RenderPlayerUI(Dictionary<string, int> players)
+    private void Start()
     {
+        SetSkinnedMeshRenderers();
+    }
 
-        viewPlayerList = players;
+    public void GetPlayerSeats(int[] para)
+    {
+        Debug.Log("GetPlayerSeats");
+        viewSeats = para;
+    }
 
-        int playerIdx = 0;
-
-        foreach(KeyValuePair<string, int> kvp in players)
+    void SetSkinnedMeshRenderers()
+    {
+        smRenderers = new SkinnedMeshRenderer[4];
+        for (int i = 0; i < 4; i++)
         {
-            Debug.Log($"{playerIdx} 번째 플레이어의 닉네임 : {kvp.Key}, 아이디 : {kvp.Value}");
-
-            playersUI[playerIdx].SetActive(true);
-            playersRawImage[playerIdx].SetActive(true);
-
-            SkinnedMeshRenderer sm = playersUI[playerIdx].GetComponentInChildren<SkinnedMeshRenderer>();
-
-            sm.material = storage.GetMesh(kvp.Value);
-            nicknamesUI[playerIdx].text = kvp.Key;
-
-            playerIdx++;
+            smRenderers[i] = playersUI[i].GetComponentInChildren<SkinnedMeshRenderer>();
         }
     }
 
-    public void RemovePlayerUI(string nickname)
+
+    public void UpdatePlayerUI(Dictionary<int, Hashtable> updatedPlayers)
     {
-        int playerIdx = 0;
+        viewPlayerList = updatedPlayers;
 
-        foreach (KeyValuePair<string, int> p in viewPlayerList)
+        for (int i = 0; i < viewSeats.Length; i++)
         {
-            Debug.Log($"키 : {p.Key}, 닉네임 : {nickname}이니까, {p.Key == nickname}" );
-            if (p.Key == nickname)
+            if (viewSeats[i] == -1)
             {
-                playersUI[playerIdx].SetActive (false);
-                nicknamesUI[playerIdx].text = string.Empty;
-                playersRawImage[playerIdx].SetActive(false);
-
-                viewPlayerList.Remove(p.Key);
-
-                return;
+                playersUI[i].SetActive(false);
+                nicknamesUI[i].text = string.Empty;
+                playersRawImage[i].SetActive(false);
             }
-            playerIdx++;
-        }
+            else
+            {
+                foreach (KeyValuePair<int, Hashtable> kvp in updatedPlayers)
+                {
+                    if(kvp.Key == viewSeats[i])
+                    {
+                        int characterId = (int)kvp.Value["CharacterId"];
+                        string nickname = (string)kvp.Value["Nickname"];
 
+                        playersUI[i].SetActive(true);
+                        playersRawImage[i].SetActive(true);
+
+                        smRenderers[i].material = storage.GetMesh(characterId);
+                        nicknamesUI[i].text = nickname;
+                    }
+                }
+            }
+
+        }
     }
 
 }
