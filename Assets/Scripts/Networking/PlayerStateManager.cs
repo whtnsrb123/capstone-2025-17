@@ -7,6 +7,7 @@ using UnityEngine;
 
 public class PlayerStateManager : MonoBehaviourPun
 {
+    public static PlayerStateManager Instance { get;  private set;  }
     public enum PlayerState
     {
         //정상
@@ -17,6 +18,19 @@ public class PlayerStateManager : MonoBehaviourPun
     }
     Dictionary<int, PlayerState> playerStates = new Dictionary<int, PlayerState>(); //플레이어 상태를 관리하는 딕셔너리 <playerId, PlayerState>
     Dictionary<int, bool> playerEscaped = new Dictionary<int, bool>();//플레이어 도착지점 도달 여부를 관리하는 딕셔너리 <playerId, bool>
+
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject); // 씬이 변경되어도 유지
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
     
     //플레이어의 상태를 업데이트 (ex.정상 -> 젖음, 젖음 -> 정상)
     public void UpdatePlayerState(int playerId, PlayerState state)
