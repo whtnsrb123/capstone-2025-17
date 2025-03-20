@@ -57,12 +57,10 @@ public class RoomUIController : MonoBehaviour
         SaveProfileInfo();
 
         string roomCode =$"{Random.Range(10000, 99999)}";
-        Debug.Log(roomCode);
-        int _maxPlayer = (int)roomView.maxPlayerCount.value;
 
         roomModel.RoomType = ServerInfo.RoomTypes.Create;
 
-        roomManager.CreateRoom(roomCode, _maxPlayer);
+        roomManager.CreateRoom(roomCode);
     }
 
 

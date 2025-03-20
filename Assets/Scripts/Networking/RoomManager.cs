@@ -10,12 +10,14 @@ public class RoomManager : MonoBehaviour
 {
     public static Dictionary<int, Player> s_players;
 
+    const int RequiredPlayerCount = 4;
+
     // 해시 키
     const string NicknameKey = "Nickname";
     const string CharacterIdKey = "CharacterId";
 
     // 랜덤 매치를 요청한다 
-    public void RandomRoom(int maxPlayer = 4)
+    public void RandomRoom()
     {
         // 방 기본 속성
         Hashtable customProperties = new Hashtable
@@ -25,7 +27,7 @@ public class RoomManager : MonoBehaviour
 
         RoomOptions room = new RoomOptions
         {
-            MaxPlayers = maxPlayer,
+            MaxPlayers = RequiredPlayerCount,
             CustomRoomProperties = customProperties,
             EmptyRoomTtl = 0
         };
@@ -39,7 +41,7 @@ public class RoomManager : MonoBehaviour
     }
 
     // 방 생성을 요청한다 
-    public void CreateRoom(string roomName, int maxPlayer = 4)
+    public void CreateRoom(string roomName)
     {
         Hashtable customProperties = new Hashtable
         {
@@ -48,7 +50,7 @@ public class RoomManager : MonoBehaviour
 
         RoomOptions room = new RoomOptions
         {
-            MaxPlayers = maxPlayer,
+            MaxPlayers = RequiredPlayerCount,
             CustomRoomProperties = customProperties,
             EmptyRoomTtl = 0
         };
