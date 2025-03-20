@@ -15,6 +15,7 @@ public enum ConnectState
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
+
     public static Action OnConnectedToServer; // 마스터 서버에 접속했을 때
     public static Action OnRoomEntered; // 룸에 입장했을 때
     public static Action OnRequestFailed; // 네트워크 요청이 실패했을 때
@@ -24,9 +25,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     // 플레이어의 연결 상태
     static ConnectState sConnectState;
 
-    const string _gameVersion = "1";
-    const bool PlayerEntered = true;
-
+    const string _gameVersion = "1"; 
+    const bool PlayerEntered = true; // 대기방의 플레이어가 입장/퇴장인지 구분하기 위해 매개변수로 쓰일 const 변수
 
     void Start()
     {
@@ -51,83 +51,34 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     }
    
 
-    #region Callbacks
+    #region 네트워크 작업 요청 콜백 함수들
     public override void OnConnectedToMaster()
     {
-        Debug.Log("NetworkManager.cs - On Connected To Master()");
-
         // 마스터 서버 접속 성공 시, 바로 로비 접속 시도
         PhotonNetwork.JoinLobby();
     }
 
-    public override void OnDisconnected(DisconnectCause cause)
-    {
-        Debug.Log("NetworkManager.cs - On Disconnected()");
-
-        // 연결 실패 시, 재접속 시도 
-        int retry = 0,  maxRetry = 5;
-        if (retry < maxRetry)
-        {
-            retry++;
-
-            Debug.Log("NetworkManager.cs - retry connect to master server");
-
-            Invoke(nameof(ConnectToMasterServer), 2f);
-        }
-    }
-
     public override void OnJoinedLobby()
     {
-        Debug.Log("On Joined Lobby()");
-
+        // 로비에 조인 성공
         sConnectState = ConnectState.Lobby;
 
-        // StartSceneUI.cs 에서 등록된 이벤트
+        // StartSceneUI.cs 에서 등록된 이벤트 실행
         OnConnectedToServer?.Invoke();
     }
 
     public override void OnJoinedRoom()
     {
-        // 방에 성공적으로 접속 시, 플레이어 정보를 서버에 전송하기
-        if (PhotonNetwork.IsConnected)
-        {
-            sConnectState = ConnectState.Room;
+        // 룸에 조인 성공
+         sConnectState = ConnectState.Room;
 
-            // 이벤트를 실행한다 
-            OnRoomEntered?.Invoke();
-        }
-        else
-        {
-            // 연결 실패 처리
-        }
+         // 이벤트를 실행한다 
+         OnRoomEntered?.Invoke();
     }
 
     public override void OnLeftRoom()
     {
         Debug.Log("On Left Room()");
-    }
-
-    public override void OnJoinRandomFailed(short returnCode, string message)
-    {
-        // 룸 연결 실패 처리
-    }
-
-    public override void OnJoinRoomFailed(short returnCode, string message)
-    {
-        base.OnJoinRoomFailed(returnCode, message);
-        Debug.Log(returnCode);
-        Debug.Log(message);
-    }
-
-    public override void OnCreatedRoom()
-    {
-        Debug.Log("NetworkManager.cs - On Created Room()");
-        Debug.Log($"NetworkManager.cs - {PhotonNetwork.CurrentRoom.Name}");
-    }
-
-
-    public override void OnCreateRoomFailed(short returnCode, string message)
-    {
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
@@ -150,6 +101,42 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
         Debug.Log("OnRoomPropertiesUpdate");
     }
+
+
+    #endregion
+
+    #region 서버 예외 처리 콜백 함수들
+
+    public override void OnJoinRandomFailed(short returnCode, string message)
+    {
+        base.OnJoinRandomFailed(returnCode, message);
+
+        // 랜덤 매치 예외 처리
+    }
+    public override void OnCreateRoomFailed(short returnCode, string message)
+    {
+        base.OnCreateRoomFailed(returnCode, message);
+
+        // 방 생성 예외 처리
+        NetworkHandler.Instance.SetCreateExceptionPanel(returnCode);
+    }
+
+    public override void OnJoinRoomFailed(short returnCode, string message)
+    {
+        base.OnJoinRoomFailed(returnCode, message);
+
+        // 조인 예외 처리
+        NetworkHandler.Instance.SetJoinExceptionPanel(returnCode);
+
+    }
+
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        NetworkHandler.Instance.SetDisconnectedExceptionPanel((int)cause, sConnectState);
+
+    }
+
+
 
 
     #endregion
