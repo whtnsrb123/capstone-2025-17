@@ -18,9 +18,9 @@ public class ProfileUIController : MonoBehaviour
     private void Start()
     {
         // lobby view 이벤트 등록
-        profileView.nicknameBtn.onClick.AddListener(() => OnClickNicknameBtn());
-        profileView.nextBtn.onClick.AddListener(() => OnClickNextBtn());
-        profileView.prevBtn.onClick.AddListener(() => OnClickPrevBtn());
+        profileView.nicknameBtn.onClick.AddListener(OnClickNicknameBtn);
+        profileView.nextBtn.onClick.AddListener(OnClickNextBtn);
+        profileView.prevBtn.onClick.AddListener(OnClickPrevBtn);
 
         // lobby model 이벤트 등록 
         profileModel.NicknameUpdate += profileView.UpdateNicknameUI;

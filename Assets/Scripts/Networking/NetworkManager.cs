@@ -15,6 +15,7 @@ public enum ConnectState
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
+    public static NetworkManager Instance;
 
     public static Action OnConnectedToServer; // 마스터 서버에 접속했을 때
     public static Action OnRoomEntered; // 룸에 입장했을 때
@@ -27,6 +28,18 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     const string _gameVersion = "1"; 
     const bool PlayerEntered = true; // 대기방의 플레이어가 입장/퇴장인지 구분하기 위해 매개변수로 쓰일 const 변수
+
+    private void Awake()
+    {
+        if(Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     void Start()
     {
@@ -78,6 +91,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnLeftRoom()
     {
+        //sConnectState = ConnectState.Lobby;
         Debug.Log("On Left Room()");
     }
 
@@ -132,13 +146,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnDisconnected(DisconnectCause cause)
     {
+        Debug.Log("On Disconnected");
         NetworkHandler.Instance.SetDisconnectedExceptionPanel((int)cause, sConnectState);
-
     }
-
-
-
-
     #endregion
 
 }

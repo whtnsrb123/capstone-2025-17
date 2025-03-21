@@ -16,11 +16,7 @@ public class StartSceneUI : MonoBehaviour
     void Awake()
     {
         // Master Server 연결 시 실행할 이벤트 등록 
-        NetworkManager.OnConnectedToServer += () =>
-        {
-            connectButton.interactable = true;
-            connectInfoTMP.text = CONNECT_SUCCESS;
-        };
+        NetworkManager.OnConnectedToServer += SetConnectedEvent;
     }
 
     void Start()
@@ -28,6 +24,17 @@ public class StartSceneUI : MonoBehaviour
         FadeUI.Fade?.Invoke(true);
         connectButton.interactable = false;
         connectInfoTMP.text = CONNECT_TRY;
+    }
+
+    private void OnDestroy()
+    {
+        NetworkManager.OnConnectedToServer -= SetConnectedEvent;
+    }
+
+    void SetConnectedEvent()
+    {
+        connectButton.interactable = true;
+        connectInfoTMP.text = CONNECT_SUCCESS;
     }
 
     public void OnClickConnectButton()

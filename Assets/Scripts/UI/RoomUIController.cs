@@ -25,20 +25,28 @@ public class RoomUIController : MonoBehaviour
     private void Start()
     {
         // room view 이벤트 등록
-        roomView.randomBtn.onClick.AddListener(() => OnClickRandomBtn());
-        roomView.leaveBtn.onClick.AddListener(() => OnClickLeaveBtn());
+        roomView.randomBtn.onClick.AddListener(OnClickRandomBtn);
+        roomView.leaveBtn.onClick.AddListener(OnClickLeaveBtn);
 
         // create view 이벤트 등록
-        roomView.c_confirmBtn.onClick.AddListener(() => OnClickCreateConfirmBtn());
+        roomView.c_confirmBtn.onClick.AddListener(OnClickCreateConfirmBtn);
         
         // join view 이벤트 등록
-        roomView.j_confirmBtn.onClick.AddListener(() => OnClickJoinConfirmBtn());
+        roomView.j_confirmBtn.onClick.AddListener(OnClickJoinConfirmBtn);
 
         // NetworkManager 이벤트 등록 
         NetworkManager.OnRoomPlayerUpdated += UpdatePlayerSeats;
         NetworkManager.OnRoomSeatsUpdated += UpdatePlayersUI;
         NetworkManager.OnRoomEntered += OnEnteredRoom;
 
+    }
+
+    private void OnDestroy()
+    {
+        // NetworkManager 이벤트 해제
+        NetworkManager.OnRoomPlayerUpdated -= UpdatePlayerSeats;
+        NetworkManager.OnRoomSeatsUpdated -= UpdatePlayersUI;
+        NetworkManager.OnRoomEntered -= OnEnteredRoom;
     }
 
     // =================== Lobby Buttons =====================

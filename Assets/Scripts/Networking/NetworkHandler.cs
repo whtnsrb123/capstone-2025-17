@@ -3,6 +3,7 @@ using Photon.Realtime;
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class NetworkHandler : MonoBehaviour
@@ -51,7 +52,18 @@ public class NetworkHandler : MonoBehaviour
                 errorText = "Server is BoorAnJeong, Try Later~";
                 break;
         }
-        OnDisconnect = BackToStartScene;
+
+
+        if (state == ConnectState.Room || state == ConnectState.InGame)
+        {
+            // 대기방 혹은 인게임에서 Disconnected -> Rejoin 시도
+            OnDisconnect = ReconnectAndRejoin;
+        }
+        else
+        {
+            // 그 외 모든 곳에서 Disconnected -> StartScene으로 돌아가서 재접속
+            OnDisconnect = BackToStartScene;
+        }
         ShowExceptionPanel("====You Can't Create====", errorText, OnDisconnect);
     }
 
@@ -136,15 +148,22 @@ public class NetworkHandler : MonoBehaviour
         Button confirmButton = currentErrorPanel.GetComponentInChildren<Button>();
         // 확인 버튼 클릭 시, 실행할 함수 추가
         confirmButton.onClick.AddListener(() =>  ActivePanelUI.Inactive(currentErrorPanel) );
-        if (action != null ) {  confirmButton.onClick.AddListener(() => action());   }
+        
         // 예외 패널을 잘 사용되지 않으므로, 사용 후 바로 삭제하기
         confirmButton.onClick.AddListener( () => Destroy( currentErrorPanel ) );
+        
+        if (action != null) { confirmButton.onClick.AddListener(() => action()); }
     }
 
     // 네트워크 재연결이 필요한 경우, 첫 화면에서 재접속 시도 
     void BackToStartScene()
     {
         PhotonNetwork.LoadLevel("StartScene");
+    }
+
+    void ReconnectAndRejoin()
+    {
+        PhotonNetwork.ReconnectAndRejoin();
     }
 
 
