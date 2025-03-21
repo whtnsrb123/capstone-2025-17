@@ -74,13 +74,16 @@ public class RoomUIController : MonoBehaviour
 
     void OnClickJoinConfirmBtn()
     {
-        // 방 참가하기 버튼 클릭 시 
-        SaveProfileInfo();
-
-        roomModel.RoomType = ServerInfo.RoomTypes.Join;
         string code = roomView.roomCodeTMPInp.text;
+        // 참여 코드가 공백이 아니어야 한다
+        if (!string.IsNullOrWhiteSpace(code))
+        {
+            // 방 참가하기 버튼 클릭 시 
+            SaveProfileInfo();
 
-        roomManager.JoinRoom(code);
+            roomModel.RoomType = ServerInfo.RoomTypes.Join;
+            roomManager.JoinRoom(code);
+        }
     }
 
     // ========================= In Room ===========================
