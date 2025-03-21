@@ -14,12 +14,18 @@ public class CharacterController : MonoBehaviour
     private Transform cameraTransform;      // 메인 카메라의 Transform
     private rotateToMouse rotateToMouse;    // 마우스 입력 캐릭터 회전
 
+    private float originalMoveSpeed; // 원래 이동 속도
+    private float originalSprintSpeed; // 원래 달리기 속도
+    private bool isAffectedByWind = false; // 바람의 영향을 받는지 여부
+    private Vector3 currentWindDirection; // 현재 바람 방향
+    private float currentWindForce; // 현재 바람 세기
+
     private void Awake()
     {
-        Cursor.lockState = CursorLockMode.Locked; // 게임 시작 시 마우스 커서를 화면 중앙에 고정 
+        Cursor.lockState = CursorLockMode.Locked; // 마우스 커서 고정 
         Cursor.visible = false; // 마우스 커서를 숨김
 
-        // 마우스 회전 관련 컴포넌트 가져오기
+        // 마우스 컨트롤 
         rotateToMouse = GetComponent<rotateToMouse>();
     }
 
@@ -27,75 +33,69 @@ public class CharacterController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true; // 캐릭터 회전이 물리적으로 영향을 받지 않도록 설정
-        cameraTransform = Camera.main.transform; // 메인 카메라의 Transform 가져오기
+        cameraTransform = Camera.main.transform;
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous; // 충돌 감지 모드 설정
+        originalMoveSpeed = moveSpeed;
+        originalSprintSpeed = sprintSpeed;
     }
 
     void Update()
     {
-        MoveCharacter();  // 캐릭터 이동
-        UpdateRotate();   // 마우스 입력 캐릭터 회전
+        MoveCharacter();  // 이동
+        UpdateRotate();   // 캐릭터 회전
         HandleJump();     // 점프
         CheckGrounded();  // 땅에 닿아 있는지 감지
     }
 
-    
-    void MoveCharacter()// 캐릭터 이동
+    void MoveCharacter()
     {
-        float horizontal = Input.GetAxis("Horizontal"); // A, D 좌우 입력 값
-        float vertical = Input.GetAxis("Vertical");     // W, S 상하 입력 값
-
-        // 달리기
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
         float currentSpeed = Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : moveSpeed;
-
-        // 이동 방향 계산
         Vector3 moveDirection = (transform.forward * vertical + transform.right * horizontal).normalized;
-        moveDirection.y = 0f; // 수직 이동 제거 (땅에 붙어 있도록 유지)
+        moveDirection.y = 0f;
 
-        // 목표 속도 계산
         Vector3 targetVelocity = moveDirection * currentSpeed;
         Vector3 currentVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
 
-        // 이동 입력이 없으면 즉시 속도를 0으로 설정
         if (Mathf.Approximately(horizontal, 0f) && Mathf.Approximately(vertical, 0f))
         {
-            rb.velocity = new Vector3(0, rb.velocity.y, 0); // Y 속도 유지 (중력/점프 영향)
+            rb.velocity = new Vector3(0, rb.velocity.y, 0);
         }
         else
         {
-            // 가속도를 적용하여 목표 속도까지 부드럽게 변경
             Vector3 newVelocity = Vector3.Lerp(currentVelocity, targetVelocity, acceleration * Time.deltaTime);
             rb.velocity = new Vector3(newVelocity.x, rb.velocity.y, newVelocity.z);
         }
-    }
 
-    // 마우스 입력을 받아 캐릭터 회전 처리
-    void UpdateRotate()
-    {
-        float mouseX = Input.GetAxis("Mouse X"); // 마우스 좌우 이동 입력
-        float mouseY = Input.GetAxis("Mouse Y"); // 마우스 상하 이동 입력
-        rotateToMouse.UpdateRotate(mouseX, mouseY); // 회전 적용
-    }
-
-    // 점프 처리
-    void HandleJump()
-    {
-        // 스페이스바를 누르고 땅에 닿아 있을 때 점프
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        if (isAffectedByWind)
         {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse); // 위쪽 방향으로 힘을 가해 점프
-            isGrounded = false; // 점프 후 공중 상태로 변경
+            rb.AddForce(currentWindDirection.normalized * currentWindForce, ForceMode.Force);
         }
     }
 
-    // 땅에 닿아 있는지 감지
+    void UpdateRotate()
+    {
+        float mouseX = Input.GetAxis("Mouse X");
+        float mouseY = Input.GetAxis("Mouse Y");
+        rotateToMouse.UpdateRotate(mouseX, mouseY);
+    }
+
+    void HandleJump()
+    {
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        {
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            isGrounded = false;
+        }
+    }
+
     void CheckGrounded()
     {
-        Vector3 rayOrigin = transform.position + Vector3.up * 0.1f; // 캐릭터 위치에서 살짝 위쪽에서 Ray 시작
-        Ray ray = new Ray(rayOrigin, Vector3.down); // 아래 방향으로 Ray 발사
+        Vector3 rayOrigin = transform.position + Vector3.up * 0.1f;
+        Ray ray = new Ray(rayOrigin, Vector3.down);
         RaycastHit hit;
 
-        // Ray가 groundCheckDistance 범위 내에서 충돌하면 땅에 있는 것으로 판단
         if (Physics.Raycast(ray, out hit, groundCheckDistance))
         {
             isGrounded = true;
@@ -106,11 +106,54 @@ public class CharacterController : MonoBehaviour
         }
     }
 
-    // 에디터에서 땅 감지 Ray 시각적으로 표시
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
         Vector3 rayOrigin = transform.position + Vector3.up * 0.1f;
         Gizmos.DrawLine(rayOrigin, rayOrigin + Vector3.down * groundCheckDistance);
+    }
+
+    public void ApplyWindEffect(Vector3 windDirection, float windForce)
+    {
+        // 플레이어의 현재 이동 방향
+        Vector3 playerDirection = rb.velocity.normalized;
+
+        // 바람 방향과 플레이어 방향의 각도 계산
+        float angle = Vector3.Angle(playerDirection, windDirection);
+
+        // 각도에 따른 힘의 크기 조절
+        float forceMagnitude = windForce * Mathf.Cos(angle * Mathf.Deg2Rad);
+
+        // 바람 방향으로 힘 적용
+        rb.AddForce(windDirection.normalized * forceMagnitude, ForceMode.Force);
+
+        Debug.Log("바람에 맞았다");
+    }
+
+    public void RemoveWindEffect()
+    {
+        isAffectedByWind = false;
+        currentWindDirection = Vector3.zero;
+        currentWindForce = 0f;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("WindArea"))
+        {
+            WindController windController = other.GetComponent<WindController>();
+            if (windController != null)
+            {
+                ApplyWindEffect(windController.windDirection, windController.windForce);
+            }
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("WindArea"))
+        {
+            RemoveWindEffect();
+        }
     }
 }
