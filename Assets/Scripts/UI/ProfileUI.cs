@@ -28,6 +28,7 @@ public class ProfileUI : MonoBehaviour
 
     public TMP_InputField nicknameInp;
     public TextMeshProUGUI nicknameTMP;
+    public TextMeshProUGUI nicknameGuideTMP;
 
     private void Awake()
     {

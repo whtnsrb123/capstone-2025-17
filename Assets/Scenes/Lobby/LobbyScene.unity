@@ -8330,7 +8330,6 @@ GameObject:
   - component: {fileID: 1088450583}
   - component: {fileID: 1088450585}
   - component: {fileID: 1088450584}
-  - component: {fileID: 1088450586}
   m_Layer: 5
   m_Name: Create Room Panel
   m_TagString: Untagged
@@ -8398,21 +8397,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1088450582}
   m_CullTransparentMesh: 1
---- !u!114 &1088450586
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1088450582}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 71ef6a122bbd6094084a0a0a0c9f0413, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  roomPlayerCount: {fileID: 0}
-  CancelBtn: {fileID: 1557565626}
-  ConfirmBtn: {fileID: 913488364}
 --- !u!1 &1089859838
 GameObject:
   m_ObjectHideFlags: 0
@@ -14432,6 +14416,7 @@ MonoBehaviour:
   prevBtn: {fileID: 1547896113}
   nicknameInp: {fileID: 1920151495}
   nicknameTMP: {fileID: 1664985356}
+  nicknameGuideTMP: {fileID: 985303246}
 --- !u!114 &1973008135
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14476,7 +14461,6 @@ MonoBehaviour:
   - {fileID: 2101840464}
   - {fileID: 56184740}
   - {fileID: 407082514}
-  maxPlayerCount: {fileID: 0}
   c_confirmBtn: {fileID: 913488364}
   c_cancelBtn: {fileID: 1557565626}
   roomCodeTMPInp: {fileID: 1843567211}

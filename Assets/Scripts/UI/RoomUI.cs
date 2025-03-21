@@ -19,7 +19,6 @@ public class RoomUI : MonoBehaviour
     public GameObject[] playersRawImage;
 
     // create panel
-    public Slider maxPlayerCount;
     public Button c_confirmBtn;
     public Button c_cancelBtn;
 
