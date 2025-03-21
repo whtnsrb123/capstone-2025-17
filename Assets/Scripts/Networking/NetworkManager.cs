@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
@@ -17,17 +17,17 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 {
     public static NetworkManager Instance;
 
-    public static Action OnConnectedToServer; // ¸¶½ºÅÍ ¼­¹ö¿¡ Á¢¼ÓÇßÀ» ¶§
-    public static Action OnRoomEntered; // ·ë¿¡ ÀÔÀåÇßÀ» ¶§
-    public static Action OnRequestFailed; // ³×Æ®¿öÅ© ¿äÃ»ÀÌ ½ÇÆĞÇßÀ» ¶§
-    public static Action OnRoomSeatsUpdated; // Seats Á¤º¸°¡ °»½ÅµÉ ¶§ 
-    public static Action<int, bool> OnRoomPlayerUpdated; // ·ë ÇÃ·¹ÀÌ¾î ¸®½ºÆ®°¡ º¯µ¿µÆÀ» ¶§
+    public static Action OnConnectedToServer; // ë§ˆìŠ¤í„° ì„œë²„ì— ì ‘ì†í–ˆì„ ë•Œ
+    public static Action OnRoomEntered; // ë£¸ì— ì…ì¥í–ˆì„ ë•Œ
+    public static Action OnRequestFailed; // ë„¤íŠ¸ì›Œí¬ ìš”ì²­ì´ ì‹¤íŒ¨í–ˆì„ ë•Œ
+    public static Action OnRoomSeatsUpdated; // Seats ì •ë³´ê°€ ê°±ì‹ ë  ë•Œ 
+    public static Action<int, bool> OnRoomPlayerUpdated; // ë£¸ í”Œë ˆì´ì–´ ë¦¬ìŠ¤íŠ¸ê°€ ë³€ë™ëì„ ë•Œ
 
-    // ÇÃ·¹ÀÌ¾îÀÇ ¿¬°á »óÅÂ
+    // í”Œë ˆì´ì–´ì˜ ì—°ê²° ìƒíƒœ
     static ConnectState sConnectState;
 
     const string _gameVersion = "1"; 
-    const bool PlayerEntered = true; // ´ë±â¹æÀÇ ÇÃ·¹ÀÌ¾î°¡ ÀÔÀå/ÅğÀåÀÎÁö ±¸ºĞÇÏ±â À§ÇØ ¸Å°³º¯¼ö·Î ¾²ÀÏ const º¯¼ö
+    const bool PlayerEntered = true; // ëŒ€ê¸°ë°©ì˜ í”Œë ˆì´ì–´ê°€ ì…ì¥/í‡´ì¥ì¸ì§€ êµ¬ë¶„í•˜ê¸° ìœ„í•´ ë§¤ê°œë³€ìˆ˜ë¡œ ì“°ì¼ const ë³€ìˆ˜
 
     private void Awake()
     {
@@ -54,38 +54,38 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         if (!PhotonNetwork.IsConnected)
         {
-            // ¾À µ¿±âÈ­
+            // ì”¬ ë™ê¸°í™”
             PhotonNetwork.AutomaticallySyncScene = true;
             PhotonNetwork.GameVersion = _gameVersion;
 
-            // Á¢¼Ó ½Ãµµ
+            // ì ‘ì† ì‹œë„
             PhotonNetwork.ConnectUsingSettings();
         }
     }
    
 
-    #region ³×Æ®¿öÅ© ÀÛ¾÷ ¿äÃ» Äİ¹é ÇÔ¼öµé
+    #region ë„¤íŠ¸ì›Œí¬ ì‘ì—… ìš”ì²­ ì½œë°± í•¨ìˆ˜ë“¤
     public override void OnConnectedToMaster()
     {
-        // ¸¶½ºÅÍ ¼­¹ö Á¢¼Ó ¼º°ø ½Ã, ¹Ù·Î ·Îºñ Á¢¼Ó ½Ãµµ
+        // ë§ˆìŠ¤í„° ì„œë²„ ì ‘ì† ì„±ê³µ ì‹œ, ë°”ë¡œ ë¡œë¹„ ì ‘ì† ì‹œë„
         PhotonNetwork.JoinLobby();
     }
 
     public override void OnJoinedLobby()
     {
-        // ·Îºñ¿¡ Á¶ÀÎ ¼º°ø
+        // ë¡œë¹„ì— ì¡°ì¸ ì„±ê³µ
         sConnectState = ConnectState.Lobby;
 
-        // StartSceneUI.cs ¿¡¼­ µî·ÏµÈ ÀÌº¥Æ® ½ÇÇà
+        // StartSceneUI.cs ì—ì„œ ë“±ë¡ëœ ì´ë²¤íŠ¸ ì‹¤í–‰
         OnConnectedToServer?.Invoke();
     }
 
     public override void OnJoinedRoom()
     {
-        // ·ë¿¡ Á¶ÀÎ ¼º°ø
+        // ë£¸ì— ì¡°ì¸ ì„±ê³µ
          sConnectState = ConnectState.Room;
 
-         // ÀÌº¥Æ®¸¦ ½ÇÇàÇÑ´Ù 
+         // ì´ë²¤íŠ¸ë¥¼ ì‹¤í–‰í•œë‹¤ 
          OnRoomEntered?.Invoke();
     }
 
@@ -97,13 +97,13 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
-        // ´Ù¸¥ ÇÃ·¹ÀÌ¾î°¡ ¹æ¿¡ ÀÔÀåÇÑ °æ¿ì
+        // ë‹¤ë¥¸ í”Œë ˆì´ì–´ê°€ ë°©ì— ì…ì¥í•œ ê²½ìš°
         OnRoomPlayerUpdated?.Invoke(newPlayer.ActorNumber, PlayerEntered);
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
-        // ´Ù¸¥ ÇÃ·¹ÀÌ¾î°¡ ¹æÀ» ³ª°£ °æ¿ì 
+        // ë‹¤ë¥¸ í”Œë ˆì´ì–´ê°€ ë°©ì„ ë‚˜ê°„ ê²½ìš° 
         OnRoomPlayerUpdated?.Invoke(otherPlayer.ActorNumber, !PlayerEntered);
     }
 
@@ -119,19 +119,19 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     #endregion
 
-    #region ¼­¹ö ¿¹¿Ü Ã³¸® Äİ¹é ÇÔ¼öµé
+    #region ì„œë²„ ì˜ˆì™¸ ì²˜ë¦¬ ì½œë°± í•¨ìˆ˜ë“¤
 
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
         base.OnJoinRandomFailed(returnCode, message);
 
-        // ·£´ı ¸ÅÄ¡ ¿¹¿Ü Ã³¸®
+        // ëœë¤ ë§¤ì¹˜ ì˜ˆì™¸ ì²˜ë¦¬
     }
     public override void OnCreateRoomFailed(short returnCode, string message)
     {
         base.OnCreateRoomFailed(returnCode, message);
 
-        // ¹æ »ı¼º ¿¹¿Ü Ã³¸®
+        // ë°© ìƒì„± ì˜ˆì™¸ ì²˜ë¦¬
         NetworkHandler.Instance.SetCreateExceptionPanel(returnCode);
     }
 
@@ -139,7 +139,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         base.OnJoinRoomFailed(returnCode, message);
 
-        // Á¶ÀÎ ¿¹¿Ü Ã³¸®
+        // ì¡°ì¸ ì˜ˆì™¸ ì²˜ë¦¬
         NetworkHandler.Instance.SetJoinExceptionPanel(returnCode);
 
     }

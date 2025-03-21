@@ -1,4 +1,4 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 
 public class ProfileUIController : MonoBehaviour
 {    
@@ -17,12 +17,12 @@ public class ProfileUIController : MonoBehaviour
 
     private void Start()
     {
-        // lobby view ¿Ã∫•∆Æ µÓ∑œ
+        // lobby view Ïù¥Î≤§Ìä∏ Îì±Î°ù
         profileView.nicknameBtn.onClick.AddListener(OnClickNicknameBtn);
         profileView.nextBtn.onClick.AddListener(OnClickNextBtn);
         profileView.prevBtn.onClick.AddListener(OnClickPrevBtn);
 
-        // lobby model ¿Ã∫•∆Æ µÓ∑œ 
+        // lobby model Ïù¥Î≤§Ìä∏ Îì±Î°ù 
         profileModel.NicknameUpdate += profileView.UpdateNicknameUI;
         profileModel.CharacterIdUpdate += profileView.UpdateCharacterUI;
 
@@ -31,7 +31,7 @@ public class ProfileUIController : MonoBehaviour
 
     private void OnDestroy()
     {
-        // Destroy Ω√ ¿Ã∫•∆Æ «ÿ¡¶
+        // Destroy Ïãú Ïù¥Î≤§Ìä∏ Ìï¥Ï†ú
         profileView.nicknameBtn.onClick.RemoveListener(OnClickNicknameBtn);
         profileView.nextBtn.onClick.RemoveListener(OnClickNextBtn);
         profileView.prevBtn.onClick.RemoveListener(OnClickPrevBtn);
@@ -42,7 +42,7 @@ public class ProfileUIController : MonoBehaviour
 
     void OnClickNicknameBtn()
     {
-        // ¥–≥◊¿” ¿Ø»øº∫ ∞ÀªÁ 
+        // ÎãâÎÑ§ÏûÑ Ïú†Ìö®ÏÑ± Í≤ÄÏÇ¨ 
         updatedNickname = profileView.nicknameInp.text;
 
         Debug.Log(updatedNickname);
@@ -50,7 +50,7 @@ public class ProfileUIController : MonoBehaviour
         if (updatedNickname.Trim() == null)
         {
             profileView.nicknameTMP.text = "blank";
-            Debug.Log("¥–≥◊¿” ∞¯πÈ ªÛ≈¬");
+            Debug.Log("ÎãâÎÑ§ÏûÑ Í≥µÎ∞± ÏÉÅÌÉú");
         }
 
         profileModel.Nickname = updatedNickname;

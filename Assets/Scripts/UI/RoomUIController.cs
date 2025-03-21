@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
 
@@ -24,17 +24,17 @@ public class RoomUIController : MonoBehaviour
 
     private void Start()
     {
-        // room view ÀÌº¥Æ® µî·Ï
+        // room view ì´ë²¤íŠ¸ ë“±ë¡
         roomView.randomBtn.onClick.AddListener(OnClickRandomBtn);
         roomView.leaveBtn.onClick.AddListener(OnClickLeaveBtn);
 
-        // create view ÀÌº¥Æ® µî·Ï
+        // create view ì´ë²¤íŠ¸ ë“±ë¡
         roomView.c_confirmBtn.onClick.AddListener(OnClickCreateConfirmBtn);
         
-        // join view ÀÌº¥Æ® µî·Ï
+        // join view ì´ë²¤íŠ¸ ë“±ë¡
         roomView.j_confirmBtn.onClick.AddListener(OnClickJoinConfirmBtn);
 
-        // NetworkManager ÀÌº¥Æ® µî·Ï 
+        // NetworkManager ì´ë²¤íŠ¸ ë“±ë¡ 
         NetworkManager.OnRoomPlayerUpdated += UpdatePlayerSeats;
         NetworkManager.OnRoomSeatsUpdated += UpdatePlayersUI;
         NetworkManager.OnRoomEntered += OnEnteredRoom;
@@ -43,7 +43,7 @@ public class RoomUIController : MonoBehaviour
 
     private void OnDestroy()
     {
-        // NetworkManager ÀÌº¥Æ® ÇØÁ¦
+        // NetworkManager ì´ë²¤íŠ¸ í•´ì œ
         NetworkManager.OnRoomPlayerUpdated -= UpdatePlayerSeats;
         NetworkManager.OnRoomSeatsUpdated -= UpdatePlayersUI;
         NetworkManager.OnRoomEntered -= OnEnteredRoom;
@@ -52,7 +52,7 @@ public class RoomUIController : MonoBehaviour
     // =================== Lobby Buttons =====================
     void OnClickRandomBtn()
     {
-        // ·£´ı ¸ÅÄ¡ ¹öÆ° Å¬¸¯ ½Ã 
+        // ëœë¤ ë§¤ì¹˜ ë²„íŠ¼ í´ë¦­ ì‹œ 
         SaveProfileInfo();
 
         roomModel.RoomType = ServerInfo.RoomTypes.Random;
@@ -61,7 +61,7 @@ public class RoomUIController : MonoBehaviour
 
     void OnClickCreateConfirmBtn()
     {
-        // ¹æ »ı¼º È®ÀÎ ¹öÆ° Å¬¸¯ ½Ã 
+        // ë°© ìƒì„± í™•ì¸ ë²„íŠ¼ í´ë¦­ ì‹œ 
         SaveProfileInfo();
 
         string roomCode =$"{Random.Range(10000, 99999)}";
@@ -74,7 +74,7 @@ public class RoomUIController : MonoBehaviour
 
     void OnClickJoinConfirmBtn()
     {
-        // ¹æ Âü°¡ÇÏ±â ¹öÆ° Å¬¸¯ ½Ã 
+        // ë°© ì°¸ê°€í•˜ê¸° ë²„íŠ¼ í´ë¦­ ì‹œ 
         SaveProfileInfo();
 
         roomModel.RoomType = ServerInfo.RoomTypes.Join;
@@ -87,25 +87,25 @@ public class RoomUIController : MonoBehaviour
 
     void OnEnteredRoom()
     {
-        // ·ë Á¢¼Ó ¼º°ø ½Ã ¸Ş¼Òµå È£Ãâ
+        // ë£¸ ì ‘ì† ì„±ê³µ ì‹œ ë©”ì†Œë“œ í˜¸ì¶œ
         roomPanel.SetActive(true);
 
         string roomCode = roomManager.GetRoomCode();
         roomView.roomCode.text = $"Room Code : {roomCode}";
 
-        // MasterClientÀÏ ¶§, ³ªÀÇ ActorNumber¸¦ ½º½º·Î Àü¼ÛÇÑ´Ù 
+        // MasterClientì¼ ë•Œ, ë‚˜ì˜ ActorNumberë¥¼ ìŠ¤ìŠ¤ë¡œ ì „ì†¡í•œë‹¤ 
         roomManager.UpdateEnteredPlayerSeats(roomManager.GetActorNumber());
     }
 
     void OnClickLeaveBtn()
     {
-        // ·ë ³ª°¡±â
+        // ë£¸ ë‚˜ê°€ê¸°
         roomManager.LeaveRoom();
     }
 
     public void SaveProfileInfo()
     {
-        // ·ë¿¡ Á¢¼Ó ½Ã Å¬¶óÀÌ¾ğÆ®ÀÇ Á¤º¸¸¦ Àü¼ÛÇÑ´Ù
+        // ë£¸ì— ì ‘ì† ì‹œ í´ë¼ì´ì–¸íŠ¸ì˜ ì •ë³´ë¥¼ ì „ì†¡í•œë‹¤
         string nickname = profileModel.Nickname;
         int characterId = profileModel.CharacterId;
 
@@ -114,17 +114,17 @@ public class RoomUIController : MonoBehaviour
 
     void UpdatePlayerSeats(int actorNumber, bool isEntered)
     {
-        // RoomMananger´Â ÇöÀç ·ëÀÇ CustomPropertiesÀÇ "Seats" Á¤º¸¸¦ ¾÷µ¥ÀÌÆ® ÇÑ´Ù.
+        // RoomManangerëŠ” í˜„ì¬ ë£¸ì˜ CustomPropertiesì˜ "Seats" ì •ë³´ë¥¼ ì—…ë°ì´íŠ¸ í•œë‹¤.
 
         if (isEntered) 
         {
-            // ÀÔÀåÇÑ °æ¿ì
-            roomManager.UpdateEnteredPlayerSeats(actorNumber); // ÀÔÀåÇÑ ÇÃ·¹ÀÌ¾îÀÇ actorNumber
+            // ì…ì¥í•œ ê²½ìš°
+            roomManager.UpdateEnteredPlayerSeats(actorNumber); // ì…ì¥í•œ í”Œë ˆì´ì–´ì˜ actorNumber
         }
         else 
         {
-            // ÅğÀåÇÑ °æ¿ì
-            roomManager.UpdateLeftPlayerSeats(actorNumber); // ³ª°£ ÇÃ·¹ÀÌ¾îÀÇ actorNumber
+            // í‡´ì¥í•œ ê²½ìš°
+            roomManager.UpdateLeftPlayerSeats(actorNumber); // ë‚˜ê°„ í”Œë ˆì´ì–´ì˜ actorNumber
         }
             
     }

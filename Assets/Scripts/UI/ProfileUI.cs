@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEditor;
@@ -15,12 +15,12 @@ public class ProfileUI : MonoBehaviour
 
     SkinnedMeshRenderer sm_renderer;
 
-    // ¸ÅÄ¡¸ŞÀÌÅ· ¹öÆ°
+    // ë§¤ì¹˜ë©”ì´í‚¹ ë²„íŠ¼
     public Button randomBtn;
     public Button createBtn;
     public Button joinBtn;
 
-    // ÇÁ·ÎÇÊ °ü·Ã ¹öÆ°
+    // í”„ë¡œí•„ ê´€ë ¨ ë²„íŠ¼
     public Button optionBtn;
     public Button nicknameBtn;
     public Button nextBtn;
@@ -34,7 +34,7 @@ public class ProfileUI : MonoBehaviour
         sm_renderer = characterRender.GetComponent<SkinnedMeshRenderer>();
     }
 
-    // M º¯°æ -> V ¾÷µ¥ÀÌÆ®
+    // M ë³€ê²½ -> V ì—…ë°ì´íŠ¸
     public void UpdateCharacterUI(int characterId)
     {
         sm_renderer.material = materials.GetMesh(characterId);

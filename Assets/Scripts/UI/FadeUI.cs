@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -24,7 +24,7 @@ public class FadeUI : MonoBehaviour
 
     void OnDestroy()
     {
-        // static º¯¼ö¿¡ µî·ÏÇÑ ¸Ş¼ÒµåÀÇ °´Ã¼°¡ Destroy µÉ °æ¿ì ¹İµå½Ã »èÁ¦ 
+        // static ë³€ìˆ˜ì— ë“±ë¡í•œ ë©”ì†Œë“œì˜ ê°ì²´ê°€ Destroy ë  ê²½ìš° ë°˜ë“œì‹œ ì‚­ì œ 
         Fade -= FadeInOut;
     }
 

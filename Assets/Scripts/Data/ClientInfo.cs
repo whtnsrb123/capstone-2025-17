@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using UnityEngine;
 
 public class ClientInfo : MonoBehaviour
@@ -6,7 +6,7 @@ public class ClientInfo : MonoBehaviour
     string nickname;
     int characterId;
 
-    // ProfileUIController ¿¡¼­ ÀÌº¥Æ®¸¦ µî·ÏÇÏ¿©, µ¥ÀÌÅÍ º¯°æ ½Ã UI°¡ ¾÷µ¥ÀÌÆ® µÇ°Ô ÇÑ´Ù
+    // ProfileUIController ì—ì„œ ì´ë²¤íŠ¸ë¥¼ ë“±ë¡í•˜ì—¬, ë°ì´í„° ë³€ê²½ ì‹œ UIê°€ ì—…ë°ì´íŠ¸ ë˜ê²Œ í•œë‹¤
     public Action<string> NicknameUpdate;
     public  Action<int> CharacterIdUpdate;
 
@@ -41,7 +41,7 @@ public class ClientInfo : MonoBehaviour
 
     string DefaultNickname()
     {
-        // ´Ğ³×ÀÓ ¼³Á¤ Àü, ±âº» ´Ğ³×ÀÓÀ» »ı¼ºÇÑ´Ù 
+        // ë‹‰ë„¤ì„ ì„¤ì • ì „, ê¸°ë³¸ ë‹‰ë„¤ì„ì„ ìƒì„±í•œë‹¤ 
         string defaultNickname = $"USER_{UnityEngine.Random.Range(1000, 9999)}";
         return defaultNickname;
     }

@@ -1,4 +1,4 @@
-using Photon.Pun;
+ï»¿using Photon.Pun;
 using Photon.Realtime;
 using System;
 using TMPro;
@@ -10,26 +10,26 @@ public class NetworkHandler : MonoBehaviour
 {
     public static NetworkHandler Instance;
 
-    // ===== ¿¡·¯ ÆĞ³Î UI ¿ÀºêÁ§Æ® º¯¼ö =====
-    GameObject errorPanelPrefab; // ¿¡·¯ ÆĞ³Î ÇÁ¸®ÆÕ
-    GameObject currentErrorPanel = null; // ¾À¿¡ Á¸ÀçÇÏ´Â ÆĞ³Î
-    TextMeshProUGUI errorTypeTMP; // ¿¡·¯ ¸Ş½ÃÁö À¯Çü
-    TextMeshProUGUI errorMessageTMP; // ¿¡·¯ ¸Ş½ÃÁö ³»¿ë
-    Button confirmButton; // È®ÀÎ ¹öÆ°
+    // ===== ì—ëŸ¬ íŒ¨ë„ UI ì˜¤ë¸Œì íŠ¸ ë³€ìˆ˜ =====
+    GameObject errorPanelPrefab; // ì—ëŸ¬ íŒ¨ë„ í”„ë¦¬íŒ¹
+    GameObject currentErrorPanel = null; // ì”¬ì— ì¡´ì¬í•˜ëŠ” íŒ¨ë„
+    TextMeshProUGUI errorTypeTMP; // ì—ëŸ¬ ë©”ì‹œì§€ ìœ í˜•
+    TextMeshProUGUI errorMessageTMP; // ì—ëŸ¬ ë©”ì‹œì§€ ë‚´ìš©
+    Button confirmButton; // í™•ì¸ ë²„íŠ¼
 
     string errorText = "ERROR";
 
     private void Awake()
     {
         {
-            // Å×½ºÆ®¿ë~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // í…ŒìŠ¤íŠ¸ìš©~~~~~~~~~~~~~~~~~~~~~~~~~~~
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
         errorPanelPrefab = Resources.Load<GameObject>("Prefabs/UI/ErrorPanel");
     }
 
-    // Á¢¼ÓÀÌ ²÷°åÀ» ¶§ ¿¹¿Ü Ã³¸® 
+    // ì ‘ì†ì´ ëŠê²¼ì„ ë•Œ ì˜ˆì™¸ ì²˜ë¦¬ 
    public  void SetDisconnectedExceptionPanel(int code, ConnectState state)
     {
         Action OnDisconnect = null;
@@ -56,24 +56,24 @@ public class NetworkHandler : MonoBehaviour
 
         if (state == ConnectState.Room || state == ConnectState.InGame)
         {
-            // ´ë±â¹æ È¤Àº ÀÎ°ÔÀÓ¿¡¼­ Disconnected -> Rejoin ½Ãµµ
+            // ëŒ€ê¸°ë°© í˜¹ì€ ì¸ê²Œì„ì—ì„œ Disconnected -> Rejoin ì‹œë„
             OnDisconnect = ReconnectAndRejoin;
         }
         else
         {
-            // ±× ¿Ü ¸ğµç °÷¿¡¼­ Disconnected -> StartSceneÀ¸·Î µ¹¾Æ°¡¼­ ÀçÁ¢¼Ó
+            // ê·¸ ì™¸ ëª¨ë“  ê³³ì—ì„œ Disconnected -> StartSceneìœ¼ë¡œ ëŒì•„ê°€ì„œ ì¬ì ‘ì†
             OnDisconnect = BackToStartScene;
         }
         ShowExceptionPanel("====You Can't Create====", errorText, OnDisconnect);
     }
 
-    // ¹æ »ı¼º ½Ã, ¿¹¿Ü Ã³¸® 
+    // ë°© ìƒì„± ì‹œ, ì˜ˆì™¸ ì²˜ë¦¬ 
     public void SetCreateExceptionPanel(int code)
     {
         Action OnCreateFailed = null;
         switch (code)
         {
-            // ÀçÁ¢¼ÓÀÌ ÇÊ¼öÀÎ °æ¿ì
+            // ì¬ì ‘ì†ì´ í•„ìˆ˜ì¸ ê²½ìš°
             case ErrorCode.AuthenticationTicketExpired:
             case ErrorCode.InternalServerError:
                 errorText = "You Need to be ReConnected";
@@ -87,14 +87,14 @@ public class NetworkHandler : MonoBehaviour
         ShowExceptionPanel("====You Can't Create====", errorText, OnCreateFailed);
     }
 
-    // ¹æ Á¶ÀÎ ½Ã, ¿¹¿Ü Ã³¸® 
+    // ë°© ì¡°ì¸ ì‹œ, ì˜ˆì™¸ ì²˜ë¦¬ 
     public void SetJoinExceptionPanel(int code)
     {
         Action OnJoinFailed = null;
 
         switch(code)
         {
-            // Á¶ÀÎ°ú °ü·ÃµÈ ¿¡·¯ ÄÚµå
+            // ì¡°ì¸ê³¼ ê´€ë ¨ëœ ì—ëŸ¬ ì½”ë“œ
             case ErrorCode.GameClosed:
                 errorText = "Game Closed : The Room Was Closed :(";
                 break;
@@ -112,22 +112,22 @@ public class NetworkHandler : MonoBehaviour
         ShowExceptionPanel("====You Can't Join====", errorText, OnJoinFailed);
     }
 
-    // ÀÎ°ÔÀÓ¿¡¼­ ³×Æ®¿öÅ© ¿¹¿Ü Ã³¸®
+    // ì¸ê²Œì„ì—ì„œ ë„¤íŠ¸ì›Œí¬ ì˜ˆì™¸ ì²˜ë¦¬
     public void SetInGameExceptionPanel(int code)
     {
         
     }
 
-    // ÆĞ³ÎÀ» ¾À¿¡ ¶ç¿î´Ù
+    // íŒ¨ë„ì„ ì”¬ì— ë„ìš´ë‹¤
     void ShowExceptionPanel(string type, string message, Action action)
     {
-        // ÆĞ³ÎÀ» ¶ç¿ï Äµ¹ö½º¸¦ Ã£´Â´Ù
+        // íŒ¨ë„ì„ ë„ìš¸ ìº”ë²„ìŠ¤ë¥¼ ì°¾ëŠ”ë‹¤
         Canvas canvas = FindObjectOfType<Canvas>();
 
-        // ÆĞ³ÎÀ» ÇÁ¸®ÆÕÀ¸·Î »ı¼ºÇÑ´Ù
+        // íŒ¨ë„ì„ í”„ë¦¬íŒ¹ìœ¼ë¡œ ìƒì„±í•œë‹¤
         currentErrorPanel = Instantiate(errorPanelPrefab, canvas.transform, false);
 
-        // ÆĞ³ÎÀÇ ÀÚ½Äµé Áß »ç¿ëÇÒ UI ¿ä¼Ò Ã£¾Æ º¯¼ö¿¡ ÇÒ´çÇÑ´Ù
+        // íŒ¨ë„ì˜ ìì‹ë“¤ ì¤‘ ì‚¬ìš©í•  UI ìš”ì†Œ ì°¾ì•„ ë³€ìˆ˜ì— í• ë‹¹í•œë‹¤
         TextMeshProUGUI[] allTMPsChildren = currentErrorPanel.GetComponentsInChildren<TextMeshProUGUI>();
         
         foreach (TextMeshProUGUI tmp in allTMPsChildren)
@@ -144,18 +144,18 @@ public class NetworkHandler : MonoBehaviour
             }
         }
 
-        // È®ÀÎ ¹öÆ°À» Ã£´Â´Ù
+        // í™•ì¸ ë²„íŠ¼ì„ ì°¾ëŠ”ë‹¤
         Button confirmButton = currentErrorPanel.GetComponentInChildren<Button>();
-        // È®ÀÎ ¹öÆ° Å¬¸¯ ½Ã, ½ÇÇàÇÒ ÇÔ¼ö Ãß°¡
+        // í™•ì¸ ë²„íŠ¼ í´ë¦­ ì‹œ, ì‹¤í–‰í•  í•¨ìˆ˜ ì¶”ê°€
         confirmButton.onClick.AddListener(() =>  ActivePanelUI.Inactive(currentErrorPanel) );
         
-        // ¿¹¿Ü ÆĞ³ÎÀ» Àß »ç¿ëµÇÁö ¾ÊÀ¸¹Ç·Î, »ç¿ë ÈÄ ¹Ù·Î »èÁ¦ÇÏ±â
+        // ì˜ˆì™¸ íŒ¨ë„ì„ ì˜ ì‚¬ìš©ë˜ì§€ ì•Šìœ¼ë¯€ë¡œ, ì‚¬ìš© í›„ ë°”ë¡œ ì‚­ì œí•˜ê¸°
         confirmButton.onClick.AddListener( () => Destroy( currentErrorPanel ) );
         
         if (action != null) { confirmButton.onClick.AddListener(() => action()); }
     }
 
-    // ³×Æ®¿öÅ© Àç¿¬°áÀÌ ÇÊ¿äÇÑ °æ¿ì, Ã¹ È­¸é¿¡¼­ ÀçÁ¢¼Ó ½Ãµµ 
+    // ë„¤íŠ¸ì›Œí¬ ì¬ì—°ê²°ì´ í•„ìš”í•œ ê²½ìš°, ì²« í™”ë©´ì—ì„œ ì¬ì ‘ì† ì‹œë„ 
     void BackToStartScene()
     {
         PhotonNetwork.LoadLevel("StartScene");

@@ -1,4 +1,4 @@
-using Photon.Pun;
+ï»¿using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -15,7 +15,7 @@ public class StartSceneUI : MonoBehaviour
 
     void Awake()
     {
-        // Master Server ¿¬°á ½Ã ½ÇÇàÇÒ ÀÌº¥Æ® µî·Ï 
+        // Master Server ì—°ê²° ì‹œ ì‹¤í–‰í•  ì´ë²¤íŠ¸ ë“±ë¡ 
         NetworkManager.OnConnectedToServer += SetConnectedEvent;
     }
 
