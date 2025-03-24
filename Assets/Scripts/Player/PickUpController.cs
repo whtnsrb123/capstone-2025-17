@@ -3,7 +3,7 @@ using TMPro;
 
 public class PickUpController : MonoBehaviour
 {
-    public Transform holdPosition;  // 레이캐스트를 발사하는 위치
+    public Transform raycastPosition;  // 레이캐스트를 발사하는 위치 (holdPosition에서 변경)
     public Transform pickPosition;  // 물체를 잡을 위치
     private GameObject heldObject; // 들고 있는 물체
     private Rigidbody heldObjectRb; // 들고 있는 물체의 Rigidbody
@@ -21,13 +21,7 @@ public class PickUpController : MonoBehaviour
     void Start()
     {
         Camera mainCamera = Camera.main;
-        holdPosition = mainCamera.transform;
-
-        // pickPosition 변수 초기화
-        if (pickPosition == null)
-        {
-            Debug.LogError("pickPosition 변수가 할당되지 않았습니다. 인스펙터 창에서 할당해주세요.");
-        }
+        raycastPosition = mainCamera.transform; // holdPosition을 raycastPosition으로 변경
 
         // UI 텍스트 비활성화
         if (pickUpUI != null) pickUpUI.enabled = false;
@@ -108,15 +102,15 @@ public class PickUpController : MonoBehaviour
         detectedObject = null;
         RaycastHit hit;
 
-        // holdPosition이 할당되었는지 확인
-        if (holdPosition == null)
+        // raycastPosition이 할당되었는지 확인 (holdPosition에서 변경)
+        if (raycastPosition == null)
         {
-            Debug.LogError("holdPosition 변수가 할당되지 않았습니다.");
+            Debug.LogError("raycastPosition 변수가 할당되지 않았습니다.");
             return;
         }
 
         // 레이캐스트로 물체감지
-        if (Physics.Raycast(holdPosition.position, holdPosition.forward, out hit, detectionRange))
+        if (Physics.Raycast(raycastPosition.position, raycastPosition.forward, out hit, detectionRange)) // holdPosition을 raycastPosition으로 변경
         {
             if (hit.collider.CompareTag("Pickable"))
             {
@@ -132,7 +126,7 @@ public class PickUpController : MonoBehaviour
         }
 
         // 레이캐스트 디버그
-        Debug.DrawRay(holdPosition.position, holdPosition.forward * detectionRange, Color.red);
+        Debug.DrawRay(raycastPosition.position, raycastPosition.forward * detectionRange, Color.red); // holdPosition을 raycastPosition으로 변경
 
         // 감지된 물체 없으면 UI 숨기기
         if (detectedObject == null && heldObject == null && pickUpUI != null)
