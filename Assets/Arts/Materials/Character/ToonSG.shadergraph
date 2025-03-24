@@ -2762,7 +2762,7 @@
     "m_Type": "UnityEditor.ShaderGraph.Texture2DMaterialSlot",
     "m_ObjectId": "8e312dcdcfd84dc385bc71181941b6c6",
     "m_Id": 0,
-    "m_DisplayName": "Albedo",
+    "m_DisplayName": "BaseMap",
     "m_SlotType": 1,
     "m_Hidden": false,
     "m_ShaderOutputName": "Out",
@@ -3153,8 +3153,8 @@
     "m_ObjectId": "9cf31575b33342b48d98ec1f62b527a3",
     "m_Title": "Toon-Specular",
     "m_Position": {
-        "x": -990.9999389648438,
-        "y": 75.00000762939453
+        "x": -991.0,
+        "y": 74.99989318847656
     }
 }
 
@@ -3538,10 +3538,10 @@
     "m_Guid": {
         "m_GuidSerialized": "67345136-b6fa-43c7-96e9-2d63c4015235"
     },
-    "m_Name": "Albedo",
+    "m_Name": "BaseMap",
     "m_DefaultRefNameVersion": 1,
-    "m_RefNameGeneratedByDisplayName": "Albedo",
-    "m_DefaultReferenceName": "_Albedo",
+    "m_RefNameGeneratedByDisplayName": "BaseMap",
+    "m_DefaultReferenceName": "_BaseMap",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
     "m_UseCustomSlotLabel": false,
@@ -3714,7 +3714,7 @@
     "m_ObjectId": "c50f1c4f66d74e7d9280cb5237fe4c5f",
     "m_Title": "Toon-Diffuse",
     "m_Position": {
-        "x": -964.9998779296875,
+        "x": -965.0,
         "y": -439.0
     }
 }
@@ -4055,7 +4055,7 @@
     "m_Title": "Blinn-Phong ",
     "m_Position": {
         "x": -2653.0,
-        "y": 18.999996185302736
+        "y": 19.000118255615236
     }
 }
 
