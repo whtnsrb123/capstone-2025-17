@@ -45,6 +45,8 @@ MonoBehaviour:
   - MissionComplete
   - GameClear
   - GameOver
+  - RPC_OnTimeUp
+  - RPC_StartTimer
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 0

@@ -39,6 +39,30 @@ public class GameTimerManager : MonoBehaviourPun, IPunObservable
     [PunRPC]
     private void RPC_StartTimer(float duration)
     {
+        if (timerText != null) return;
+        
+        //------------------------------Resources 폴더에서 GameTimerCanvas 불러와서 timerText 연결------------------------------------------------------
+        // 캔버스 프리팹 로드 & 인스턴스화
+        Canvas gameTimerCanvasPrefab = Resources.Load<Canvas>("GameTimerCanvas");
+        if (gameTimerCanvasPrefab == null)
+        {
+            Debug.LogError("GameTimerCanvas 프리팹이 Resources 폴더에 없습니다!");
+            return;
+        }
+
+        Canvas canvasInstance = Instantiate(gameTimerCanvasPrefab);
+
+        // 자식 오브젝트에서 "gameTimer" 이름의 TMP_Text 찾기
+        Transform timerTransform = canvasInstance.transform.Find("gameTimer");
+        if (timerTransform != null)
+        {
+            timerText = timerTransform.GetComponent<TMP_Text>();
+        }
+        else
+        {
+            Debug.LogError("GameTimerCanvas 안에 gameTimer 오브젝트가 없습니다!");
+        }
+        //----------------------------------------------------------------------------------------------------------------------------------------
         timer = duration;
         isTimerRunning = true;
     }
