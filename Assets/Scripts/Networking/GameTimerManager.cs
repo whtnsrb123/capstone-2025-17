@@ -41,6 +41,13 @@ public class GameTimerManager : MonoBehaviourPun, IPunObservable
     {
         if (timerText != null) return;
         
+        // 이전 캔버스가 있다면 삭제
+        GameObject oldCanvas = GameObject.Find("GameTimerCanvas");
+        if (oldCanvas != null)
+        {
+            Destroy(oldCanvas);
+        }
+        
         //------------------------------Resources 폴더에서 GameTimerCanvas 불러와서 timerText 연결------------------------------------------------------
         // 캔버스 프리팹 로드 & 인스턴스화
         Canvas gameTimerCanvasPrefab = Resources.Load<Canvas>("GameTimerCanvas");
