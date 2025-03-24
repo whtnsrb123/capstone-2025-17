@@ -3,7 +3,7 @@ using TMPro;
 
 public class PickUpController : MonoBehaviour
 {
-    public Transform raycastPosition;  // 레이캐스트를 발사하는 위치 (holdPosition에서 변경)
+    public Transform raycastPosition;  // 레이캐스트를 발사하는 위치
     public Transform pickPosition;  // 물체를 잡을 위치
     private GameObject heldObject; // 들고 있는 물체
     private Rigidbody heldObjectRb; // 들고 있는 물체의 Rigidbody
@@ -18,6 +18,7 @@ public class PickUpController : MonoBehaviour
     public int trajectoryPoints = 50; // 던진 물체 궤적 점 개수
     public float timeBetweenPoints = 0.03f; // 궤적 점들 간 시간 간격
     public float crosshairSize = 50f; // Aim pointer size
+
     void Start()
     {
         Camera mainCamera = Camera.main;
@@ -32,28 +33,21 @@ public class PickUpController : MonoBehaviour
         trajectoryLine = gameObject.AddComponent<LineRenderer>();
         trajectoryLine.enabled = true;
         trajectoryLine.positionCount = 0;
-        trajectoryLine.startWidth = 0.05f;
-        trajectoryLine.endWidth = 0.05f;
+        trajectoryLine.startWidth = 0.025f; // 기존 0.05f의 절반
+        trajectoryLine.endWidth = 0.025f; // 기존 0.05f의 절반
         trajectoryLine.material = new Material(Shader.Find("Sprites/Default"));
-        trajectoryLine.startColor = Color.yellow;
-        trajectoryLine.endColor = Color.yellow;
+        trajectoryLine.startColor = new Color(1f, 1f, 0f, 0.5f); // 노란색, 투명도 0.5
+        trajectoryLine.endColor = new Color(1f, 1f, 0f, 0.5f); // 노란색, 투명도 0.5
         trajectoryLine.numCornerVertices = 5; // 꺾임을 부드럽게 처리
         trajectoryLine.numCapVertices = 5; // 끝 부분 둥글게
     }
 
     void Update()
     {
-        // 래이캐스트로 물체 감지
+        // 레이캐스트로 물체 감지
         DetectPickableObject();
 
-        // F 키
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            if (detectedObject != null && heldObject == null) TryPickUp();
-            else if (heldObject != null) DropObject();
-        }
-
-        // 물체를 들고 있을 경우
+        // 물체를 들고 있을 경우 위치 업데이트
         if (heldObject != null)
         {
             // pickPosition이 할당되었는지 확인
@@ -69,23 +63,20 @@ public class PickUpController : MonoBehaviour
                 pickUpUI.enabled = true;
                 pickUpUI.text = "Press F to Drop";
             }
-            // 물체 회전
-            if (Input.GetKeyDown(KeyCode.R)) RotateHeldObject();
-            
-            // 물체 던지기
-            if (Input.GetMouseButtonDown(0)) ThrowObject();
         }
-        else trajectoryLine.positionCount = 0;
+        else
+        {
+            trajectoryLine.positionCount = 0;
+        }
     }
 
-        void FixedUpdate()
-        {
-                // 물체 궤적 표시
-            DisplayTrajectory();
-        }
+    void FixedUpdate()
+    {
+        // 물체 궤적 표시
+        DisplayTrajectory();
+    }
 
-        // Aim Pointer
-        void OnGUI()
+    void OnGUI()
     {
         float screenCenterX = Screen.width / 2;
         float screenCenterY = Screen.height / 2;
@@ -96,21 +87,20 @@ public class PickUpController : MonoBehaviour
         GUI.DrawTexture(new Rect(screenCenterX - thickness / 2, screenCenterY - crosshairSize / 2, thickness, crosshairSize), Texture2D.whiteTexture);
     }
 
-    // 물체 감지, UI 업데이트
     void DetectPickableObject()
     {
         detectedObject = null;
         RaycastHit hit;
 
-        // raycastPosition이 할당되었는지 확인 (holdPosition에서 변경)
+        // raycastPosition이 할당되었는지 확인
         if (raycastPosition == null)
         {
             Debug.LogError("raycastPosition 변수가 할당되지 않았습니다.");
             return;
         }
 
-        // 레이캐스트로 물체감지
-        if (Physics.Raycast(raycastPosition.position, raycastPosition.forward, out hit, detectionRange)) // holdPosition을 raycastPosition으로 변경
+        // 레이캐스트로 물체 감지
+        if (Physics.Raycast(raycastPosition.position, raycastPosition.forward, out hit, detectionRange))
         {
             if (hit.collider.CompareTag("Pickable"))
             {
@@ -123,10 +113,15 @@ public class PickUpController : MonoBehaviour
                 }
                 Debug.Log("물건 감지중: " + detectedObject.name);
             }
+            else
+            {
+                Debug.Log("감지된 오브젝트가 Pickable 태그가 아님: " + hit.collider.gameObject.name);
+            }
         }
-
-        // 레이캐스트 디버그
-        Debug.DrawRay(raycastPosition.position, raycastPosition.forward * detectionRange, Color.red); // holdPosition을 raycastPosition으로 변경
+        else
+        {
+            Debug.Log("레이캐스트로 아무것도 감지되지 않음");
+        }
 
         // 감지된 물체 없으면 UI 숨기기
         if (detectedObject == null && heldObject == null && pickUpUI != null)
@@ -135,8 +130,25 @@ public class PickUpController : MonoBehaviour
         }
     }
 
-    // 물체를 잡기 시도
-    void TryPickUp()
+    public void HandlePickUpOrDrop()
+    {
+        if (detectedObject != null && heldObject == null)
+        {
+            Debug.Log("물체 잡기 시도: " + detectedObject.name);
+            TryPickUp();
+        }
+        else if (heldObject != null)
+        {
+            Debug.Log("물체 놓기 시도: " + heldObject.name);
+            DropObject();
+        }
+        else
+        {
+            Debug.Log("잡을 물체 없음: detectedObject = " + (detectedObject == null ? "null" : detectedObject.name));
+        }
+    }
+
+    private void TryPickUp()
     {
         if (detectedObject == null) return;
 
@@ -153,7 +165,6 @@ public class PickUpController : MonoBehaviour
                 heldObjectCollider.isTrigger = true;
             }
 
-
             Bounds objectBounds = heldObjectCollider.bounds;
             float objectRadius = Mathf.Max(objectBounds.extents.x, objectBounds.extents.z); // 가로 반경 중 큰 값 사용
 
@@ -164,18 +175,26 @@ public class PickUpController : MonoBehaviour
                 heldObject.transform.position = newPickPosition; // 조정된 위치에 배치
                 heldObject.transform.rotation = pickPosition.rotation;
                 heldObject.transform.parent = pickPosition;
+                Debug.Log("물체 잡기 성공: " + heldObject.name);
             }
+            else
+            {
+                Debug.LogError("pickPosition이 설정되지 않았습니다.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("감지된 오브젝트에 Rigidbody가 없습니다: " + detectedObject.name);
+            heldObject = null;
         }
     }
 
-
-    // 물체 놓기// 물체 놓기
-    void DropObject()
+    private void DropObject()
     {
         if (heldObject != null)
         {
-            heldObjectRb.isKinematic = false;  //  물체에 물리 적용
-            heldObjectRb.useGravity = true;    //  중력 활성화
+            heldObjectRb.isKinematic = false;  // 물체에 물리 적용
+            heldObjectRb.useGravity = true;    // 중력 활성화
             heldObjectRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
             heldObject.transform.parent = null; // 부모 관계 해제
@@ -184,15 +203,15 @@ public class PickUpController : MonoBehaviour
             Collider heldObjectCollider = heldObject.GetComponent<Collider>();
             if (heldObjectCollider != null)
             {
-                heldObjectCollider.isTrigger = false; //  충돌 감지 활성화
+                heldObjectCollider.isTrigger = false; // 충돌 감지 활성화
             }
 
             heldObject = null;
+            Debug.Log("물체 놓기 성공");
         }
     }
 
-    // 물체 던지기
-    void ThrowObject()
+    public void ThrowObject()
     {
         if (heldObject != null && heldObjectRb != null)
         {
@@ -215,48 +234,47 @@ public class PickUpController : MonoBehaviour
                 heldObject.transform.position += Vector3.up * 0.1f;
 
                 heldObject = null;
+                Debug.Log("물체 던지기 성공");
+            }
+            else
+            {
+                Debug.LogError("pickPosition이 설정되지 않았습니다.");
             }
         }
     }
 
-    // 물체 던짐 궤적 표시
-    void DisplayTrajectory()
+    private void DisplayTrajectory()
     {
-        if (heldObject == null || heldObjectRb == null) return;
+        if (heldObject == null || heldObjectRb == null || pickPosition == null) return;
 
-        trajectoryLine.positionCount = trajectoryPoints / 2; // 점 개수 절반으로 줄이기
+        // 궤적 점 개수 설정
+        trajectoryLine.positionCount = trajectoryPoints;
         Vector3 currentPosition = heldObject.transform.position;
         Vector3 initialVelocity = (pickPosition.forward + Vector3.up * 0.5f).normalized * throwForce;
 
-        bool drawPoint = true;
-        int index = 0;
-
+        // 궤적 점 계산 및 설정
         for (int i = 0; i < trajectoryPoints; i++)
         {
             float t = i * timeBetweenPoints;
             Vector3 displacement = (initialVelocity * t) + (0.5f * Physics.gravity * t * t);
             Vector3 pointPosition = currentPosition + displacement;
-
-            // 홀수 번째 점만 추가하여 점선처럼 보이게 만들기
-            if (drawPoint && index < trajectoryLine.positionCount)
-            {
-                trajectoryLine.SetPosition(index, pointPosition);
-                index++;
-            }
-
-            drawPoint = !drawPoint; // 번갈아가며 점 추가
+            trajectoryLine.SetPosition(i, pointPosition);
         }
     }
 
-
-    // 물체 회전
-    void RotateHeldObject()
+    public void RotateHeldObject()
     {
         if (heldObject != null)
         {
             Quaternion currentRotation = heldObject.transform.rotation;
             Quaternion newRotation = currentRotation * Quaternion.Euler(0, 0, -90);
             heldObject.transform.rotation = newRotation;
+            Debug.Log("물체 회전 성공");
         }
+    }
+
+    public bool IsHoldingObject()
+    {
+        return heldObject != null;
     }
 }

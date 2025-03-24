@@ -29,11 +29,6 @@ public class Player_Push_Controller : MonoBehaviour
     void Update()
     {
         DetectPlayer(); // 플레이어 감지 함수 호출
-
-        if (canPush && Input.GetMouseButtonDown(0) && !isPushing) 
-        {
-            PushPlayer();
-        }
     }
 
     void DetectPlayer()
@@ -42,6 +37,13 @@ public class Player_Push_Controller : MonoBehaviour
         canPush = false;
 
         RaycastHit hit;
+
+        // holdPosition이 null인지 확인
+        if (holdPosition == null)
+        {
+            Debug.LogError("holdPosition이 설정되지 않았습니다.");
+            return;
+        }
 
         // 정면으로 하나의 레이캐스트를 쏘아 플레이어 감지
         if (Physics.Raycast(holdPosition.position, holdPosition.forward, out hit, detectionRange))
@@ -58,7 +60,19 @@ public class Player_Push_Controller : MonoBehaviour
                     
                     Debug.Log("플레이어 감지됨: " + hit.collider.gameObject.name);
                 }
+                else
+                {
+                    Debug.LogWarning("감지된 오브젝트에 Rigidbody가 없습니다: " + hit.collider.gameObject.name);
+                }
             }
+            else
+            {
+                Debug.Log("감지된 오브젝트가 Player 태그가 아님: " + hit.collider.gameObject.name);
+            }
+        }
+        else
+        {
+            Debug.Log("레이캐스트로 아무것도 감지되지 않음");
         }
 
         // 플레이어를 감지하지 못했을 경우 UI 숨김
@@ -68,16 +82,35 @@ public class Player_Push_Controller : MonoBehaviour
         }
     }
 
-    void PushPlayer()
+    public void PushPlayer()
     {
+        if (!canPush || isPushing)
+        {
+            Debug.Log("밀치기 불가능: canPush = " + canPush + ", isPushing = " + isPushing);
+            return;
+        }
+
         isPushing = true; // 밀치는 중으로 설정
 
-        // 밀칠 대상이 있고 PickUp이 우선권을 갖지 않은 경우 실행
-        Vector3 pushDirection = (targetPlayerRb.transform.position - transform.position).normalized; // 밀칠 방향 계산
+        // targetPlayerRb가 null인지 확인
+        if (targetPlayerRb == null)
+        {
+            Debug.LogError("targetPlayerRb가 null입니다. 밀칠 대상이 없습니다.");
+            isPushing = false;
+            return;
+        }
+
+        // 밀칠 방향 계산
+        Vector3 pushDirection = (targetPlayerRb.transform.position - transform.position).normalized;
         targetPlayerRb.AddForce(pushDirection * pushForce, ForceMode.Impulse); // 힘 적용하여 밀치기
-        Debug.Log("밀치기 성공"); // 디버그 메시지
+        Debug.Log("밀치기 성공: " + targetPlayerRb.gameObject.name); // 디버그 메시지
 
         StartCoroutine(ResetPushing()); // 딜레이 코루틴 시작
+    }
+
+    public bool CanPush()
+    {
+        return canPush && !isPushing;
     }
 
     IEnumerator ResetPushing()

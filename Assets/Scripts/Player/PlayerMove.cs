@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class CharacterController : MonoBehaviour
 {
@@ -13,6 +14,12 @@ public class CharacterController : MonoBehaviour
     private Rigidbody rb;                   // 캐릭터의 Rigidbody 컴포넌트
     private Transform cameraTransform;      // 메인 카메라의 Transform
     private rotateToMouse rotateToMouse;    // 마우스 입력 캐릭터 회전
+
+    // 물에 젖은 상태 관리
+    private bool isWet = false;            // 물에 젖었는지 여부
+    private float originalMoveSpeed;       // 원래 걷기 속도
+    private float originalSprintSpeed;     // 원래 달리기 속도
+    private float originalJumpForce;       // 원래 점프 힘
 
     private void Awake()
     {
@@ -29,6 +36,11 @@ public class CharacterController : MonoBehaviour
         rb.freezeRotation = true; // 캐릭터 회전이 물리적으로 영향을 받지 않도록 설정
         cameraTransform = Camera.main.transform;
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous; // 충돌 감지 모드 설정
+
+        // 원래 속도와 점프력 저장
+        originalMoveSpeed = moveSpeed;
+        originalSprintSpeed = sprintSpeed;
+        originalJumpForce = jumpForce;
     }
 
     void Update()
@@ -39,8 +51,7 @@ public class CharacterController : MonoBehaviour
         CheckGrounded();  // 땅에 닿아 있는지 감지
     }
 
-    
-    void MoveCharacter()// 캐릭터 이동
+    void MoveCharacter() // 캐릭터 이동
     {
         float horizontal = Input.GetAxis("Horizontal"); // A, D
         float vertical = Input.GetAxis("Vertical");     // W, S
@@ -67,7 +78,6 @@ public class CharacterController : MonoBehaviour
         }
     }
 
-    
     void UpdateRotate()
     {
         float mouseX = Input.GetAxis("Mouse X"); // 마우스 좌우
@@ -75,7 +85,6 @@ public class CharacterController : MonoBehaviour
         rotateToMouse.UpdateRotate(mouseX, mouseY); // 회전 적용
     }
 
-    // 점프 
     void HandleJump()
     {
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
@@ -85,7 +94,6 @@ public class CharacterController : MonoBehaviour
         }
     }
 
-    // 땅에 닿아 있는지 감지
     void CheckGrounded()
     {
         Vector3 rayOrigin = transform.position + Vector3.up * 0.1f; // 캐릭터 위치에서 살짝 위쪽에서 Ray 시작
@@ -101,6 +109,46 @@ public class CharacterController : MonoBehaviour
         {
             isGrounded = false;
         }
+    }
+
+    // 물에 닿았을 때 호출
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Water"))
+        {
+            Debug.Log("물에 닿음 - 속도와 점프력 감소 시작");
+            StartWetEffect();
+        }
+    }
+
+    // 물에 젖은 효과 적용
+    private void StartWetEffect()
+    {
+        if (isWet) return; // 이미 젖은 상태라면 중복 실행 방지
+
+        isWet = true;
+
+        // 속도와 점프력을 절반으로 줄임
+        moveSpeed = originalMoveSpeed * 0.5f;
+        sprintSpeed = originalSprintSpeed * 0.5f;
+        jumpForce = originalJumpForce * 0.5f;
+
+        // 5초 후 원래 값으로 복구
+        StartCoroutine(ResetWetEffect());
+    }
+
+    // 5초 후 원래 속도와 점프력으로 복구
+    private IEnumerator ResetWetEffect()
+    {
+        yield return new WaitForSeconds(5f);
+
+        // 원래 값으로 복구
+        moveSpeed = originalMoveSpeed;
+        sprintSpeed = originalSprintSpeed;
+        jumpForce = originalJumpForce;
+
+        isWet = false;
+        Debug.Log("물에 젖은 효과 종료 - 속도와 점프력 복구");
     }
 
     // 에디터에서 땅 감지 Ray 시각적으로 표시
