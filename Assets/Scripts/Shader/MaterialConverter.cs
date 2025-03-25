@@ -1,10 +1,11 @@
 using UnityEngine;
 using UnityEditor;
+using System.Linq;
 
 public class MaterialConverter : EditorWindow
 {
     private Material newMaterial;
-    private int newLayer;
+    private int newLayer = 6;
 
     [MenuItem("Tools/Change Materials (Keep BaseMap)")]
     private static void ShowWindow()
@@ -37,50 +38,27 @@ public class MaterialConverter : EditorWindow
 
     private void ChangeSelectedMaterials()
     {
-        foreach (GameObject obj in Selection.gameObjects)
-        {
-            Renderer renderer = obj.GetComponent<Renderer>();
-            if (renderer != null)
-            {
-                Material[] oldMaterials = renderer.sharedMaterials; // 모든 머테리얼 가져오기
-                Material[] newMaterials = new Material[oldMaterials.Length]; // 변경할 머테리얼 배열 생성
-
-                for (int i = 0; i < oldMaterials.Length; i++)
-                {
-                    Material oldMaterial = oldMaterials[i];
-                    if (oldMaterial != null)
-                    {
-                        // 기존 BaseMap 텍스처 가져오기
-                        Texture baseMapTexture = oldMaterial.GetTexture("_BaseMap");
-
-                        Undo.RecordObject(renderer, "Change Material");
-                        Material newMatInstance = new Material(newMaterial);
-
-                        // 기존 BaseMap 텍스처가 있으면 유지
-                        if (baseMapTexture != null)
-                        {
-                            newMatInstance.SetTexture("_BaseMap", baseMapTexture);
-                        }
-
-                        newMaterials[i] = newMatInstance;
-                    }
-                }
-
-                renderer.sharedMaterials = newMaterials; // 모든 머테리얼 교체
-                EditorUtility.SetDirty(renderer);
-            }
-
-            obj.layer = newLayer;
-        }
+        Renderer[] renderers;
+        renderers = Selection.gameObjects
+           .Select(go => go.GetComponent<Renderer>())
+           .Where(r => r != null) // Renderer가 없는 GameObject는 제외
+           .ToArray();
+        ChangeMaterials(renderers);
 
         Debug.Log("선택된 오브젝트의 모든 머테리얼을 변경하였습니다.");
     }
 
     private void ChangeAllMaterials()
     {
-        foreach (Renderer renderer in FindObjectsOfType<Renderer>())
+        ChangeMaterials(FindObjectsOfType<Renderer>());
+
+        Debug.Log("모든 오브젝트의 모든 머테리얼을 변경하였습니다.");
+    }
+
+    private void ChangeMaterials(Renderer[] renderers)
+    {
+        foreach (Renderer renderer in renderers)
         {
-            //Renderer renderer = obj.GetComponent<Renderer>();
             if (renderer != null)
             {
                 Material[] oldMaterials = renderer.sharedMaterials; // 모든 머테리얼 가져오기
@@ -93,6 +71,7 @@ public class MaterialConverter : EditorWindow
                     {
                         // 기존 BaseMap 텍스처 가져오기
                         Texture baseMapTexture = oldMaterial.GetTexture("_BaseMap");
+                        Color color = oldMaterial.GetColor("_BaseColor");
 
                         Undo.RecordObject(renderer, "Change Material");
                         Material newMatInstance = new Material(newMaterial);
@@ -102,6 +81,7 @@ public class MaterialConverter : EditorWindow
                         {
                             newMatInstance.SetTexture("_BaseMap", baseMapTexture);
                         }
+                        newMatInstance.SetColor("_BaseColor", color);
 
                         newMaterials[i] = newMatInstance;
                     }
@@ -112,7 +92,5 @@ public class MaterialConverter : EditorWindow
             }
             renderer.gameObject.layer = newLayer;
         }
-
-        Debug.Log("선택된 오브젝트의 모든 머테리얼을 변경하였습니다.");
     }
 }
