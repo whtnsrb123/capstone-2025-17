@@ -33,9 +33,6 @@ public class GameTimerManager : MonoBehaviourPun, IPunObservable
             return;
         }
         
-        timer = duration;
-        isTimerRunning = true;
-        
         //모든 플레이어가 타이머 시작을 동기화
         photonView.RPC(nameof(RPC_StartTimer), RpcTarget.All, duration);
     }
