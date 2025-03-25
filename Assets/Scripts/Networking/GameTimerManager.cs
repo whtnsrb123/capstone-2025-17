@@ -11,6 +11,10 @@ public class GameTimerManager : MonoBehaviourPun, IPunObservable
     private float timer = 0f;
     private bool isTimerRunning = false;
     
+    // 초 변경 감지를 위한 변수
+    private int currentSeconds = 0;
+    private int lastSeconds = 0;
+    
     // 싱글톤을 유지하면 방을 나갔다가 들어가도 기존 인스턴스를 유지하는 문제가 생김.
     // 따라서 싱글톤을 제거하고, 방마다 새로운 GameTimerManager가 생성되도록 해야 함.
     private void Start()
@@ -79,7 +83,14 @@ public class GameTimerManager : MonoBehaviourPun, IPunObservable
         if (!isTimerRunning) return;
         
         timer -= Time.deltaTime;
-        UpdateTimerUI();
+        
+        currentSeconds = Mathf.FloorToInt(timer);
+        if (currentSeconds != lastSeconds) // 초가 변경될 때만 UI 업데이트
+        {
+            lastSeconds = currentSeconds;
+            UpdateTimerUI();
+        }
+        
         
         if (timer <= 0f)
         {
