@@ -56,7 +56,7 @@ public class GameStateManager : MonoBehaviourPun
             return; // 게임 클리어 상태면 게임 오버 체크하지 않음
         }
         //제한 시간이 초과되었는지 확인
-        if (isGameStarted && GameTimer.Instance.IsTimeOver())
+        if (isGameStarted && FindObjectOfType<GameTimerManager>().IsTimeOver())
         {
             isGameStarted = false;
             photonView.RPC("GameOver", RpcTarget.All);

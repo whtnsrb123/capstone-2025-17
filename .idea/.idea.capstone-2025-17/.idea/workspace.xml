@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7ca77f44-c133-4a41-b675-4d0220a63863" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Networking/PlayerStateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Networking/PlayerStateManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Networking/GameTimerManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Networking/GameTimerManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,7 +30,7 @@
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feat/#7-playerstatemanager&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feat/#8-gametimer&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -103,8 +103,9 @@
       <workItem from="1741503066393" duration="144000" />
       <workItem from="1741672320193" duration="5037000" />
       <workItem from="1741683047030" duration="360000" />
-      <workItem from="1742210130213" duration="1071000" />
-      <workItem from="1742211421009" duration="4435000" />
+      <workItem from="1742279730399" duration="2465000" />
+      <workItem from="1742811434792" duration="1478000" />
+      <workItem from="1742883854157" duration="312000" />
     </task>
     <servers />
   </component>
