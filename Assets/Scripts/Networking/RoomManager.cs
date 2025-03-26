@@ -1,23 +1,25 @@
-using ExitGames.Client.Photon;
+ï»¿using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Pun.Demo.Cockpit;
 using Photon.Realtime;
 using System.Collections.Generic;
 using UnityEngine;
 
-// Room °ú °ü·ÃµÈ ³×Æ®¿öÅ© ÀÛ¾÷À» ´ã´çÇÏ´Â Å¬·¡½º
+// Room ê³¼ ê´€ë ¨ëœ ë„¤íŠ¸ì›Œí¬ ì‘ì—…ì„ ë‹´ë‹¹í•˜ëŠ” í´ë˜ìŠ¤
 public class RoomManager : MonoBehaviour
 {
     public static Dictionary<int, Player> s_players;
 
-    // ÇØ½Ã Å°
+    const int RequiredPlayerCount = 4;
+
+    // í•´ì‹œ í‚¤
     const string NicknameKey = "Nickname";
     const string CharacterIdKey = "CharacterId";
 
-    // ·£´ı ¸ÅÄ¡¸¦ ¿äÃ»ÇÑ´Ù 
-    public void RandomRoom(int maxPlayer = 4)
+    // ëœë¤ ë§¤ì¹˜ë¥¼ ìš”ì²­í•œë‹¤ 
+    public void RandomRoom()
     {
-        // ¹æ ±âº» ¼Ó¼º
+        // ë°© ê¸°ë³¸ ì†ì„±
         Hashtable customProperties = new Hashtable
         {
             { "Seats", new int[] {-1, -1, -1, -1} }
@@ -25,21 +27,21 @@ public class RoomManager : MonoBehaviour
 
         RoomOptions room = new RoomOptions
         {
-            MaxPlayers = maxPlayer,
+            MaxPlayers = RequiredPlayerCount,
             CustomRoomProperties = customProperties,
             EmptyRoomTtl = 0
         };
 
-        // ¹æ¿¡ Á¶ÀÎÀ» ½Ãµµ ÈÄ, ½ÇÆĞ ½Ã ¹æ »ı¼ºÇÏ±â
+        // ë°©ì— ì¡°ì¸ì„ ì‹œë„ í›„, ì‹¤íŒ¨ ì‹œ ë°© ìƒì„±í•˜ê¸°
         PhotonNetwork.JoinOrCreateRoom (
-            "Random", // ¹æ ÀÌ¸§
-            room, // ¹æ ¼Ó¼º
-            TypedLobby.Default // ·Îºñ Å¸ÀÔ
+            "Random", // ë°© ì´ë¦„
+            room, // ë°© ì†ì„±
+            TypedLobby.Default // ë¡œë¹„ íƒ€ì…
             );
     }
 
-    // ¹æ »ı¼ºÀ» ¿äÃ»ÇÑ´Ù 
-    public void CreateRoom(string roomName, int maxPlayer = 4)
+    // ë°© ìƒì„±ì„ ìš”ì²­í•œë‹¤ 
+    public void CreateRoom(string roomName)
     {
         Hashtable customProperties = new Hashtable
         {
@@ -48,7 +50,7 @@ public class RoomManager : MonoBehaviour
 
         RoomOptions room = new RoomOptions
         {
-            MaxPlayers = maxPlayer,
+            MaxPlayers = RequiredPlayerCount,
             CustomRoomProperties = customProperties,
             EmptyRoomTtl = 0
         };
@@ -61,7 +63,7 @@ public class RoomManager : MonoBehaviour
        );
     }
 
-    // ¹æ Âü°¡¸¦ ¿äÃ»ÇÑ´Ù 
+    // ë°© ì°¸ê°€ë¥¼ ìš”ì²­í•œë‹¤ 
     public void JoinRoom(string code)
     {
         PhotonNetwork.JoinRoom
@@ -70,7 +72,7 @@ public class RoomManager : MonoBehaviour
        );
     }
 
-    // ¹æÀ» ³ª¿Â´Ù 
+    // ë°©ì„ ë‚˜ì˜¨ë‹¤ 
     public void LeaveRoom()
     {
         PhotonNetwork.LeaveRoom();
@@ -79,7 +81,7 @@ public class RoomManager : MonoBehaviour
     }
 
 
-    // Å¬¶óÀÌ¾ğÆ®ÀÇ Á¤º¸¸¦ Àü¼ÛÇÑ´Ù 
+    // í´ë¼ì´ì–¸íŠ¸ì˜ ì •ë³´ë¥¼ ì „ì†¡í•œë‹¤ 
     bool isFirstSend = true;
 
     public void SendClientInfo(string nickname, int characterId)
@@ -87,7 +89,7 @@ public class RoomManager : MonoBehaviour
         Hashtable hash = new Hashtable();
         if (isFirstSend)
         {
-            // Ã³À½À¸·Î Á¤º¸¸¦ Àü¼ÛÇÑ °æ¿ì
+            // ì²˜ìŒìœ¼ë¡œ ì •ë³´ë¥¼ ì „ì†¡í•œ ê²½ìš°
             isFirstSend = false;
 
             hash.Add(NicknameKey, nickname);
@@ -95,7 +97,7 @@ public class RoomManager : MonoBehaviour
         }
         else
         {
-            // ÀÌ¹Ì Á¤º¸¸¦ Àü¼ÛÇÑ °æ¿ì
+            // ì´ë¯¸ ì •ë³´ë¥¼ ì „ì†¡í•œ ê²½ìš°
             hash = PhotonNetwork.LocalPlayer.CustomProperties;
             hash[NicknameKey] = nickname;
             hash[CharacterIdKey] = characterId;
@@ -104,7 +106,7 @@ public class RoomManager : MonoBehaviour
         PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
     }
 
-    // MasterClient´Â »õ·Î¿î ÇÃ·¹ÀÌ¾î ÀÔÀå ½Ã, ÇÃ·¹ÀÌ¾î Ç¥½Ã ¼ø¼­¸¦ °»½ÅÇÑ´Ù
+    // MasterClientëŠ” ìƒˆë¡œìš´ í”Œë ˆì´ì–´ ì…ì¥ ì‹œ, í”Œë ˆì´ì–´ í‘œì‹œ ìˆœì„œë¥¼ ê°±ì‹ í•œë‹¤
     public void UpdateEnteredPlayerSeats(int actorNumber)
     {
         if (!PhotonNetwork.IsMasterClient)
@@ -116,7 +118,7 @@ public class RoomManager : MonoBehaviour
 
         for (int i = 0; i < 4; i++)
         {
-          // ºó ÀÚ¸®¸¦ ¹ß°ß
+          // ë¹ˆ ìë¦¬ë¥¼ ë°œê²¬
             if (seats[i] == -1)
             {
                 seats[i] = actorNumber;
@@ -129,7 +131,7 @@ public class RoomManager : MonoBehaviour
         }
      }
 
-    // MasterClient´Â ÇÃ·¹ÀÌ¾î ÅğÀå ½Ã, ÇÃ·¹ÀÌ¾î Ç¥½Ã ¼ø¼­¸¦ °»½ÅÇÑ´Ù
+    // MasterClientëŠ” í”Œë ˆì´ì–´ í‡´ì¥ ì‹œ, í”Œë ˆì´ì–´ í‘œì‹œ ìˆœì„œë¥¼ ê°±ì‹ í•œë‹¤
     public void UpdateLeftPlayerSeats(int actorNumber)
     {
         if (!PhotonNetwork.IsMasterClient)
@@ -141,7 +143,7 @@ public class RoomManager : MonoBehaviour
 
         for (int i = 0; i < 4; i++)
         {
-            // ¶°³­ ÇÃ·¹ÀÌ¾î ¹ß°ß 
+            // ë– ë‚œ í”Œë ˆì´ì–´ ë°œê²¬ 
             if (seats[i] == actorNumber)
             {
                 seats[i] = -1;
@@ -154,7 +156,7 @@ public class RoomManager : MonoBehaviour
         }
     }
 
-    // °»½ÅµÈ ÇÃ·¹ÀÌ¾î Ç¥½Ã ¼ø¼­ Á¤º¸¸¦ ¹Ş¾Æ¿Â´Ù 
+    // ê°±ì‹ ëœ í”Œë ˆì´ì–´ í‘œì‹œ ìˆœì„œ ì •ë³´ë¥¼ ë°›ì•„ì˜¨ë‹¤ 
     public int[] GetUpdatedPlayerSeats()
     {
         Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
@@ -163,12 +165,12 @@ public class RoomManager : MonoBehaviour
         return seats;
     }
 
-    // ´ë±â¹æ¿¡¼­ ÇÃ·¹ÀÌ¾î Ç¥½Ã¸¦ À§ÇØ ÇöÀç ¹æÀÇ ÇÃ·¹ÀÌ¾î Á¤º¸¸¦ ¹Ş¾Æ¿Â´Ù
+    // ëŒ€ê¸°ë°©ì—ì„œ í”Œë ˆì´ì–´ í‘œì‹œë¥¼ ìœ„í•´ í˜„ì¬ ë°©ì˜ í”Œë ˆì´ì–´ ì •ë³´ë¥¼ ë°›ì•„ì˜¨ë‹¤
     public Dictionary<int, System.Collections.Hashtable> RenderPlayersUI()
     {
         s_players = PhotonNetwork.CurrentRoom.Players;
 
-        // PlayerÀÇ ActorNumber¿Í Á¤º¸¸¦ ´ãÀº HashTable 
+        // Playerì˜ ActorNumberì™€ ì •ë³´ë¥¼ ë‹´ì€ HashTable 
         Dictionary<int, System.Collections.Hashtable> playersInfo = new Dictionary<int, System.Collections.Hashtable>();
 
         foreach(KeyValuePair<int, Player> p in s_players)
@@ -189,7 +191,7 @@ public class RoomManager : MonoBehaviour
             }
             else
             {
-                // hash°¡ ºñ¾îÀÖ´Â °æ¿ì ÀÓ½Ã·Î ±âº» °ª ¼³Á¤
+                // hashê°€ ë¹„ì–´ìˆëŠ” ê²½ìš° ì„ì‹œë¡œ ê¸°ë³¸ ê°’ ì„¤ì •
                 newHash.Add(NicknameKey, $"USER_{Random.Range(100, 999)}");
                 newHash.Add(CharacterIdKey, 0);
 
@@ -200,14 +202,14 @@ public class RoomManager : MonoBehaviour
     }
 
 
-    // ÇöÀç ¹æÀÇ ·ë ÄÚµå¸¦ ¹Ş¾Æ¿Â´Ù
+    // í˜„ì¬ ë°©ì˜ ë£¸ ì½”ë“œë¥¼ ë°›ì•„ì˜¨ë‹¤
     public string GetRoomCode()
     {
         string roomCode = PhotonNetwork.CurrentRoom.Name;
         return roomCode;
     }
 
-    // ÇöÀç ¹æ¿¡¼­ÀÇ actorNumber¸¦ ¹Ş¾Æ¿Â´Ù
+    // í˜„ì¬ ë°©ì—ì„œì˜ actorNumberë¥¼ ë°›ì•„ì˜¨ë‹¤
     public int GetActorNumber()
     {
         return PhotonNetwork.LocalPlayer.ActorNumber;

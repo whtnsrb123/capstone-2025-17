@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -19,7 +19,6 @@ public class RoomUI : MonoBehaviour
     public GameObject[] playersRawImage;
 
     // create panel
-    public Slider maxPlayerCount;
     public Button c_confirmBtn;
     public Button c_cancelBtn;
 
@@ -28,7 +27,7 @@ public class RoomUI : MonoBehaviour
     public Button j_confirmBtn;
     public Button j_cancelBtn;
 
-    // Ä³¸¯ÅÍ ¸ğµ¨ÀÇ ¸Ş½Ã°¡ ÀúÀåµÈ Scriptable Object º¯¼ö 
+    // ìºë¦­í„° ëª¨ë¸ì˜ ë©”ì‹œê°€ ì €ì¥ëœ Scriptable Object ë³€ìˆ˜ 
     [SerializeField]
     MaterialStorage storage;
 

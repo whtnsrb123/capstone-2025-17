@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,9 +22,15 @@ public class FadeUI : MonoBehaviour
         Fade += FadeInOut;
     }
 
+    void OnDestroy()
+    {
+        // static 변수에 등록한 메소드의 객체가 Destroy 될 경우 반드시 삭제 
+        Fade -= FadeInOut;
+    }
+
     void FadeInOut(bool isFadeIn)
     {
-        
+
         if (isFadeIn)
         {
             StartCoroutine(nameof(FadeIn));
@@ -34,7 +40,6 @@ public class FadeUI : MonoBehaviour
             StartCoroutine(nameof(FadeOut));
         }
     }
-
     public IEnumerator FadeIn()
     {
         Debug.Log(group.alpha);
