@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class rotateToMouse : MonoBehaviour
+public class RotateToMouse : MonoBehaviour
 {
     [SerializeField]
     private float rotCamXAxisSpeed = 2;  // 상 하  감도

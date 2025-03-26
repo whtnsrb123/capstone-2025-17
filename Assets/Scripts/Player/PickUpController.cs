@@ -92,13 +92,6 @@ public class PickUpController : MonoBehaviour
         detectedObject = null;
         RaycastHit hit;
 
-        // raycastPosition이 할당되었는지 확인
-        if (raycastPosition == null)
-        {
-            Debug.LogError("raycastPosition 변수가 할당되지 않았습니다.");
-            return;
-        }
-
         // 레이캐스트로 물체 감지
         if (Physics.Raycast(raycastPosition.position, raycastPosition.forward, out hit, detectionRange))
         {
@@ -113,14 +106,6 @@ public class PickUpController : MonoBehaviour
                 }
                 Debug.Log("물건 감지중: " + detectedObject.name);
             }
-            else
-            {
-                Debug.Log("감지된 오브젝트가 Pickable 태그가 아님: " + hit.collider.gameObject.name);
-            }
-        }
-        else
-        {
-            Debug.Log("레이캐스트로 아무것도 감지되지 않음");
         }
 
         // 감지된 물체 없으면 UI 숨기기
@@ -134,17 +119,11 @@ public class PickUpController : MonoBehaviour
     {
         if (detectedObject != null && heldObject == null)
         {
-            Debug.Log("물체 잡기 시도: " + detectedObject.name);
             TryPickUp();
         }
         else if (heldObject != null)
         {
-            Debug.Log("물체 놓기 시도: " + heldObject.name);
             DropObject();
-        }
-        else
-        {
-            Debug.Log("잡을 물체 없음: detectedObject = " + (detectedObject == null ? "null" : detectedObject.name));
         }
     }
 
@@ -175,16 +154,11 @@ public class PickUpController : MonoBehaviour
                 heldObject.transform.position = newPickPosition; // 조정된 위치에 배치
                 heldObject.transform.rotation = pickPosition.rotation;
                 heldObject.transform.parent = pickPosition;
-                Debug.Log("물체 잡기 성공: " + heldObject.name);
-            }
-            else
-            {
-                Debug.LogError("pickPosition이 설정되지 않았습니다.");
+                Debug.Log("물체 잡기 : " + heldObject.name);
             }
         }
         else
         {
-            Debug.LogWarning("감지된 오브젝트에 Rigidbody가 없습니다: " + detectedObject.name);
             heldObject = null;
         }
     }
@@ -207,7 +181,7 @@ public class PickUpController : MonoBehaviour
             }
 
             heldObject = null;
-            Debug.Log("물체 놓기 성공");
+            Debug.Log("물체 놓기");
         }
     }
 
@@ -234,11 +208,7 @@ public class PickUpController : MonoBehaviour
                 heldObject.transform.position += Vector3.up * 0.1f;
 
                 heldObject = null;
-                Debug.Log("물체 던지기 성공");
-            }
-            else
-            {
-                Debug.LogError("pickPosition이 설정되지 않았습니다.");
+                Debug.Log("물체 던지기");
             }
         }
     }
@@ -269,7 +239,7 @@ public class PickUpController : MonoBehaviour
             Quaternion currentRotation = heldObject.transform.rotation;
             Quaternion newRotation = currentRotation * Quaternion.Euler(0, 0, -90);
             heldObject.transform.rotation = newRotation;
-            Debug.Log("물체 회전 성공");
+            Debug.Log("물체 회전");
         }
     }
 

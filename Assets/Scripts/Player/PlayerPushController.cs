@@ -21,9 +21,6 @@ public class Player_Push_Controller : MonoBehaviour
     {
         // UI가 존재하면 비활성화
         if (pushUI != null) pushUI.enabled = false;
-        
-        // holdPosition이 설정되지 않았을 경우 기본값을 transform으로 설정
-        if (holdPosition == null) holdPosition = transform;
     }
 
     void Update()
@@ -37,14 +34,6 @@ public class Player_Push_Controller : MonoBehaviour
         canPush = false;
 
         RaycastHit hit;
-
-        // holdPosition이 null인지 확인
-        if (holdPosition == null)
-        {
-            Debug.LogError("holdPosition이 설정되지 않았습니다.");
-            return;
-        }
-
         // 정면으로 하나의 레이캐스트를 쏘아 플레이어 감지
         if (Physics.Raycast(holdPosition.position, holdPosition.forward, out hit, detectionRange))
         {
@@ -60,19 +49,7 @@ public class Player_Push_Controller : MonoBehaviour
                     
                     Debug.Log("플레이어 감지됨: " + hit.collider.gameObject.name);
                 }
-                else
-                {
-                    Debug.LogWarning("감지된 오브젝트에 Rigidbody가 없습니다: " + hit.collider.gameObject.name);
-                }
             }
-            else
-            {
-                Debug.Log("감지된 오브젝트가 Player 태그가 아님: " + hit.collider.gameObject.name);
-            }
-        }
-        else
-        {
-            Debug.Log("레이캐스트로 아무것도 감지되지 않음");
         }
 
         // 플레이어를 감지하지 못했을 경우 UI 숨김
@@ -84,18 +61,11 @@ public class Player_Push_Controller : MonoBehaviour
 
     public void PushPlayer()
     {
-        if (!canPush || isPushing)
-        {
-            Debug.Log("밀치기 불가능: canPush = " + canPush + ", isPushing = " + isPushing);
-            return;
-        }
-
         isPushing = true; // 밀치는 중으로 설정
 
         // targetPlayerRb가 null인지 확인
         if (targetPlayerRb == null)
         {
-            Debug.LogError("targetPlayerRb가 null입니다. 밀칠 대상이 없습니다.");
             isPushing = false;
             return;
         }
