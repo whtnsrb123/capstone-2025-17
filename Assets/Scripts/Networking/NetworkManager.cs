@@ -4,6 +4,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
 using System.Collections;
+using System.Collections.Generic;
 
 public enum ConnectState
 {
@@ -19,8 +20,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public static NetworkManager Instance;
 
     public static Action OnConnectedToServer; // 마스터 서버에 접속했을 때
+    public static Action<List<string>> OnRoomListUpdated; // 방 목록이 업데이트 됐을 때 
     public static Action OnRoomEntered; // 룸에 입장했을 때
-    public static Action OnRequestFailed; // 네트워크 요청이 실패했을 때
     public static Action OnRoomSeatsUpdated; // Seats 정보가 갱신될 때 
     public static Action<int, bool> OnRoomPlayerUpdated; // 룸 플레이어 리스트가 변동됐을 때
 
@@ -128,6 +129,28 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
         Debug.Log("On Left Room()");
     }
+    #endregion
+
+    // Lobby에서 RoomList를 받아오기
+    public override void OnRoomListUpdate(List<RoomInfo> roomList)
+    {
+        // Lobby가 아닌 곳에서는 해당 콜백을 무시한다
+        // if ((sCurrentState == ConnectState.Lobby) && (sClientState == ConnectState.Lobby))
+        {
+            base.OnRoomListUpdate(roomList);
+
+            List<string> roomNames = new List<string>();
+
+            // 이름만 전달하기
+            foreach (var room in roomList)
+            {
+                roomNames.Add(room.Name);
+                Debug.Log(room.CustomProperties["Seats"]);
+            }
+
+            OnRoomListUpdated?.Invoke(roomNames);
+        }
+    }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
@@ -150,8 +173,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         Debug.Log("OnRoomPropertiesUpdate");
     }
 
-
-    #endregion
 
     #region 서버 예외 처리 콜백 함수들
 

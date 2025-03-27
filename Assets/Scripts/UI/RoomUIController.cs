@@ -15,6 +15,9 @@ public class RoomUIController : MonoBehaviour
     ServerInfo roomModel;
     ClientInfo profileModel;
 
+    static List<string> sRoomNameList = new List<string>(); // 방 목록을 저장할 변수
+    const string MakeRoomNameFailed = "Failed"; // 방 이름 생성에 실패한 경우
+
     void Awake()
     {
         roomView = GetComponent<RoomUI>();
@@ -35,6 +38,7 @@ public class RoomUIController : MonoBehaviour
         roomView.j_confirmBtn.onClick.AddListener(OnClickJoinConfirmBtn);
 
         // NetworkManager 이벤트 등록 
+        NetworkManager.OnRoomListUpdated += GetRoomNameList;
         NetworkManager.OnRoomPlayerUpdated += UpdatePlayerSeats;
         NetworkManager.OnRoomSeatsUpdated += UpdatePlayersUI;
         NetworkManager.OnRoomEntered += OnEnteredRoom;
@@ -55,8 +59,18 @@ public class RoomUIController : MonoBehaviour
         // 랜덤 매치 버튼 클릭 시 
         SaveProfileInfo();
 
-        roomModel.RoomType = ServerInfo.RoomTypes.Random;
-        roomManager.RandomRoom();
+        string roomName = MakeRoomName();
+        if (roomName != MakeRoomNameFailed)
+        {
+            // 방 이름 생성에 실패하지 않은 경우
+            roomModel.RoomType = ServerInfo.RoomTypes.Random;
+            roomManager.JoinRandomRoom(roomName);
+        }
+        else
+        {
+            // 방 이름 생성에 실패한 경우 
+            NetworkHandler.Instance.SetRandomMatchExceptionPanel(0);
+        }
     }
 
     void OnClickCreateConfirmBtn()
@@ -64,25 +78,31 @@ public class RoomUIController : MonoBehaviour
         // 방 생성 확인 버튼 클릭 시 
         SaveProfileInfo();
 
-        string roomCode =$"{Random.Range(10000, 99999)}";
-
-        roomModel.RoomType = ServerInfo.RoomTypes.Create;
-
-        roomManager.CreateRoom(roomCode);
+        string roomName = MakeRoomName();
+        if (roomName != MakeRoomNameFailed)
+        {
+            roomModel.RoomType = ServerInfo.RoomTypes.Create;
+            roomManager.CreateRoom(roomName);
+        }
+        else
+        {
+            // 방 이름 생성에 실패한 경우 
+            NetworkHandler.Instance.SetCreateExceptionPanel(0);
+        }
     }
 
 
     void OnClickJoinConfirmBtn()
     {
-        string code = roomView.roomCodeTMPInp.text;
+        string name = roomView.roomCodeTMPInp.text;
         // 참여 코드가 공백이 아니어야 한다
-        if (!string.IsNullOrWhiteSpace(code))
+        if (!string.IsNullOrWhiteSpace(name))
         {
             // 방 참가하기 버튼 클릭 시 
             SaveProfileInfo();
 
             roomModel.RoomType = ServerInfo.RoomTypes.Join;
-            roomManager.JoinRoom(code);
+            roomManager.JoinRoom(name);
         }
     }
 
@@ -146,6 +166,49 @@ public class RoomUIController : MonoBehaviour
 
         roomView.UpdatePlayerUI(playersInfo);
 
+    }
+
+    // ====================== Room Name 생성하기 =========================
+
+    // OnRoomListUpdate() 콜백에서 Room Name 리스트를 받아온다
+    void GetRoomNameList(List<string> roomNames)
+    {
+        sRoomNameList = roomNames;
+    }
+
+    // 중복된 Room Name인지 확인한다
+    bool IsDuplicateRoomName(string myRoom)
+    {
+        foreach(string name in sRoomNameList)
+        {
+            if (myRoom == name)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // 랜덤으로 Room Name을 생성한다
+    string MakeRoomName()
+    {
+        int maxTry = 10;
+
+        string roomName =  $"{Random.Range(10000, 99999)}";
+
+        while (IsDuplicateRoomName(roomName))
+        {
+            roomName = $"{Random.Range(10000, 99999)}";
+            maxTry--;
+
+            if (maxTry < 0)
+            {
+                roomName = MakeRoomNameFailed;
+                break;
+            }
+        }
+
+        return roomName;
     }
 
 }
