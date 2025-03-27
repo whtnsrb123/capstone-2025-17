@@ -33,11 +33,14 @@ public class RoomManager : MonoBehaviour
         };
 
         // 방에 조인을 시도 후, 실패 시 방 생성하기
-        PhotonNetwork.JoinOrCreateRoom (
+        PhotonNetwork.JoinOrCreateRoom(
             "Random", // 방 이름
             room, // 방 속성
             TypedLobby.Default // 로비 타입
             );
+
+        // 클라이언트는 방 입장을 요청한 상태
+        NetworkManager.Instance.SetClientState(ConnectState.Room);
     }
 
     // 방 생성을 요청한다 
@@ -61,6 +64,9 @@ public class RoomManager : MonoBehaviour
             room,
             TypedLobby.Default
        );
+
+        // 클라이언트는 방 입장을 요청한 상태
+        NetworkManager.Instance.SetClientState(ConnectState.Room);
     }
 
     // 방 참가를 요청한다 
@@ -70,6 +76,9 @@ public class RoomManager : MonoBehaviour
        (
             code
        );
+
+        // 클라이언트는 방 입장을 요청한 상태
+        NetworkManager.Instance.SetClientState(ConnectState.Room);
     }
 
     // 방을 나온다 
@@ -77,7 +86,9 @@ public class RoomManager : MonoBehaviour
     {
         PhotonNetwork.LeaveRoom();
         s_players.Clear();
-        RenderPlayersUI();
+
+        // 클라이언트는 방 퇴장을 요청한 상태
+        NetworkManager.Instance.SetClientState(ConnectState.Lobby);
     }
 
 
@@ -118,7 +129,7 @@ public class RoomManager : MonoBehaviour
 
         for (int i = 0; i < 4; i++)
         {
-          // 빈 자리를 발견
+            // 빈 자리를 발견
             if (seats[i] == -1)
             {
                 seats[i] = actorNumber;
@@ -129,7 +140,7 @@ public class RoomManager : MonoBehaviour
                 break;
             }
         }
-     }
+    }
 
     // MasterClient는 플레이어 퇴장 시, 플레이어 표시 순서를 갱신한다
     public void UpdateLeftPlayerSeats(int actorNumber)
@@ -173,7 +184,7 @@ public class RoomManager : MonoBehaviour
         // Player의 ActorNumber와 정보를 담은 HashTable 
         Dictionary<int, System.Collections.Hashtable> playersInfo = new Dictionary<int, System.Collections.Hashtable>();
 
-        foreach(KeyValuePair<int, Player> p in s_players)
+        foreach (KeyValuePair<int, Player> p in s_players)
         {
             Hashtable hash = p.Value.CustomProperties;
 
@@ -185,7 +196,7 @@ public class RoomManager : MonoBehaviour
                 int characterId = (int)hash[CharacterIdKey];
 
                 newHash.Add(NicknameKey, nickname);
-                newHash.Add(CharacterIdKey , characterId);
+                newHash.Add(CharacterIdKey, characterId);
 
                 playersInfo.Add(p.Key, newHash);
             }

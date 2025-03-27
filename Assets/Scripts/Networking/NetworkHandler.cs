@@ -3,7 +3,6 @@ using Photon.Realtime;
 using System;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class NetworkHandler : MonoBehaviour
@@ -45,7 +44,7 @@ public class NetworkHandler : MonoBehaviour
             case (int) DisconnectCause.CustomAuthenticationFailed:
                 errorText = "You InJeung failed";
                 break;
-            case (int)DisconnectCause.MaxCcuReached:
+            case (int) DisconnectCause.MaxCcuReached:
                 errorText = "Server Too Many People.. sorry";
                 break;
             default:
@@ -64,7 +63,7 @@ public class NetworkHandler : MonoBehaviour
             // 그 외 모든 곳에서 Disconnected -> StartScene으로 돌아가서 재접속
             OnDisconnect = BackToStartScene;
         }
-        ShowExceptionPanel("====You Can't Create====", errorText, OnDisconnect);
+        ShowExceptionPanel("====Disconnected====", errorText, OnDisconnect);
     }
 
     // 방 생성 시, 예외 처리 
@@ -115,7 +114,7 @@ public class NetworkHandler : MonoBehaviour
     // 인게임에서 네트워크 예외 처리
     public void SetInGameExceptionPanel(int code)
     {
-        
+
     }
 
     // 패널을 씬에 띄운다
@@ -129,7 +128,7 @@ public class NetworkHandler : MonoBehaviour
 
         // 패널의 자식들 중 사용할 UI 요소 찾아 변수에 할당한다
         TextMeshProUGUI[] allTMPsChildren = currentErrorPanel.GetComponentsInChildren<TextMeshProUGUI>();
-        
+
         foreach (TextMeshProUGUI tmp in allTMPsChildren)
         {
             if (tmp.name == "ErrorTypeTMP")
@@ -148,10 +147,11 @@ public class NetworkHandler : MonoBehaviour
         Button confirmButton = currentErrorPanel.GetComponentInChildren<Button>();
         // 확인 버튼 클릭 시, 실행할 함수 추가
         confirmButton.onClick.AddListener(() =>  ActivePanelUI.Inactive(currentErrorPanel) );
-        
+
         // 예외 패널을 잘 사용되지 않으므로, 사용 후 바로 삭제하기
         confirmButton.onClick.AddListener( () => Destroy( currentErrorPanel ) );
-        
+
+        // case에 따라 추가 로직이 필요한 경우 등록 
         if (action != null) { confirmButton.onClick.AddListener(() => action()); }
     }
 
@@ -163,7 +163,22 @@ public class NetworkHandler : MonoBehaviour
 
     void ReconnectAndRejoin()
     {
-        PhotonNetwork.ReconnectAndRejoin();
+        //
+        // TODO : Room List를 얻어서 찾는 Room Name이 있는지 확인해야 한다.
+        //
+
+        if (!PhotonNetwork.ReconnectAndRejoin())
+        {
+            // 돌아갈 Room이 없어진 경우
+            Debug.Log("돌아갈 룸이 없어용");
+            BackToStartScene();
+        }
+        else
+        {
+            Debug.Log("돌아갈 룸이 있대용");
+            // 돌아갈 Room이 있는 경우 
+            PhotonNetwork.ReconnectAndRejoin();
+        }
     }
 
 
