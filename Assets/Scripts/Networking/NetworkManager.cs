@@ -145,7 +145,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             foreach (var room in roomList)
             {
                 roomNames.Add(room.Name);
-                Debug.Log(room.CustomProperties["Seats"]);
             }
 
             OnRoomListUpdated?.Invoke(roomNames);

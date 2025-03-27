@@ -1,6 +1,5 @@
 ﻿using ExitGames.Client.Photon;
 using Photon.Pun;
-using Photon.Pun.Demo.Cockpit;
 using Photon.Realtime;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,27 +16,42 @@ public class RoomManager : MonoBehaviour
     const string CharacterIdKey = "CharacterId";
 
     // 랜덤 매치를 요청한다 
-    public void RandomRoom()
+    public void JoinRandomRoom(string roomName)
     {
         // 방 기본 속성
         Hashtable customProperties = new Hashtable
         {
-            { "Seats", new int[] {-1, -1, -1, -1} }
+            // 플레이어 ActorNumber를 기록하는 배열이다
+            { "Seats", new int[] {-1, -1, -1, -1} },
+            // 랜덤 매치인 방을 검색하거나, 생성하는 데 사용된다
+            { "MatchType", "Random"}
+        };
+
+        // MatchType이 RandomMatch 인 방만 찾도록 한다
+        Hashtable expectedCustomProperties = new Hashtable
+        {
+            { "MatchType", "Random"}
         };
 
         RoomOptions room = new RoomOptions
         {
             MaxPlayers = RequiredPlayerCount,
             CustomRoomProperties = customProperties,
+            CustomRoomPropertiesForLobby = new string[] {"MatchType"}, // 로비에서 검색할 방 속성 지정
             EmptyRoomTtl = 0
         };
 
-        // 방에 조인을 시도 후, 실패 시 방 생성하기
-        PhotonNetwork.JoinOrCreateRoom(
-            "Random", // 방 이름
-            room, // 방 속성
-            TypedLobby.Default // 로비 타입
-            );
+        PhotonNetwork.JoinRandomOrCreateRoom
+        (
+            expectedCustomProperties, // 검색 조건
+            RequiredPlayerCount, // 최대 플레이어 수
+            MatchmakingMode.FillRoom, // 많은 방부터 우선 채우기
+            TypedLobby.Default, //  기본 로비만 사용
+            null, // sql 로비 필터 없음
+            roomName, // 생성 시 방 이름
+            room, // 방 옵션
+            null // 플레이어 조건 
+        );
 
         // 클라이언트는 방 입장을 요청한 상태
         NetworkManager.Instance.SetClientState(ConnectState.Room);
@@ -48,13 +62,16 @@ public class RoomManager : MonoBehaviour
     {
         Hashtable customProperties = new Hashtable
         {
-            {"Seats", new int[] {-1, -1, -1, -1} }
+            {"Seats", new int[] {-1, -1, -1, -1} },
+            // 랜덤 매치를 시도하는 클라이언트에게 제외되도록 한다
+            { "MatchType",  "Create"}
         };
 
         RoomOptions room = new RoomOptions
         {
             MaxPlayers = RequiredPlayerCount,
             CustomRoomProperties = customProperties,
+            CustomRoomPropertiesForLobby = new string[] { "MatchType" },
             EmptyRoomTtl = 0
         };
 

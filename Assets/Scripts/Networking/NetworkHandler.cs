@@ -66,6 +66,17 @@ public class NetworkHandler : MonoBehaviour
         ShowExceptionPanel("====Disconnected====", errorText, OnDisconnect);
     }
 
+    // 랜덤 매치 시, 예외 처리
+    public void SetRandomMatchExceptionPanel(int code)
+    {
+        Action OnRandomMathFailed = null;
+
+        errorText = "You cant random now sorry";
+
+        ShowExceptionPanel("No Random Now", errorText, OnRandomMathFailed);
+    }
+
+
     // 방 생성 시, 예외 처리 
     public void SetCreateExceptionPanel(int code)
     {
