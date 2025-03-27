@@ -3,17 +3,14 @@ using System.Collections;
 
 public class CharacterController : MonoBehaviour
 {
-    public float moveSpeed = 2f;            // 걷기 속도
-    public float sprintSpeed = 3f;         // 달리기 속도
-    public float jumpForce = 3f;           // 점프 힘
-    public float mouseSensitivity = 300f;  // 마우스 감도
-    public float groundCheckDistance = 0.4f; // 땅 감지 거리
-    public float acceleration = 20f;       // 이동 가속도
+    [SerializeField] private float moveSpeed = 2f;              // 걷기 속도
+    [SerializeField] private float sprintSpeed = 3f;             // 달리기 속도
+    [SerializeField] private float jumpForce = 3f;                // 점프 힘
+    private float groundCheckDistance = 0.4f;                  // 땅 감지 거리
+    private float acceleration = 20f;                                       // 이동 가속도
 
-    private bool isGrounded;               // 캐릭터가 땅에 닿아 있는지 여부
-    private Rigidbody rb;                   // 캐릭터의 Rigidbody 컴포넌트
-    private Transform cameraTransform;      // 메인 카메라의 Transform
-    private RotateToMouse rotateToMouse;    // 마우스 입력 캐릭터 회전
+    private bool isGrounded;                                // 캐릭터가 땅에 닿아 있는지 여부
+    private Rigidbody rb;                                       // 캐릭터의 Rigidbody 컴포넌트
     
     // 물에 젖은 상태 관리
     private bool isWet = false;            // 물에 젖었는지 여부
@@ -22,7 +19,7 @@ public class CharacterController : MonoBehaviour
     private float originalJumpForce;       // 원래 점프 힘
 
     // 물 파티클 시스템 (파이프 오브젝트에서 발생하는 파티클)
-    public ParticleSystem waterEffect;     // 물 파티클 시스템
+    [SerializeField] private ParticleSystem waterEffect;     // 물 파티클 시스템
 
     // 물에 닿은 시간
     private float wetTime = 0f;            // 물에 닿은 시간을 기록
@@ -41,7 +38,6 @@ public class CharacterController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true; // 캐릭터 회전이 물리적으로 영향을 받지 않도록 설정
-        cameraTransform = Camera.main.transform;
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous; // 충돌 감지 모드 설정
 
         // 원래 속도와 점프력 저장
@@ -165,8 +161,11 @@ public class CharacterController : MonoBehaviour
     // 물에 젖은 효과 적용
     private void StartWetEffect()
     {
-        if (isWet) return; // 이미 젖은 상태라면 중복 실행 방지
-
+        if (isWet)
+        {
+            wetTime = wetDuration; 
+            return; // 이미 젖은 상태라면 중복 실행 방지
+        }
         isWet = true;
         wetTime = wetDuration; // 5초 타이머 시작
 

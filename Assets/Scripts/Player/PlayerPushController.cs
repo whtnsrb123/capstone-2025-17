@@ -4,23 +4,22 @@ using System.Collections;
 
 public class Player_Push_Controller : MonoBehaviour
 {
-    public float pushForce = 3f; // 밀치는 힘
+    [SerializeField] private  float pushForce = 3f; // 밀치는 힘
     private bool canPush = false; // 밀칠 수 있는 상태 여부
     private Rigidbody targetPlayerRb; // 밀칠 대상 플레이어의 Rigidbody
 
     public Transform holdPosition; // 레이캐스트 발사 위치
-    public float detectionRange = 0.5f; // 감지 거리
-    public float fieldOfView = 120f; // 감지할 시야각
-    public int rayCount = 20; // 감지를 위한 레이의 개수
-    public TMP_Text pushUI; // 밀칠 수 있을 때 표시할 UI
+    [SerializeField] private  float detectionRange = 0.5f; // 감지 거리
+    // public float fieldOfView = 120f; // 감지할 시야각
+    // public int rayCount = 20; // 감지를 위한 레이의 개수
+    [SerializeField] private  TMP_Text pushUI; // 밀칠 수 있을 때 표시할 UI
 
     private bool isPushing = false; // 밀치는 중인지 여부
-    public float pushDelay = 1f; // 밀치기 딜레이 (초)
+    private float pushDelay = 1f; // 밀치기 딜레이 (초)
 
     void Start()
     {
-        // UI가 존재하면 비활성화
-        if (pushUI != null) pushUI.enabled = false;
+         if (pushUI != null) pushUI.enabled = false; // UI가 존재하면 비활성화
     }
 
     void Update()
@@ -61,11 +60,17 @@ public class Player_Push_Controller : MonoBehaviour
 
     public void PushPlayer()
     {
+        if (!canPush || isPushing)
+        {
+            return;
+        }
+
         isPushing = true; // 밀치는 중으로 설정
 
         // targetPlayerRb가 null인지 확인
         if (targetPlayerRb == null)
         {
+            Debug.LogError("targetPlayerRb가 null입니다. 밀칠 대상이 없습니다.");
             isPushing = false;
             return;
         }

@@ -4,10 +4,8 @@ using UnityEngine;
 
 public class RotateToMouse : MonoBehaviour
 {
-    [SerializeField]
-    private float rotCamXAxisSpeed = 2;  // 상 하  감도
-    [SerializeField]
-    private float rotCamYAxisSpeed = 2;  // 좌 우 감도
+    [SerializeField] private float rotCamXAxisSpeed = 2;  // 상 하  감도
+    [SerializeField] private float rotCamYAxisSpeed = 2;  // 좌 우 감도
 
     private float limitMinX = -50;  // 수직 회전 최소 각도
     private float limitMaxX = 50;   // 수직 회전 최대 각도

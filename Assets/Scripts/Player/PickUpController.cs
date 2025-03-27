@@ -3,26 +3,26 @@ using TMPro;
 
 public class PickUpController : MonoBehaviour
 {
-    public Transform raycastPosition;  // 레이캐스트를 발사하는 위치
-    public Transform pickPosition;  // 물체를 잡을 위치
+    [SerializeField]private Transform raycastPosition;  // 레이캐스트를 발사하는 위치
+    [SerializeField]private Transform pickPosition;  // 물체를 잡을 위치
     private GameObject heldObject; // 들고 있는 물체
     private Rigidbody heldObjectRb; // 들고 있는 물체의 Rigidbody
     private GameObject detectedObject; // 감지된 물체
 
-    public float detectionRange = 10f; // 물체 감지 범위
-    public float pickUpOffset = 0.5f; // 물체를 들 때의 오프셋 거리
-    public TMP_Text pickUpUI; // UI 텍스트 (PickUp 메시지)
+    private float detectionRange = 10f; // 물체 감지 범위
+    private float pickUpOffset = 0.5f; // 물체를 들 때의 오프셋 거리
+    [SerializeField]private TMP_Text pickUpUI; // UI 텍스트 (PickUp 메시지)
     private Player_Push_Controller pushController; // 물체를 밀 수 있는지 확인
-    public float throwForce = 2f; // 던질 힘
+    private float throwForce = 2f; // 던질 힘
     private LineRenderer trajectoryLine; // 던진 물체의 궤적을 그릴 라인 렌더러
-    public int trajectoryPoints = 50; // 던진 물체 궤적 점 개수
-    public float timeBetweenPoints = 0.03f; // 궤적 점들 간 시간 간격
-    public float crosshairSize = 50f; // Aim pointer size
+    private int trajectoryPoints = 50; // 던진 물체 궤적 점 개수
+    private float timeBetweenPoints = 0.03f; // 궤적 점들 간 시간 간격
+    private float crosshairSize = 50f; // Aim pointer size
 
     void Start()
     {
         Camera mainCamera = Camera.main;
-        raycastPosition = mainCamera.transform; // holdPosition을 raycastPosition으로 변경
+        raycastPosition = mainCamera.transform;
 
         // UI 텍스트 비활성화
         if (pickUpUI != null) pickUpUI.enabled = false;
@@ -33,11 +33,11 @@ public class PickUpController : MonoBehaviour
         trajectoryLine = gameObject.AddComponent<LineRenderer>();
         trajectoryLine.enabled = true;
         trajectoryLine.positionCount = 0;
-        trajectoryLine.startWidth = 0.025f; // 기존 0.05f의 절반
-        trajectoryLine.endWidth = 0.025f; // 기존 0.05f의 절반
+        trajectoryLine.startWidth = 0.025f; // 라인 두께 설정
+        trajectoryLine.endWidth = 0.025f;
         trajectoryLine.material = new Material(Shader.Find("Sprites/Default"));
-        trajectoryLine.startColor = new Color(1f, 1f, 0f, 0.5f); // 노란색, 투명도 0.5
-        trajectoryLine.endColor = new Color(1f, 1f, 0f, 0.5f); // 노란색, 투명도 0.5
+        trajectoryLine.startColor = new Color(1f, 1f, 0f, 0.5f); // 노란색, 반투명
+        trajectoryLine.endColor = new Color(1f, 1f, 0f, 0.5f); 
         trajectoryLine.numCornerVertices = 5; // 꺾임을 부드럽게 처리
         trajectoryLine.numCapVertices = 5; // 끝 부분 둥글게
     }
@@ -66,7 +66,7 @@ public class PickUpController : MonoBehaviour
         }
         else
         {
-            trajectoryLine.positionCount = 0;
+            trajectoryLine.positionCount = 0; // 물체를 들고 있지 않으면 궤적 라인 없애기
         }
     }
 
@@ -80,11 +80,11 @@ public class PickUpController : MonoBehaviour
     {
         float screenCenterX = Screen.width / 2;
         float screenCenterY = Screen.height / 2;
-        float thickness = 5f; // 굵기
+        float thickness = 5f; // 굵기 설정
 
-        GUI.color = Color.red; // 색상
-        GUI.DrawTexture(new Rect(screenCenterX - crosshairSize / 2, screenCenterY - thickness / 2, crosshairSize, thickness), Texture2D.whiteTexture);
-        GUI.DrawTexture(new Rect(screenCenterX - thickness / 2, screenCenterY - crosshairSize / 2, thickness, crosshairSize), Texture2D.whiteTexture);
+        GUI.color = Color.red; // 색상 설정
+        GUI.DrawTexture(new Rect(screenCenterX - crosshairSize / 2, screenCenterY - thickness / 2, crosshairSize, thickness), Texture2D.whiteTexture); // Aim pointer 그리기
+        GUI.DrawTexture(new Rect(screenCenterX - thickness / 2, screenCenterY - crosshairSize / 2, thickness, crosshairSize), Texture2D.whiteTexture); // Aim pointer 그리기
     }
 
     void DetectPickableObject()
@@ -136,30 +136,26 @@ public class PickUpController : MonoBehaviour
 
         if (heldObjectRb != null)
         {
-            heldObjectRb.isKinematic = true;
+            heldObjectRb.isKinematic = true; // 물리 엔진 비활성화
             Collider heldObjectCollider = heldObject.GetComponent<Collider>();
 
             if (heldObjectCollider != null && heldObject.CompareTag("Pickable"))
             {
-                heldObjectCollider.isTrigger = true;
+                heldObjectCollider.isTrigger = true; // 충돌 감지 비활성화
             }
 
             Bounds objectBounds = heldObjectCollider.bounds;
             float objectRadius = Mathf.Max(objectBounds.extents.x, objectBounds.extents.z); // 가로 반경 중 큰 값 사용
+            Vector3 newPickPosition = pickPosition.position + pickPosition.forward * (objectRadius + pickUpOffset);
+            heldObject.transform.position = newPickPosition;
+            heldObject.transform.rotation = pickPosition.rotation;
+            heldObject.transform.parent = pickPosition;
+            Debug.Log("물체 잡기 : " + heldObject.name);
 
-            // pickPosition이 할당되었는지 확인
-            if (pickPosition != null)
-            {
-                Vector3 newPickPosition = pickPosition.position + pickPosition.forward * (objectRadius + pickUpOffset);
-                heldObject.transform.position = newPickPosition; // 조정된 위치에 배치
-                heldObject.transform.rotation = pickPosition.rotation;
-                heldObject.transform.parent = pickPosition;
-                Debug.Log("물체 잡기 : " + heldObject.name);
-            }
         }
         else
         {
-            heldObject = null;
+            heldObject = null; // 물체가 없다면 잡을 수 없음
         }
     }
 
@@ -171,7 +167,7 @@ public class PickUpController : MonoBehaviour
             heldObjectRb.useGravity = true;    // 중력 활성화
             heldObjectRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
-            heldObject.transform.parent = null; // 부모 관계 해제
+            heldObject.transform.parent = null; // 부모 객체에서 분리
 
             // Collider 설정 되돌리기
             Collider heldObjectCollider = heldObject.GetComponent<Collider>();
@@ -195,7 +191,7 @@ public class PickUpController : MonoBehaviour
                 heldObjectCollider.isTrigger = false;
             }
 
-            heldObjectRb.isKinematic = false;
+            heldObjectRb.isKinematic = false; // 물리 적용
             heldObjectRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
             // 던질 방향과 힘 설정
@@ -237,7 +233,7 @@ public class PickUpController : MonoBehaviour
         if (heldObject != null)
         {
             Quaternion currentRotation = heldObject.transform.rotation;
-            Quaternion newRotation = currentRotation * Quaternion.Euler(0, 0, -90);
+            Quaternion newRotation = currentRotation * Quaternion.Euler(0, 0, -90); // 90도 회전
             heldObject.transform.rotation = newRotation;
             Debug.Log("물체 회전");
         }
@@ -245,6 +241,6 @@ public class PickUpController : MonoBehaviour
 
     public bool IsHoldingObject()
     {
-        return heldObject != null;
+        return heldObject != null; // 물체를 들고 있는지 여부 반환
     }
 }
