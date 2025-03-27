@@ -3,43 +3,68 @@ using TMPro;
 
 public class PickUpController : MonoBehaviour
 {
-    [SerializeField]private Transform raycastPosition;  // 레이캐스트를 발사하는 위치
-    [SerializeField]private Transform pickPosition;  // 물체를 잡을 위치
+    [SerializeField] private Transform raycastPosition;  // 레이캐스트를 발사하는 위치 (메인 카메라 Transform)
+    [SerializeField] private Transform pickPosition;  // 물체를 잡을 위치 (플레이어 앞의 Transform)
     private GameObject heldObject; // 들고 있는 물체
     private Rigidbody heldObjectRb; // 들고 있는 물체의 Rigidbody
     private GameObject detectedObject; // 감지된 물체
 
     private float detectionRange = 10f; // 물체 감지 범위
     private float pickUpOffset = 0.5f; // 물체를 들 때의 오프셋 거리
-    [SerializeField]private TMP_Text pickUpUI; // UI 텍스트 (PickUp 메시지)
+    [SerializeField] private TMP_Text pickUpUI; // UI 텍스트 (PickUp 메시지)
     private Player_Push_Controller pushController; // 물체를 밀 수 있는지 확인
-    private float throwForce = 2f; // 던질 힘
-    private LineRenderer trajectoryLine; // 던진 물체의 궤적을 그릴 라인 렌더러
+    [SerializeField] private float throwForce = 10f; // 던질 힘
+    [SerializeField] private LineRenderer trajectoryLine; // 던진 물체의 궤적을 그릴 라인 렌더러 (인스펙터에서 참조)
     private int trajectoryPoints = 50; // 던진 물체 궤적 점 개수
     private float timeBetweenPoints = 0.03f; // 궤적 점들 간 시간 간격
+    [SerializeField] private float dashLength = 0.1f; // 점선의 길이 (점의 길이)
+    [SerializeField] private float dashGap = 0.05f; // 점선 간격 (점 사이의 빈 공간)
     private float crosshairSize = 50f; // Aim pointer size
 
     void Start()
     {
+        // 메인 카메라를 레이캐스트 위치로 설정
         Camera mainCamera = Camera.main;
         raycastPosition = mainCamera.transform;
 
         // UI 텍스트 비활성화
         if (pickUpUI != null) pickUpUI.enabled = false;
+
         // 밀기 컨트롤러 초기화
         pushController = GetComponent<Player_Push_Controller>();
 
-        // 궤적 라인 렌더러 설정
-        trajectoryLine = gameObject.AddComponent<LineRenderer>();
+        // 궤적 라인 렌더러 설정 (인스펙터에서 이미 추가된 LineRenderer 사용)
+        if (trajectoryLine == null)
+        {
+            Debug.LogError("LineRenderer가 인스펙터에 할당되지 않았습니다! 플레이어 오브젝트에 LineRenderer 컴포넌트를 추가하고, Trajectory Line 필드에 할당해주세요.");
+            return;
+        }
+
         trajectoryLine.enabled = true;
         trajectoryLine.positionCount = 0;
-        trajectoryLine.startWidth = 0.025f; // 라인 두께 설정
-        trajectoryLine.endWidth = 0.025f;
-        trajectoryLine.material = new Material(Shader.Find("Sprites/Default"));
-        trajectoryLine.startColor = new Color(1f, 1f, 0f, 0.5f); // 노란색, 반투명
-        trajectoryLine.endColor = new Color(1f, 1f, 0f, 0.5f); 
+        trajectoryLine.startWidth = 0.05f; // 라인 두께 설정
+        trajectoryLine.endWidth = 0.05f;
         trajectoryLine.numCornerVertices = 5; // 꺾임을 부드럽게 처리
-        trajectoryLine.numCapVertices = 5; // 끝 부분 둥글게
+        trajectoryLine.numCapVertices = 0; // 끝 부분 둥글게 처리하지 않음
+
+        // 점선 텍스처 생성 및 설정
+        trajectoryLine.material = new Material(Shader.Find("Sprites/Default"));
+        trajectoryLine.startColor = new Color(1f, 1f, 0f, 1f); // 노란색
+        trajectoryLine.endColor = new Color(1f, 1f, 0f, 1f);
+
+        // 텍스처 모드를 타일로 설정
+        trajectoryLine.textureMode = LineTextureMode.Tile;
+
+        // 점선 패턴을 위한 텍스처 생성 (더 세밀한 텍스처로 변경)
+        Texture2D dashTexture = new Texture2D(4, 1); // 텍스처 크기를 늘려 더 세밀한 점선 생성
+        dashTexture.SetPixel(0, 0, Color.white); // 점 부분
+        dashTexture.SetPixel(1, 0, Color.white); // 점 부분
+        dashTexture.SetPixel(2, 0, Color.clear); // 빈 부분
+        dashTexture.SetPixel(3, 0, Color.clear); // 빈 부분
+        dashTexture.Apply();
+
+        trajectoryLine.material.mainTexture = dashTexture;
+        trajectoryLine.material.mainTextureScale = new Vector2(1f / (dashLength + dashGap), 1f); // 점선 간격 조정
     }
 
     void Update()
@@ -80,7 +105,7 @@ public class PickUpController : MonoBehaviour
     {
         float screenCenterX = Screen.width / 2;
         float screenCenterY = Screen.height / 2;
-        float thickness = 5f; // 굵기 설정
+        float thickness = 2f; // 굵기 설정
 
         GUI.color = Color.red; // 색상 설정
         GUI.DrawTexture(new Rect(screenCenterX - crosshairSize / 2, screenCenterY - thickness / 2, crosshairSize, thickness), Texture2D.whiteTexture); // Aim pointer 그리기
@@ -151,7 +176,6 @@ public class PickUpController : MonoBehaviour
             heldObject.transform.rotation = pickPosition.rotation;
             heldObject.transform.parent = pickPosition;
             Debug.Log("물체 잡기 : " + heldObject.name);
-
         }
         else
         {
@@ -219,13 +243,26 @@ public class PickUpController : MonoBehaviour
         Vector3 initialVelocity = (pickPosition.forward + Vector3.up * 0.5f).normalized * throwForce;
 
         // 궤적 점 계산 및 설정
+        float totalLength = 0f;
+        Vector3 previousPoint = currentPosition;
+
         for (int i = 0; i < trajectoryPoints; i++)
         {
             float t = i * timeBetweenPoints;
             Vector3 displacement = (initialVelocity * t) + (0.5f * Physics.gravity * t * t);
             Vector3 pointPosition = currentPosition + displacement;
             trajectoryLine.SetPosition(i, pointPosition);
+
+            // 궤적 길이 계산 (점선 스케일 조정용)
+            if (i > 0)
+            {
+                totalLength += Vector3.Distance(previousPoint, pointPosition);
+            }
+            previousPoint = pointPosition;
         }
+
+        // 점선 텍스처 스케일 조정
+        trajectoryLine.material.mainTextureScale = new Vector2(totalLength / (dashLength + dashGap), 1f);
     }
 
     public void RotateHeldObject()
