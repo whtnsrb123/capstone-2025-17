@@ -16,6 +16,8 @@ public class InteractManager : MonoBehaviour
     private PickUpController pickUpController;
     private InteractController interactController;
 
+    private Outline targetOutline;
+
     void Start()
     {
         pickUpController = GetComponent<PickUpController>();
@@ -64,10 +66,34 @@ public class InteractManager : MonoBehaviour
                     isPickable = false;
                 }
             }
-        }
 
+            Outline outline = hit.collider.gameObject.GetComponent<Outline>();
+            if(outline != null)
+            {
+                if(targetOutline != outline)
+                {
+                    ClearOutline();
+                    targetOutline = outline;
+                    targetOutline.enabled = true;
+                }
+            } else {
+                ClearOutline();
+            }
+        } else {
+            ClearOutline();
+        }
+        
         if (detectedObject == null && heldObject == null && descriptionText != null)
             descriptionText.enabled = false;
+    }
+
+    private void ClearOutline()
+    {
+        if(targetOutline != null)
+        {
+            targetOutline.enabled = false;
+            targetOutline = null;
+        }
     }
 
     public void OnInput()
