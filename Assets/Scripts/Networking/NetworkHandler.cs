@@ -172,7 +172,7 @@ public class NetworkHandler : MonoBehaviour
 
         foreach (TextMeshProUGUI tmp in allTMPsChildren)
         {
-            if (tmp.name == "ErrorTypeTMP")
+            if (tmp.name == "ErrorTitleTMP")
             {
                 errorTypeTMP = tmp;
                 errorTypeTMP.text = type;
