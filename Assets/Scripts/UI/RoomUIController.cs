@@ -69,7 +69,7 @@ public class RoomUIController : MonoBehaviour
         else
         {
             // 방 이름 생성에 실패한 경우 
-            NetworkHandler.Instance.SetRandomMatchExceptionPanel(0);
+            NetworkHandler.Instance.SetRandomMatchExceptionPanel(NetworkHandler.MakeNameFailed);
         }
     }
 
@@ -87,7 +87,7 @@ public class RoomUIController : MonoBehaviour
         else
         {
             // 방 이름 생성에 실패한 경우 
-            NetworkHandler.Instance.SetCreateExceptionPanel(0);
+            NetworkHandler.Instance.SetCreateExceptionPanel(NetworkHandler.MakeNameFailed);
         }
     }
 

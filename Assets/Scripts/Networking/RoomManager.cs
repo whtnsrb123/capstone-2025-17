@@ -41,7 +41,7 @@ public class RoomManager : MonoBehaviour
             EmptyRoomTtl = 0
         };
 
-        PhotonNetwork.JoinRandomOrCreateRoom
+        bool sent = PhotonNetwork.JoinRandomOrCreateRoom
         (
             expectedCustomProperties, // 검색 조건
             RequiredPlayerCount, // 최대 플레이어 수
@@ -55,6 +55,11 @@ public class RoomManager : MonoBehaviour
 
         // 클라이언트는 방 입장을 요청한 상태
         NetworkManager.Instance.SetClientState(ConnectState.Room);
+
+        // 접속이 끊겨, 요청이 전송되지 않은 경우
+        if (!sent)
+            NetworkHandler.Instance.SetJoinExceptionPanel(NetworkHandler.RequestNotSent);
+
     }
 
     // 방 생성을 요청한다 
@@ -75,7 +80,7 @@ public class RoomManager : MonoBehaviour
             EmptyRoomTtl = 0
         };
 
-        PhotonNetwork.CreateRoom
+        bool sent = PhotonNetwork.CreateRoom
        (
             roomName,
             room,
@@ -84,18 +89,26 @@ public class RoomManager : MonoBehaviour
 
         // 클라이언트는 방 입장을 요청한 상태
         NetworkManager.Instance.SetClientState(ConnectState.Room);
+
+        // 접속이 끊겨, 요청이 전송되지 않은 경우
+        if (!sent)
+            NetworkHandler.Instance.SetCreateExceptionPanel(NetworkHandler.RequestNotSent);
     }
 
     // 방 참가를 요청한다 
     public void JoinRoom(string code)
     {
-        PhotonNetwork.JoinRoom
+        bool sent = PhotonNetwork.JoinRoom
        (
             code
        );
 
         // 클라이언트는 방 입장을 요청한 상태
         NetworkManager.Instance.SetClientState(ConnectState.Room);
+
+        // 접속이 끊겨, 요청이 전송되지 않은 경우
+        if (!sent)
+            NetworkHandler.Instance.SetJoinExceptionPanel(NetworkHandler.RequestNotSent);
     }
 
     // 방을 나온다 

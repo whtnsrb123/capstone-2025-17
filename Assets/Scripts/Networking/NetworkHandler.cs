@@ -18,6 +18,11 @@ public class NetworkHandler : MonoBehaviour
 
     string errorText = "ERROR";
 
+    #region 사용자정의 에러 코드
+    public const int RequestNotSent = 0; // 접속이 끊겨, 요청이 전송되지 않은 경우
+    public const int MakeNameFailed = 1; // 방 이름을 생성하지 못한 경우
+    # endregion
+
     private void Awake()
     {
         {
@@ -71,7 +76,19 @@ public class NetworkHandler : MonoBehaviour
     {
         Action OnRandomMathFailed = null;
 
-        errorText = "You cant random now sorry";
+        switch (code)
+        {
+            // 재접속이 필수인 경우
+            case MakeNameFailed:
+                errorText = "I dont know reason bur failed random match";
+                break;
+            case RequestNotSent:
+                errorText = "Disconnect, You failed";
+                break;
+            default:
+                errorText = "You Can't random match Now :(";
+                break;
+        }
 
         ShowExceptionPanel("No Random Now", errorText, OnRandomMathFailed);
     }
@@ -89,6 +106,12 @@ public class NetworkHandler : MonoBehaviour
                 errorText = "You Need to be ReConnected";
                 OnCreateFailed = BackToStartScene;
                 break;
+            case RequestNotSent:
+                errorText = "Disconnect, You failed";
+                break;
+            case MakeNameFailed:
+                errorText = "I dont know reason bur failed random match";
+                break;
             default:
                 errorText = "You Can't Create Room Now :(";
                 break;
@@ -100,6 +123,10 @@ public class NetworkHandler : MonoBehaviour
     // 방 조인 시, 예외 처리 
     public void SetJoinExceptionPanel(int code)
     {
+        //  예외를 중복으로 처리하지 않도록 return  
+        if (NetworkManager.Instance.GetCurrenttState() == ConnectState.Disconnected)
+            return;
+
         Action OnJoinFailed = null;
 
         switch(code)
@@ -113,6 +140,9 @@ public class NetworkHandler : MonoBehaviour
                 break;
             case ErrorCode.GameFull:
                 errorText = "Game Full : The Room is Full :(";
+                break;
+            case RequestNotSent:
+                errorText = "Disconnect, You failed";
                 break;
             default:
                 errorText = "Join Room Failed :(";
@@ -174,23 +204,11 @@ public class NetworkHandler : MonoBehaviour
 
     void ReconnectAndRejoin()
     {
-        //
-        // TODO : Room List를 얻어서 찾는 Room Name이 있는지 확인해야 한다.
-        //
-
-        if (!PhotonNetwork.ReconnectAndRejoin())
+        // Reconnect And Rejoin 시도 
+        if (PhotonNetwork.ReconnectAndRejoin())
         {
             // 돌아갈 Room이 없어진 경우
-            Debug.Log("돌아갈 룸이 없어용");
             BackToStartScene();
         }
-        else
-        {
-            Debug.Log("돌아갈 룸이 있대용");
-            // 돌아갈 Room이 있는 경우 
-            PhotonNetwork.ReconnectAndRejoin();
-        }
     }
-
-
 }

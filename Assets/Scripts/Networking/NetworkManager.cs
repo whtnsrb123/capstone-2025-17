@@ -180,6 +180,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         base.OnJoinRandomFailed(returnCode, message);
 
         // 랜덤 매치 예외 처리
+        NetworkHandler.Instance.SetJoinExceptionPanel(returnCode);
     }
     public override void OnCreateRoomFailed(short returnCode, string message)
     {
