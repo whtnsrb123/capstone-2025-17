@@ -3,16 +3,16 @@ using TMPro;
 
 public class PickUpController : MonoBehaviour
 {
-    [SerializeField] private Transform raycastPosition;  // 레이캐스트를 발사하는 위치 (메인 카메라 Transform)
-    [SerializeField] private Transform pickPosition;  // 물체를 잡을 위치 (플레이어 앞의 Transform)
-    private GameObject heldObject; // 들고 있는 물체
+    public Transform raycastPosition;  // 레이캐스트를 발사하는 위치
+    public Transform pickPosition;  // 물체를 잡을 위치
+    public GameObject heldObject; // 들고 있는 물체
     private Rigidbody heldObjectRb; // 들고 있는 물체의 Rigidbody
-    private GameObject detectedObject; // 감지된 물체
+    public GameObject detectedObject; // 감지된 물체
 
-    private float detectionRange = 10f; // 물체 감지 범위
+    private float detectionRange = 2f; // 물체 감지 범위
     private float pickUpOffset = 0.5f; // 물체를 들 때의 오프셋 거리
     [SerializeField] private TMP_Text pickUpUI; // UI 텍스트 (PickUp 메시지)
-    private Player_Push_Controller pushController; // 물체를 밀 수 있는지 확인
+    private PlayerPushController pushController; // 물체를 밀 수 있는지 확인
     [SerializeField] private float throwForce = 10f; // 던질 힘
     [SerializeField] private LineRenderer trajectoryLine; // 던진 물체의 궤적을 그릴 라인 렌더러 (인스펙터에서 참조)
     private int trajectoryPoints = 50; // 던진 물체 궤적 점 개수
@@ -26,20 +26,12 @@ public class PickUpController : MonoBehaviour
         // 메인 카메라를 레이캐스트 위치로 설정
         Camera mainCamera = Camera.main;
         raycastPosition = mainCamera.transform;
-
         // UI 텍스트 비활성화
         if (pickUpUI != null) pickUpUI.enabled = false;
-
         // 밀기 컨트롤러 초기화
-        pushController = GetComponent<Player_Push_Controller>();
+        pushController = GetComponent<PlayerPushController>();
 
-        // 궤적 라인 렌더러 설정 (인스펙터에서 이미 추가된 LineRenderer 사용)
-        if (trajectoryLine == null)
-        {
-            Debug.LogError("LineRenderer가 인스펙터에 할당되지 않았습니다! 플레이어 오브젝트에 LineRenderer 컴포넌트를 추가하고, Trajectory Line 필드에 할당해주세요.");
-            return;
-        }
-
+        // 궤적 라인 렌더러 설정
         trajectoryLine.enabled = true;
         trajectoryLine.positionCount = 0;
         trajectoryLine.startWidth = 0.05f; // 라인 두께 설정
@@ -69,8 +61,9 @@ public class PickUpController : MonoBehaviour
 
     void Update()
     {
-        // 레이캐스트로 물체 감지
-        DetectPickableObject();
+        // 레이캐스트 시각화
+        Debug.DrawRay(raycastPosition.position, raycastPosition.forward * detectionRange, Color.red);
+
 
         // 물체를 들고 있을 경우 위치 업데이트
         if (heldObject != null)
@@ -91,7 +84,15 @@ public class PickUpController : MonoBehaviour
         }
         else
         {
-            trajectoryLine.positionCount = 0; // 물체를 들고 있지 않으면 궤적 라인 없애기
+            if (trajectoryLine != null)
+            {
+                trajectoryLine.positionCount = 0;
+            }
+            else
+            {
+                Debug.LogError("trajectoryLine is not assigned!");
+            }
+
         }
     }
 
@@ -111,35 +112,6 @@ public class PickUpController : MonoBehaviour
         GUI.DrawTexture(new Rect(screenCenterX - crosshairSize / 2, screenCenterY - thickness / 2, crosshairSize, thickness), Texture2D.whiteTexture); // Aim pointer 그리기
         GUI.DrawTexture(new Rect(screenCenterX - thickness / 2, screenCenterY - crosshairSize / 2, thickness, crosshairSize), Texture2D.whiteTexture); // Aim pointer 그리기
     }
-
-    void DetectPickableObject()
-    {
-        detectedObject = null;
-        RaycastHit hit;
-
-        // 레이캐스트로 물체 감지
-        if (Physics.Raycast(raycastPosition.position, raycastPosition.forward, out hit, detectionRange))
-        {
-            if (hit.collider.CompareTag("Pickable"))
-            {
-                detectedObject = hit.collider.gameObject;
-                // UI 업데이트
-                if (pickUpUI != null && heldObject == null)
-                {
-                    pickUpUI.enabled = true;
-                    pickUpUI.text = "Press F to Pick Up";
-                }
-                Debug.Log("물건 감지중: " + detectedObject.name);
-            }
-        }
-
-        // 감지된 물체 없으면 UI 숨기기
-        if (detectedObject == null && heldObject == null && pickUpUI != null)
-        {
-            pickUpUI.enabled = false;
-        }
-    }
-
     public void HandlePickUpOrDrop()
     {
         if (detectedObject != null && heldObject == null)
@@ -151,7 +123,6 @@ public class PickUpController : MonoBehaviour
             DropObject();
         }
     }
-
     private void TryPickUp()
     {
         if (detectedObject == null) return;
@@ -169,12 +140,14 @@ public class PickUpController : MonoBehaviour
                 heldObjectCollider.isTrigger = true; // 충돌 감지 비활성화
             }
 
+            // 물체의 중심을 기준으로 pickPosition에 위치하도록 조정
             Bounds objectBounds = heldObjectCollider.bounds;
             float objectRadius = Mathf.Max(objectBounds.extents.x, objectBounds.extents.z); // 가로 반경 중 큰 값 사용
             Vector3 newPickPosition = pickPosition.position + pickPosition.forward * (objectRadius + pickUpOffset);
-            heldObject.transform.position = newPickPosition;
+            heldObject.transform.position = newPickPosition; // 조정된 위치에 배치
             heldObject.transform.rotation = pickPosition.rotation;
             heldObject.transform.parent = pickPosition;
+            Debug.Log("물체 잡기 성공: " + heldObject.name);
             Debug.Log("물체 잡기 : " + heldObject.name);
         }
         else
@@ -183,21 +156,21 @@ public class PickUpController : MonoBehaviour
         }
     }
 
-    private void DropObject()
+    public void DropObject()
     {
         if (heldObject != null)
         {
-            heldObjectRb.isKinematic = false;  // 물체에 물리 적용
-            heldObjectRb.useGravity = true;    // 중력 활성화
+            // 현재 위치에서 물체 내려놓기
+            heldObjectRb.isKinematic = false;
+            heldObjectRb.useGravity = true;
             heldObjectRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
-            heldObject.transform.parent = null; // 부모 객체에서 분리
+            heldObject.transform.parent = null;
 
-            // Collider 설정 되돌리기
             Collider heldObjectCollider = heldObject.GetComponent<Collider>();
             if (heldObjectCollider != null)
             {
-                heldObjectCollider.isTrigger = false; // 충돌 감지 활성화
+                heldObjectCollider.isTrigger = false;
             }
 
             heldObject = null;
