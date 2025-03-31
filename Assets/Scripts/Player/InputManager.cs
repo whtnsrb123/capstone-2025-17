@@ -6,6 +6,8 @@ public class InputManager : MonoBehaviour
     private PickUpController pickUpController;
     private RotateToMouse rotateToMouse;
     private InteractManager interactManager;
+    public Animator animator; // 애니메이터 컴포넌트 연결
+    public string throwTriggerName = "IsThrow"; // 던지기 트리거 이름
 
     private void Awake()
     {
@@ -19,6 +21,7 @@ public class InputManager : MonoBehaviour
         pushController = GetComponent<PlayerPushController>();
         pickUpController = GetComponent<PickUpController>();
         interactManager = GetComponent<InteractManager>();
+        animator = GetComponent<Animator>(); // 애니메이터 컴포넌트 할당
     }
 
     void Update()
@@ -38,6 +41,7 @@ public class InputManager : MonoBehaviour
             {
                 Debug.Log("물체를 들고 있음 -> 던지기 시도");
                 pickUpController.ThrowObject();
+                animator.SetTrigger(throwTriggerName); // 던지기 트리거 활성화
             }
             else if (pushController.CanPush())
             {
@@ -53,6 +57,7 @@ public class InputManager : MonoBehaviour
             pickUpController.RotateHeldObject();
         }
     }
+
     void UpdateRotate() // 화면 회전 (마우스)
     {
         float mouseX = Input.GetAxis("Mouse X"); // 마우스 좌우

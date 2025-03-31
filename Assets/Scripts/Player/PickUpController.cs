@@ -20,6 +20,7 @@ public class PickUpController : MonoBehaviour
     [SerializeField] private float dashLength = 0.1f; // 점선의 길이 (점의 길이)
     [SerializeField] private float dashGap = 0.05f; // 점선 간격 (점 사이의 빈 공간)
     private float crosshairSize = 50f; // Aim pointer size
+    private ConfigurableJoint joint; // Configurable Joint 컴포넌트
 
     void Start()
     {
@@ -132,20 +133,18 @@ public class PickUpController : MonoBehaviour
 
         if (heldObjectRb != null)
         {
-            heldObjectRb.isKinematic = true; // 물리 엔진 비활성화
-            Collider heldObjectCollider = heldObject.GetComponent<Collider>();
+            // Configurable Joint 생성 및 설정
+            joint = gameObject.AddComponent<ConfigurableJoint>();
+            joint.connectedBody = heldObjectRb;
+            joint.anchor = pickPosition.localPosition;
+            joint.connectedAnchor = Vector3.zero;
+            joint.xMotion = ConfigurableJointMotion.Free;
+            joint.yMotion = ConfigurableJointMotion.Free;
+            joint.zMotion = ConfigurableJointMotion.Free;
+            joint.angularXMotion = ConfigurableJointMotion.Free;
+            joint.angularYMotion = ConfigurableJointMotion.Free;
+            joint.angularZMotion = ConfigurableJointMotion.Free;
 
-            if (heldObjectCollider != null && heldObject.CompareTag("Pickable"))
-            {
-                heldObjectCollider.isTrigger = true; // 충돌 감지 비활성화
-            }
-
-            // 물체의 중심을 기준으로 pickPosition에 위치하도록 조정
-            Bounds objectBounds = heldObjectCollider.bounds;
-            float objectRadius = Mathf.Max(objectBounds.extents.x, objectBounds.extents.z); // 가로 반경 중 큰 값 사용
-            Vector3 newPickPosition = pickPosition.position + pickPosition.forward * (objectRadius + pickUpOffset);
-            heldObject.transform.position = newPickPosition; // 조정된 위치에 배치
-            heldObject.transform.rotation = pickPosition.rotation;
             heldObject.transform.parent = pickPosition;
             Debug.Log("물체 잡기 성공: " + heldObject.name);
             Debug.Log("물체 잡기 : " + heldObject.name);
@@ -160,18 +159,10 @@ public class PickUpController : MonoBehaviour
     {
         if (heldObject != null)
         {
-            // 현재 위치에서 물체 내려놓기
-            heldObjectRb.isKinematic = false;
-            heldObjectRb.useGravity = true;
-            heldObjectRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            // Configurable Joint 제거
+            Destroy(joint);
 
             heldObject.transform.parent = null;
-
-            Collider heldObjectCollider = heldObject.GetComponent<Collider>();
-            if (heldObjectCollider != null)
-            {
-                heldObjectCollider.isTrigger = false;
-            }
 
             heldObject = null;
             Debug.Log("물체 놓기");
@@ -219,6 +210,13 @@ public class PickUpController : MonoBehaviour
         float totalLength = 0f;
         Vector3 previousPoint = currentPosition;
 
+        // Raycast 충돌 무시 설정
+        Collider heldObjectCollider = heldObject.GetComponent<Collider>();
+        if (heldObjectCollider != null)
+        {
+            Physics.IgnoreCollision(heldObjectCollider, GetComponent<Collider>());
+        }
+
         for (int i = 0; i < trajectoryPoints; i++)
         {
             float t = i * timeBetweenPoints;
@@ -226,12 +224,27 @@ public class PickUpController : MonoBehaviour
             Vector3 pointPosition = currentPosition + displacement;
             trajectoryLine.SetPosition(i, pointPosition);
 
+            // 충돌 감지
+            RaycastHit hit;
+            if (Physics.Raycast(previousPoint, (pointPosition - previousPoint).normalized, out hit, Vector3.Distance(previousPoint, pointPosition) * 0.9f)) // Raycast 거리 조정
+            {
+                // 충돌 시 궤적 중단
+                trajectoryLine.positionCount = i + 1;
+                break;
+            }
+
             // 궤적 길이 계산 (점선 스케일 조정용)
             if (i > 0)
             {
                 totalLength += Vector3.Distance(previousPoint, pointPosition);
             }
             previousPoint = pointPosition;
+        }
+
+        // Raycast 충돌 무시 해제
+        if (heldObjectCollider != null)
+        {
+            Physics.IgnoreCollision(heldObjectCollider, GetComponent<Collider>(), false);
         }
 
         // 점선 텍스처 스케일 조정

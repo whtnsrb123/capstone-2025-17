@@ -11,13 +11,14 @@ public class CharacterController : MonoBehaviour
 
     private bool isGrounded;                                // 캐릭터가 땅에 닿아 있는지 여부
     private Rigidbody rb;                                       // 캐릭터의 Rigidbody 컴포넌트
-    
+
     // 물에 젖은 상태 관리
     private bool isWet = false;            // 물에 젖었는지 여부
     private float originalMoveSpeed;       // 원래 걷기 속도
     private float originalSprintSpeed;     // 원래 달리기 속도
     private float originalJumpForce;       // 원래 점프 힘
 
+    // 물 파티클 시스템 (파이프 오브젝트에서 발생하는 파티클)
     [SerializeField] private ParticleSystem waterEffect;     // 물 파티클 시스템
 
     // 물에 닿은 시간
@@ -32,6 +33,10 @@ public class CharacterController : MonoBehaviour
 
     private ParticleSystem ps;
     private ParticleSystem.Particle[] particles;
+
+    public Animator animator; // 애니메이터 컴포넌트 연결
+    public int MoveType = 0; // MoveType 변수 선언 및 초기화
+    public string jumpTriggerName = "IsJump"; // 점프 트리거 이름
 
     void Start()
     {
@@ -52,34 +57,37 @@ public class CharacterController : MonoBehaviour
 
         ps = waterEffect; // 파티클 시스템 컴포넌트 할당
         particles = new ParticleSystem.Particle[ps.main.maxParticles];
+
+        // 애니메이터 컴포넌트 가져오기
+        animator = GetComponent<Animator>();
     }
 
     void Update()
-{
-    MoveCharacter();  // 이동
-    HandleJump();     // 점프
-    CheckGrounded();  // 땅에 닿아 있는지 감지
-
-    // 물에 닿은 상태일 때 효과 유지 (물을 계속 맞고 있으면 시간 감소 X)
-    if (isWet && wetTime > 0f)
     {
-        wetTime -= Time.deltaTime;
-        if (wetTime <= 0f)
+        MoveCharacter();  // 이동
+        HandleJump();     // 점프
+        CheckGrounded();  // 땅에 닿아 있는지 감지
+
+        // 물에 닿은 상태일 때 계속 효과가 적용되도록 유지
+        if (isWet)
         {
-            ResetWetEffect();  // 효과 종료
+            wetTime -= Time.deltaTime; // 1초마다 타이머 감소
+            if (wetTime <= 0f)
+            {
+                ResetWetEffect();  // 효과 종료
+            }
+        }
+
+        // 속도 감소 상태일 때 타이머 감소 및 효과 종료 처리
+        if (isSlowedDown)
+        {
+            slowDownTimer -= Time.deltaTime;
+            if (slowDownTimer <= 0f)
+            {
+                ResetSpeed(); // 원래 속도로 복구
+            }
         }
     }
-
-    // 속도 감소 상태일 때 타이머 감소 및 효과 종료 처리
-    if (isSlowedDown)
-    {
-        slowDownTimer -= Time.deltaTime;
-        if (slowDownTimer <= 0f)
-        {
-            ResetSpeed(); // 원래 속도로 복구
-        }
-    }
-}
 
     void MoveCharacter() // 캐릭터 이동
     {
@@ -99,12 +107,22 @@ public class CharacterController : MonoBehaviour
         if (Mathf.Approximately(horizontal, 0f) && Mathf.Approximately(vertical, 0f))
         {
             rb.velocity = new Vector3(0, rb.velocity.y, 0); // Y 속도 유지 (중력/점프 영향)
+            animator.SetInteger("MoveType", 0); // 멈춤 상태
         }
         else
         {
             // 목표 속도까지 부드럽게 변경
             Vector3 newVelocity = Vector3.Lerp(currentVelocity, targetVelocity, acceleration * Time.deltaTime);
             rb.velocity = new Vector3(newVelocity.x, rb.velocity.y, newVelocity.z);
+
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                animator.SetInteger("MoveType", 2); // 달리기 상태
+            }
+            else
+            {
+                animator.SetInteger("MoveType", 1); // 걷기 상태
+            }
         }
     }
 
@@ -114,6 +132,7 @@ public class CharacterController : MonoBehaviour
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse); // 위쪽 방향으로 힘을 가해 점프
             isGrounded = false; // 점프 후 공중 상태로 변경
+            animator.SetTrigger(jumpTriggerName); // 점프 트리거 활성화
         }
     }
 
@@ -133,35 +152,36 @@ public class CharacterController : MonoBehaviour
             isGrounded = false;
         }
     }
+
+    // 파티클 충돌 처리
     private void OnParticleCollision(GameObject other)
-{
-    if (other.CompareTag("WaterParticle")) // 파티클 태그 확인
     {
-        int numParticles = ps.GetParticles(particles);
-
-        for (int i = 0; i < numParticles; i++)
+        if (other.CompareTag("WaterParticle")) // 파티클 태그 확인
         {
-            if (particles[i].remainingLifetime < 0.1f)
+            int numParticles = ps.GetParticles(particles);
+
+            for (int i = 0; i < numParticles; i++)
             {
-                particles[i].remainingLifetime = 0f;
-                ps.SetParticles(particles, numParticles);
-                break;
+                if (particles[i].remainingLifetime < 0.1f) // 충돌한 파티클 찾기 (수명 활용)
+                {
+                    particles[i].remainingLifetime = 0f; // 파티클 수명을 0으로 설정하여 즉시 제거
+                    ps.SetParticles(particles, numParticles); // 파티클 데이터 업데이트
+                    break;
+                }
             }
+
+            Debug.Log("파티클 물방울과 충돌");
+
+            SlowDownSpeed(); // 속도 감소 효과
         }
-
-        Debug.Log("파티클 물방울과 충돌");
-
-        StartWetEffect();
     }
-}
-    
 
     // 물에 젖은 효과 적용
     private void StartWetEffect()
     {
         if (isWet)
         {
-            wetTime = wetDuration; 
+            wetTime = wetDuration;
             return; // 이미 젖은 상태라면 중복 실행 방지
         }
         isWet = true;
@@ -184,6 +204,20 @@ public class CharacterController : MonoBehaviour
         isWet = false;
 
         Debug.Log("물에 젖은 효과 종료 - 속도와 점프력 복구");
+    }
+
+    // 속도 감소 효과 적용
+    private void SlowDownSpeed()
+    {
+        if (isSlowedDown) return; // 이미 속도 감소 상태라면 중복 실행 방지
+
+        isSlowedDown = true;
+        slowDownTimer = slowDownDuration;
+
+        // 속도 감소
+        moveSpeed *= slowDownFactor;
+        sprintSpeed *= slowDownFactor;
+        jumpForce *= slowDownFactor;
     }
 
     // 원래 속도로 복구
