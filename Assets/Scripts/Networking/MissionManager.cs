@@ -4,20 +4,21 @@ using System.Linq;
 using Photon.Pun;
 using UnityEngine;
 
-public class MissionManager : MonoBehaviourPun
+public class MissionManager : MonoBehaviourPun ,IManager
 {
-    public static MissionManager Instance {get; private set;}
     private Dictionary<int, bool> missionsStates = new Dictionary<int, bool>();
     
     int nextMission = 1; //다음 미션 번호
-
     
-    private void Awake()
+    public void Init()
     {
-        if (Instance == null) { Instance = this; }
-        else { Destroy(gameObject); }
+        Debug.Log("MissionManager 초기화 완료");
     }
-    
+
+    public void Clear()
+    {
+        Debug.Log("MissionManager 클리어");
+    }
     //특정 미션을 성공처리
     public void CompleteMission(int missionId)
     {
@@ -44,6 +45,7 @@ public class MissionManager : MonoBehaviourPun
         //          return;
         //      }
         // }
+        Managers.GameTimerManager.StartTimer(300f);
         missionsStates.OrderBy(key => key.Key); 
 
         foreach (var item in missionsStates)
@@ -66,7 +68,8 @@ public class MissionManager : MonoBehaviourPun
         missionsStates[missionId] = true;
         
         //게임 종료조건 체크
-        GameStateManager.Instance.CheckGameEnd();
+        //GameStateManager.Instance.CheckGameEnd();
+        Managers.GameStateManager.CheckGameEnd();
     }
     #endregion
 }

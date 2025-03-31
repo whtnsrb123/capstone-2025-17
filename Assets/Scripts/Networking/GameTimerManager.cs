@@ -5,7 +5,7 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class GameTimerManager : MonoBehaviourPun, IPunObservable
+public class GameTimerManager : MonoBehaviourPun, IManager
 {
     public TMP_Text timerText;  // UI 타이머 표시
     private float timer = 0f;
@@ -19,10 +19,20 @@ public class GameTimerManager : MonoBehaviourPun, IPunObservable
     // 따라서 싱글톤을 제거하고, 방마다 새로운 GameTimerManager가 생성되도록 해야 함.
     private void Start()
     {
-        if (!PhotonNetwork.InRoom)
+        if (GameStateManager.isServerTest && !PhotonNetwork.InRoom)
         {
             Destroy(gameObject);
         }
+    }
+    
+    public void Init()
+    {
+        Debug.Log("GameTimerManager 초기화 완료");
+    }
+
+    public void Clear()
+    {
+        Debug.Log("GameTimerManager 클리어");
     }
     
     //미션이 시작할 때 GameTimerManager.Instance.StartTimer(300f)호출 => 5분 타이머 시작
@@ -107,7 +117,8 @@ public class GameTimerManager : MonoBehaviourPun, IPunObservable
     {
         Debug.Log("타임 오버! 게임 오버 처리 필요");
         //시간 초과되었으면 게임 종료 체크
-        GameStateManager.Instance.CheckGameEnd();
+        //GameStateManager.Instance.CheckGameEnd();
+        Managers.GameStateManager.CheckGameEnd();
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
