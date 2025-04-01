@@ -1,4 +1,4 @@
-using Photon.Pun;
+Ôªøusing Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -15,12 +15,8 @@ public class StartSceneUI : MonoBehaviour
 
     void Awake()
     {
-        // Master Server ø¨∞· Ω√ Ω««‡«“ ¿Ã∫•∆Æ µÓ∑œ 
-        NetworkManager.OnConnectedToServer += () =>
-        {
-            connectButton.interactable = true;
-            connectInfoTMP.text = CONNECT_SUCCESS;
-        };
+        // Master Server Ïó∞Í≤∞ Ïãú Ïã§ÌñâÌï† Ïù¥Î≤§Ìä∏ Îì±Î°ù 
+        NetworkManager.OnConnectedToServer += SetConnectedEvent;
     }
 
     void Start()
@@ -28,6 +24,17 @@ public class StartSceneUI : MonoBehaviour
         FadeUI.Fade?.Invoke(true);
         connectButton.interactable = false;
         connectInfoTMP.text = CONNECT_TRY;
+    }
+
+    private void OnDestroy()
+    {
+        NetworkManager.OnConnectedToServer -= SetConnectedEvent;
+    }
+
+    void SetConnectedEvent()
+    {
+        connectButton.interactable = true;
+        connectInfoTMP.text = CONNECT_SUCCESS;
     }
 
     public void OnClickConnectButton()

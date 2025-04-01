@@ -1,7 +1,8 @@
-using System;
+ï»¿using System;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using ExitGames.Client.Photon;
 
 public enum ConnectState
 {
@@ -14,19 +15,31 @@ public enum ConnectState
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
-    // ÇÃ·¹ÀÌ¾îÀÇ ¿¬°á »óÅÂ
+    public static NetworkManager Instance;
+
+    public static Action OnConnectedToServer; // ë§ˆìŠ¤í„° ì„œë²„ì— ì ‘ì†í–ˆì„ ë•Œ
+    public static Action OnRoomEntered; // ë£¸ì— ì…ì¥í–ˆì„ ë•Œ
+    public static Action OnRequestFailed; // ë„¤íŠ¸ì›Œí¬ ìš”ì²­ì´ ì‹¤íŒ¨í–ˆì„ ë•Œ
+    public static Action OnRoomSeatsUpdated; // Seats ì •ë³´ê°€ ê°±ì‹ ë  ë•Œ 
+    public static Action<int, bool> OnRoomPlayerUpdated; // ë£¸ í”Œë ˆì´ì–´ ë¦¬ìŠ¤íŠ¸ê°€ ë³€ë™ëì„ ë•Œ
+
+    // í”Œë ˆì´ì–´ì˜ ì—°ê²° ìƒíƒœ
     static ConnectState sConnectState;
 
-    static string _gameVersion = "1";
+    const string _gameVersion = "1"; 
+    const bool PlayerEntered = true; // ëŒ€ê¸°ë°©ì˜ í”Œë ˆì´ì–´ê°€ ì…ì¥/í‡´ì¥ì¸ì§€ êµ¬ë¶„í•˜ê¸° ìœ„í•´ ë§¤ê°œë³€ìˆ˜ë¡œ ì“°ì¼ const ë³€ìˆ˜
 
-    public static Action OnConnectedToServer;
-    public static Action OnRoomPlayerEntered;
-    public static Action OnRoomEntered;
-    public static Action OnRequestFailed;
-
-    // =================== int·Î º¯°æÇØ¾ß ÇÑ´Ù : ActorNumber »ç¿ë ===============
-    public static Action<string> OnRoomPlayerLeaved;
-
+    private void Awake()
+    {
+        if(Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     void Start()
     {
@@ -41,100 +54,100 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         if (!PhotonNetwork.IsConnected)
         {
-            // ¾À µ¿±âÈ­
+            // ì”¬ ë™ê¸°í™”
             PhotonNetwork.AutomaticallySyncScene = true;
             PhotonNetwork.GameVersion = _gameVersion;
 
-            // Á¢¼Ó ½Ãµµ
+            // ì ‘ì† ì‹œë„
             PhotonNetwork.ConnectUsingSettings();
         }
     }
+   
 
-
-    #region Callbacks
-
+    #region ë„¤íŠ¸ì›Œí¬ ì‘ì—… ìš”ì²­ ì½œë°± í•¨ìˆ˜ë“¤
     public override void OnConnectedToMaster()
     {
-        Debug.Log("NetworkManager.cs - On Connected To Master()");
-
-        // ¸¶½ºÅÍ ¼­¹ö Á¢¼Ó ¼º°ø ½Ã, ¹Ù·Î ·Îºñ Á¢¼Ó ½Ãµµ
+        // ë§ˆìŠ¤í„° ì„œë²„ ì ‘ì† ì„±ê³µ ì‹œ, ë°”ë¡œ ë¡œë¹„ ì ‘ì† ì‹œë„
         PhotonNetwork.JoinLobby();
-    }
-
-    public override void OnDisconnected(DisconnectCause cause)
-    {
-        Debug.Log("NetworkManager.cs - On Disconnected()");
-
-        // ¿¬°á ½ÇÆĞ ½Ã, ÀçÁ¢¼Ó ½Ãµµ 
-        int retry = 0,  maxRetry = 5;
-        if (retry < maxRetry)
-        {
-            retry++;
-
-            Debug.Log("NetworkManager.cs - retry connect to master server");
-
-            Invoke(nameof(ConnectToMasterServer), 2f);
-        }
     }
 
     public override void OnJoinedLobby()
     {
-        Debug.Log("On Joined Lobby()");
-
+        // ë¡œë¹„ì— ì¡°ì¸ ì„±ê³µ
         sConnectState = ConnectState.Lobby;
 
-        // StartSceneUI.cs ¿¡¼­ µî·ÏµÈ ÀÌº¥Æ®
+        // StartSceneUI.cs ì—ì„œ ë“±ë¡ëœ ì´ë²¤íŠ¸ ì‹¤í–‰
         OnConnectedToServer?.Invoke();
     }
 
     public override void OnJoinedRoom()
     {
-        // ÇÃ·¹ÀÌ¾î Á¤º¸¸¦ ¼­¹ö¿¡ Àü¼ÛÇÏ±â
-        if (PhotonNetwork.IsConnected)
-        {
-            sConnectState = ConnectState.Room;
-            OnRoomEntered?.Invoke();
-            OnRoomPlayerEntered?.Invoke();
-        }
-        else
-        {
-            // ¿¬°á ½ÇÆĞ Ã³¸®
-        }
-        
+        // ë£¸ì— ì¡°ì¸ ì„±ê³µ
+         sConnectState = ConnectState.Room;
+
+         // ì´ë²¤íŠ¸ë¥¼ ì‹¤í–‰í•œë‹¤ 
+         OnRoomEntered?.Invoke();
     }
+
     public override void OnLeftRoom()
     {
+        //sConnectState = ConnectState.Lobby;
         Debug.Log("On Left Room()");
-    }
-
-    public override void OnJoinRandomFailed(short returnCode, string message)
-    {
-        // ·ë ¿¬°á ½ÇÆĞ Ã³¸®
-    }
-
-    public override void OnCreatedRoom()
-    {
-        Debug.Log("NetworkManager.cs - On Created Room()");
-        Debug.Log($"NetworkManager.cs - {PhotonNetwork.CurrentRoom.Name}");
-    }
-
-
-    public override void OnCreateRoomFailed(short returnCode, string message)
-    {
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
-        OnRoomPlayerEntered?.Invoke();
-        Debug.Log("Entered Player");
+        // ë‹¤ë¥¸ í”Œë ˆì´ì–´ê°€ ë°©ì— ì…ì¥í•œ ê²½ìš°
+        OnRoomPlayerUpdated?.Invoke(newPlayer.ActorNumber, PlayerEntered);
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
+        // ë‹¤ë¥¸ í”Œë ˆì´ì–´ê°€ ë°©ì„ ë‚˜ê°„ ê²½ìš° 
+        OnRoomPlayerUpdated?.Invoke(otherPlayer.ActorNumber, !PlayerEntered);
+    }
 
-        string nickname = (string)otherPlayer.CustomProperties["Nickname"];
-        Debug.Log("NetworkManager - ³ª°£ »õ³¢ : " + nickname);
-        OnRoomPlayerLeaved?.Invoke(nickname);
+    public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
+    {
+        base.OnRoomPropertiesUpdate(propertiesThatChanged);
+
+        OnRoomSeatsUpdated?.Invoke();
+
+        Debug.Log("OnRoomPropertiesUpdate");
+    }
+
+
+    #endregion
+
+    #region ì„œë²„ ì˜ˆì™¸ ì²˜ë¦¬ ì½œë°± í•¨ìˆ˜ë“¤
+
+    public override void OnJoinRandomFailed(short returnCode, string message)
+    {
+        base.OnJoinRandomFailed(returnCode, message);
+
+        // ëœë¤ ë§¤ì¹˜ ì˜ˆì™¸ ì²˜ë¦¬
+    }
+    public override void OnCreateRoomFailed(short returnCode, string message)
+    {
+        base.OnCreateRoomFailed(returnCode, message);
+
+        // ë°© ìƒì„± ì˜ˆì™¸ ì²˜ë¦¬
+        NetworkHandler.Instance.SetCreateExceptionPanel(returnCode);
+    }
+
+    public override void OnJoinRoomFailed(short returnCode, string message)
+    {
+        base.OnJoinRoomFailed(returnCode, message);
+
+        // ì¡°ì¸ ì˜ˆì™¸ ì²˜ë¦¬
+        NetworkHandler.Instance.SetJoinExceptionPanel(returnCode);
+
+    }
+
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        Debug.Log("On Disconnected");
+        NetworkHandler.Instance.SetDisconnectedExceptionPanel((int)cause, sConnectState);
     }
     #endregion
 

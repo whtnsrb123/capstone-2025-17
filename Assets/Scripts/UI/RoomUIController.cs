@@ -1,6 +1,6 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using Photon.Realtime;
+using System.Collections;
 
 // Controller
 public class RoomUIController : MonoBehaviour
@@ -24,25 +24,35 @@ public class RoomUIController : MonoBehaviour
 
     private void Start()
     {
-        // room view �̺�Ʈ ���
-        roomView.randomBtn.onClick.AddListener(() => OnClickRandomBtn());
-        roomView.leaveBtn.onClick.AddListener(() => OnClickLeaveBtn());
+        // room view 이벤트 등록
+        roomView.randomBtn.onClick.AddListener(OnClickRandomBtn);
+        roomView.leaveBtn.onClick.AddListener(OnClickLeaveBtn);
 
-        // create view �̺�Ʈ ���
-        roomView.c_confirmBtn.onClick.AddListener(() => OnClickCreateConfirmBtn());
+        // create view 이벤트 등록
+        roomView.c_confirmBtn.onClick.AddListener(OnClickCreateConfirmBtn);
         
-        // join view �̺�Ʈ ���
-        roomView.j_confirmBtn.onClick.AddListener(() => OnClickJoinConfirmBtn());
+        // join view 이벤트 등록
+        roomView.j_confirmBtn.onClick.AddListener(OnClickJoinConfirmBtn);
 
-        // Game Lanucher �̺�Ʈ ��� 
-        NetworkManager.OnRoomPlayerEntered += RenderPlayers;
-        NetworkManager.OnRoomPlayerLeaved += RemoveRenderedPlayers;
+        // NetworkManager 이벤트 등록 
+        NetworkManager.OnRoomPlayerUpdated += UpdatePlayerSeats;
+        NetworkManager.OnRoomSeatsUpdated += UpdatePlayersUI;
         NetworkManager.OnRoomEntered += OnEnteredRoom;
+
+    }
+
+    private void OnDestroy()
+    {
+        // NetworkManager 이벤트 해제
+        NetworkManager.OnRoomPlayerUpdated -= UpdatePlayerSeats;
+        NetworkManager.OnRoomSeatsUpdated -= UpdatePlayersUI;
+        NetworkManager.OnRoomEntered -= OnEnteredRoom;
     }
 
     // =================== Lobby Buttons =====================
     void OnClickRandomBtn()
     {
+        // 랜덤 매치 버튼 클릭 시 
         SaveProfileInfo();
 
         roomModel.RoomType = ServerInfo.RoomTypes.Random;
@@ -51,66 +61,91 @@ public class RoomUIController : MonoBehaviour
 
     void OnClickCreateConfirmBtn()
     {
+        // 방 생성 확인 버튼 클릭 시 
         SaveProfileInfo();
 
         string roomCode =$"{Random.Range(10000, 99999)}";
-        Debug.Log(roomCode);
-        int _maxPlayer = (int)roomView.maxPlayerCount.value;
 
         roomModel.RoomType = ServerInfo.RoomTypes.Create;
 
-        roomManager.CreateRoom(roomCode, _maxPlayer);
+        roomManager.CreateRoom(roomCode);
     }
 
 
     void OnClickJoinConfirmBtn()
     {
-        SaveProfileInfo();
-
-        roomModel.RoomType = ServerInfo.RoomTypes.Join;
         string code = roomView.roomCodeTMPInp.text;
+        // 참여 코드가 공백이 아니어야 한다
+        if (!string.IsNullOrWhiteSpace(code))
+        {
+            // 방 참가하기 버튼 클릭 시 
+            SaveProfileInfo();
 
-        roomManager.JoinRoom(code);
+            roomModel.RoomType = ServerInfo.RoomTypes.Join;
+            roomManager.JoinRoom(code);
+        }
     }
 
-    // ================== In Room ===========================
+    // ========================= In Room ===========================
 
     void OnEnteredRoom()
     {
-        // �� ���� ���� �� �޼ҵ� ȣ��
+        // 룸 접속 성공 시 메소드 호출
         roomPanel.SetActive(true);
 
         string roomCode = roomManager.GetRoomCode();
         roomView.roomCode.text = $"Room Code : {roomCode}";
+
+        // MasterClient일 때, 나의 ActorNumber를 스스로 전송한다 
+        roomManager.UpdateEnteredPlayerSeats(roomManager.GetActorNumber());
     }
 
     void OnClickLeaveBtn()
     {
-        // �� ������
+        // 룸 나가기
         roomManager.LeaveRoom();
     }
 
     public void SaveProfileInfo()
     {
+        // 룸에 접속 시 클라이언트의 정보를 전송한다
         string nickname = profileModel.Nickname;
         int characterId = profileModel.CharacterId;
 
         roomManager.SendClientInfo(nickname, characterId);
     }
 
-    Dictionary<string, int> playersInfo = new Dictionary<string, int>();
+    void UpdatePlayerSeats(int actorNumber, bool isEntered)
+    {
+        // RoomMananger는 현재 룸의 CustomProperties의 "Seats" 정보를 업데이트 한다.
 
-    public void RenderPlayers()
-    { 
-        playersInfo = roomManager.RenderPlayers();
-
-        roomView.RenderPlayerUI(playersInfo);
+        if (isEntered) 
+        {
+            // 입장한 경우
+            roomManager.UpdateEnteredPlayerSeats(actorNumber); // 입장한 플레이어의 actorNumber
+        }
+        else 
+        {
+            // 퇴장한 경우
+            roomManager.UpdateLeftPlayerSeats(actorNumber); // 나간 플레이어의 actorNumber
+        }
+            
     }
 
-    public void RemoveRenderedPlayers(string nickname)
+    void GetUpdatedPlayerSeats()
     {
+        int[] seats = roomManager.GetUpdatedPlayerSeats();
+        roomView.GetPlayerSeats(seats);
+    }
 
-        roomView.RemovePlayerUI(nickname);
+    public void UpdatePlayersUI()
+    {
+        GetUpdatedPlayerSeats();
+
+        Dictionary<int, Hashtable> playersInfo = roomManager.RenderPlayersUI();
+
+        roomView.UpdatePlayerUI(playersInfo);
+
     }
 
 }
