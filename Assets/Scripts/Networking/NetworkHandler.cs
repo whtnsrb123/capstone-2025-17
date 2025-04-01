@@ -3,7 +3,6 @@ using Photon.Realtime;
 using System;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class NetworkHandler : MonoBehaviour
@@ -19,6 +18,11 @@ public class NetworkHandler : MonoBehaviour
 
     string errorText = "ERROR";
 
+    #region 사용자정의 에러 코드
+    public const int RequestNotSent = 0; // 접속이 끊겨, 요청이 전송되지 않은 경우
+    public const int MakeNameFailed = 1; // 방 이름을 생성하지 못한 경우
+    # endregion
+
     private void Awake()
     {
         {
@@ -30,7 +34,7 @@ public class NetworkHandler : MonoBehaviour
     }
 
     // 접속이 끊겼을 때 예외 처리 
-   public  void SetDisconnectedExceptionPanel(int code, ConnectState state)
+   public  void SetDisconnectedExceptionPanel(int code)
     {
         Action OnDisconnect = null;
         switch (code)
@@ -45,7 +49,7 @@ public class NetworkHandler : MonoBehaviour
             case (int) DisconnectCause.CustomAuthenticationFailed:
                 errorText = "You InJeung failed";
                 break;
-            case (int)DisconnectCause.MaxCcuReached:
+            case (int) DisconnectCause.MaxCcuReached:
                 errorText = "Server Too Many People.. sorry";
                 break;
             default:
@@ -54,7 +58,7 @@ public class NetworkHandler : MonoBehaviour
         }
 
 
-        if (state == ConnectState.Room || state == ConnectState.InGame)
+        if (NetworkManager.Instance.GetClienttState() == ConnectState.Room)
         {
             // 대기방 혹은 인게임에서 Disconnected -> Rejoin 시도
             OnDisconnect = ReconnectAndRejoin;
@@ -64,8 +68,31 @@ public class NetworkHandler : MonoBehaviour
             // 그 외 모든 곳에서 Disconnected -> StartScene으로 돌아가서 재접속
             OnDisconnect = BackToStartScene;
         }
-        ShowExceptionPanel("====You Can't Create====", errorText, OnDisconnect);
+        ShowExceptionPanel("====Disconnected====", errorText, OnDisconnect);
     }
+
+    // 랜덤 매치 시, 예외 처리
+    public void SetRandomMatchExceptionPanel(int code)
+    {
+        Action OnRandomMathFailed = null;
+
+        switch (code)
+        {
+            // 재접속이 필수인 경우
+            case MakeNameFailed:
+                errorText = "I dont know reason bur failed random match";
+                break;
+            case RequestNotSent:
+                errorText = "Disconnect, You failed";
+                break;
+            default:
+                errorText = "You Can't random match Now :(";
+                break;
+        }
+
+        ShowExceptionPanel("No Random Now", errorText, OnRandomMathFailed);
+    }
+
 
     // 방 생성 시, 예외 처리 
     public void SetCreateExceptionPanel(int code)
@@ -79,6 +106,12 @@ public class NetworkHandler : MonoBehaviour
                 errorText = "You Need to be ReConnected";
                 OnCreateFailed = BackToStartScene;
                 break;
+            case RequestNotSent:
+                errorText = "Disconnect, You failed";
+                break;
+            case MakeNameFailed:
+                errorText = "I dont know reason bur failed random match";
+                break;
             default:
                 errorText = "You Can't Create Room Now :(";
                 break;
@@ -90,6 +123,9 @@ public class NetworkHandler : MonoBehaviour
     // 방 조인 시, 예외 처리 
     public void SetJoinExceptionPanel(int code)
     {
+        //  예외를 중복으로 처리하지 않도록 return  
+        if (NetworkManager.Instance.GetCurrenttState() == ConnectState.Disconnected) return;
+
         Action OnJoinFailed = null;
 
         switch(code)
@@ -104,6 +140,9 @@ public class NetworkHandler : MonoBehaviour
             case ErrorCode.GameFull:
                 errorText = "Game Full : The Room is Full :(";
                 break;
+            case RequestNotSent:
+                errorText = "Disconnect, You failed";
+                break;
             default:
                 errorText = "Join Room Failed :(";
                 break;
@@ -115,7 +154,7 @@ public class NetworkHandler : MonoBehaviour
     // 인게임에서 네트워크 예외 처리
     public void SetInGameExceptionPanel(int code)
     {
-        
+
     }
 
     // 패널을 씬에 띄운다
@@ -129,10 +168,10 @@ public class NetworkHandler : MonoBehaviour
 
         // 패널의 자식들 중 사용할 UI 요소 찾아 변수에 할당한다
         TextMeshProUGUI[] allTMPsChildren = currentErrorPanel.GetComponentsInChildren<TextMeshProUGUI>();
-        
+
         foreach (TextMeshProUGUI tmp in allTMPsChildren)
         {
-            if (tmp.name == "ErrorTypeTMP")
+            if (tmp.name == "ErrorTitleTMP")
             {
                 errorTypeTMP = tmp;
                 errorTypeTMP.text = type;
@@ -148,10 +187,11 @@ public class NetworkHandler : MonoBehaviour
         Button confirmButton = currentErrorPanel.GetComponentInChildren<Button>();
         // 확인 버튼 클릭 시, 실행할 함수 추가
         confirmButton.onClick.AddListener(() =>  ActivePanelUI.Inactive(currentErrorPanel) );
-        
+
         // 예외 패널을 잘 사용되지 않으므로, 사용 후 바로 삭제하기
         confirmButton.onClick.AddListener( () => Destroy( currentErrorPanel ) );
-        
+
+        // case에 따라 추가 로직이 필요한 경우 등록 
         if (action != null) { confirmButton.onClick.AddListener(() => action()); }
     }
 
@@ -163,8 +203,18 @@ public class NetworkHandler : MonoBehaviour
 
     void ReconnectAndRejoin()
     {
-        PhotonNetwork.ReconnectAndRejoin();
+        // Reconnect And Rejoin 시도 
+        if (!PhotonNetwork.ReconnectAndRejoin())
+        {
+            // 돌아갈 Room이 없어진 경우
+            BackToStartScene();
+            Debug.Log("돌아갈 룸 없음");
+        }
+        else
+        {
+            Debug.Log("돌아갈 룸 있음");
+            NetworkManager.Instance.SetCurrenttState(ConnectState.Room);
+            NetworkManager.Instance.SetClientState(ConnectState.Room);
+        }
     }
-
-
 }

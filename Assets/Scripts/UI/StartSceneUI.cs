@@ -16,19 +16,24 @@ public class StartSceneUI : MonoBehaviour
     void Awake()
     {
         // Master Server 연결 시 실행할 이벤트 등록 
-        NetworkManager.OnConnectedToServer += SetConnectedEvent;
+        NetworkManager.OnConnectedToLobby += SetConnectedEvent;
     }
 
     void Start()
     {
         FadeUI.Fade?.Invoke(true);
         connectButton.interactable = false;
+
+        // StartScene 씬이 시작될 때, 서버 접속을 시도한다
+        // 네트워크 예외 발생 시, 시작 화면으로 돌아오기 때문에 해당 함수에서 호출한다
+        NetworkManager.Instance.SetUpConnect();
+
         connectInfoTMP.text = CONNECT_TRY;
     }
 
     private void OnDestroy()
     {
-        NetworkManager.OnConnectedToServer -= SetConnectedEvent;
+        NetworkManager.OnConnectedToLobby -= SetConnectedEvent;
     }
 
     void SetConnectedEvent()
