@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
+using TMPro;
 
 // Controller
 public class RoomUIController : MonoBehaviour
@@ -14,6 +15,9 @@ public class RoomUIController : MonoBehaviour
     RoomUI roomView;
     ServerInfo roomModel;
     ClientInfo profileModel;
+
+    static List<string> sRoomNameList = new List<string>(); // 방 목록을 저장할 변수
+    const string MakeRoomNameFailed = "Failed"; // 방 이름 생성에 실패한 경우
 
     void Awake()
     {
@@ -35,8 +39,10 @@ public class RoomUIController : MonoBehaviour
         roomView.j_confirmBtn.onClick.AddListener(OnClickJoinConfirmBtn);
 
         // NetworkManager 이벤트 등록 
+        NetworkManager.OnRoomListUpdated += GetRoomNameList;
         NetworkManager.OnRoomPlayerUpdated += UpdatePlayerSeats;
         NetworkManager.OnRoomSeatsUpdated += UpdatePlayersUI;
+        NetworkManager.OnRoomSeatsUpdated += ActivateStartButton;
         NetworkManager.OnRoomEntered += OnEnteredRoom;
 
     }
@@ -44,45 +50,69 @@ public class RoomUIController : MonoBehaviour
     private void OnDestroy()
     {
         // NetworkManager 이벤트 해제
+        NetworkManager.OnRoomListUpdated -= GetRoomNameList;
         NetworkManager.OnRoomPlayerUpdated -= UpdatePlayerSeats;
         NetworkManager.OnRoomSeatsUpdated -= UpdatePlayersUI;
+        NetworkManager.OnRoomSeatsUpdated -= ActivateStartButton;
         NetworkManager.OnRoomEntered -= OnEnteredRoom;
     }
 
     // =================== Lobby Buttons =====================
     void OnClickRandomBtn()
     {
+        // 이미 room 생성 관련 작업을 처리 중이라면 중복 요청되지 않도록 한다 
+        if (NetworkManager.Instance.GetClienttState() == ConnectState.Room) return;
+
         // 랜덤 매치 버튼 클릭 시 
         SaveProfileInfo();
 
-        roomModel.RoomType = ServerInfo.RoomTypes.Random;
-        roomManager.RandomRoom();
+        string roomName = MakeRoomName();
+        if (roomName != MakeRoomNameFailed)
+        {
+            // 방 이름 생성에 실패하지 않은 경우
+            roomModel.RoomType = ServerInfo.RoomTypes.Random;
+            roomManager.JoinRandomRoom(roomName);
+        }
+        else
+        {
+            // 방 이름 생성에 실패한 경우 
+            NetworkHandler.Instance.SetRandomMatchExceptionPanel(NetworkHandler.MakeNameFailed);
+        }
     }
 
     void OnClickCreateConfirmBtn()
     {
+        // 이미 room 생성 관련 작업을 처리 중이라면 중복 요청되지 않도록 한다 
+        if (NetworkManager.Instance.GetClienttState() == ConnectState.Room) return;
+
         // 방 생성 확인 버튼 클릭 시 
         SaveProfileInfo();
 
-        string roomCode =$"{Random.Range(10000, 99999)}";
-
-        roomModel.RoomType = ServerInfo.RoomTypes.Create;
-
-        roomManager.CreateRoom(roomCode);
+        string roomName = MakeRoomName();
+        if (roomName != MakeRoomNameFailed)
+        {
+            roomModel.RoomType = ServerInfo.RoomTypes.Create;
+            roomManager.CreateRoom(roomName);
+        }
+        else
+        {
+            // 방 이름 생성에 실패한 경우 
+            NetworkHandler.Instance.SetCreateExceptionPanel(NetworkHandler.MakeNameFailed);
+        }
     }
 
 
     void OnClickJoinConfirmBtn()
     {
-        string code = roomView.roomCodeTMPInp.text;
+        string name = roomView.roomCodeTMPInp.text;
         // 참여 코드가 공백이 아니어야 한다
-        if (!string.IsNullOrWhiteSpace(code))
+        if (!string.IsNullOrWhiteSpace(name))
         {
             // 방 참가하기 버튼 클릭 시 
             SaveProfileInfo();
 
             roomModel.RoomType = ServerInfo.RoomTypes.Join;
-            roomManager.JoinRoom(code);
+            roomManager.JoinRoom(name);
         }
     }
 
@@ -95,15 +125,34 @@ public class RoomUIController : MonoBehaviour
 
         string roomCode = roomManager.GetRoomCode();
         roomView.roomCode.text = $"Room Code : {roomCode}";
+        
+        bool isMasterClient = roomManager.IsMasterClient();
 
-        // MasterClient일 때, 나의 ActorNumber를 스스로 전송한다 
-        roomManager.UpdateEnteredPlayerSeats(roomManager.GetActorNumber());
+        if (isMasterClient)
+        {
+            // MasterClient일 때, OnPlayerEntered()가 호출되지 않으므로 나의 ActorNumber를 스스로 전송한다 
+            roomManager.UpdateEnteredPlayerSeats(roomManager.GetActorNumber());
+            // 시작하기 버튼을 비활성화 한다 
+            roomView.StartOrReadyButton.GetComponentInChildren<TMP_Text>().text = "Start Game zzzz";
+            roomView.StartOrReadyButton.enabled = false;
+        }
+        else
+        {
+            roomView.StartOrReadyButton.GetComponentInChildren<TMP_Text>().text = "Ready~!";
+        }
+        
+        NetworkManager.Instance.SetClientState(ConnectState.Room);
     }
 
     void OnClickLeaveBtn()
     {
         // 룸 나가기
         roomManager.LeaveRoom();
+    }
+
+    void OnClickReadyButton()
+    {
+        // TODO : RoomManager에게 ready true인지 확인하기 
     }
 
     public void SaveProfileInfo()
@@ -118,7 +167,6 @@ public class RoomUIController : MonoBehaviour
     void UpdatePlayerSeats(int actorNumber, bool isEntered)
     {
         // RoomMananger는 현재 룸의 CustomProperties의 "Seats" 정보를 업데이트 한다.
-
         if (isEntered) 
         {
             // 입장한 경우
@@ -132,20 +180,84 @@ public class RoomUIController : MonoBehaviour
             
     }
 
-    void GetUpdatedPlayerSeats()
+    int[] GetUpdatedPlayerSeats()
     {
-        int[] seats = roomManager.GetUpdatedPlayerSeats();
-        roomView.GetPlayerSeats(seats);
+        int[] seats = roomManager.GetPlayerSeats();
+        return seats;
+    }
+
+    void ActivateStartButton()
+    {
+        // 필요 인원 충족 시 start button 활성화 
+        if (roomManager.IsMasterClient())
+        {
+            int[] seats = GetUpdatedPlayerSeats();
+
+            for (int i = 0; i < seats.Length; i++)
+            {
+                // 플레이 인원 수가 채워지지 않은 경우
+                if (seats[i] == -1)
+                {
+                    roomView.StartOrReadyButton.enabled = false;
+                }
+            }
+
+            roomView.StartOrReadyButton.enabled = true;
+        }
     }
 
     public void UpdatePlayersUI()
     {
-        GetUpdatedPlayerSeats();
+        // room view에 플레이어의 ActorNumber 전달
+        roomView.GetPlayerSeats(GetUpdatedPlayerSeats());
 
-        Dictionary<int, Hashtable> playersInfo = roomManager.RenderPlayersUI();
-
+        // room view에 플레이어의 정보 전달
+        Dictionary<int, Hashtable> playersInfo = roomManager.GetPlayerInRoomInfos();
         roomView.UpdatePlayerUI(playersInfo);
 
+    }
+
+    // ====================== Room Name 생성하기 =========================
+
+    // OnRoomListUpdate() 콜백에서 Room Name 리스트를 받아온다
+    void GetRoomNameList(List<string> roomNames)
+    {
+        sRoomNameList = roomNames;
+    }
+
+    // 중복된 Room Name인지 확인한다
+    bool IsDuplicateRoomName(string myRoom)
+    {
+        foreach(string name in sRoomNameList)
+        {
+            if (myRoom == name)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // 랜덤으로 Room Name을 생성한다
+    string MakeRoomName()
+    {
+        int maxTry = 10;
+
+        string roomName =  $"{Random.Range(10000, 99999)}";
+
+        while (IsDuplicateRoomName(roomName))
+        {
+            roomName = $"{Random.Range(10000, 99999)}";
+            maxTry--;
+
+            if (maxTry < 0)
+            {
+                roomName = MakeRoomNameFailed;
+                break;
+            }
+        }
+
+        return roomName;
     }
 
 }
