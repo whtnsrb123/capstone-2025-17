@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7ca77f44-c133-4a41-b675-4d0220a63863" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.capstone-2025-17/.idea/projectSettingsUpdater.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.capstone-2025-17/.idea/projectSettingsUpdater.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.capstone-2025-17/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.capstone-2025-17/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Arts/RendererTextures/Team1RenderTexture 1.renderTexture" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Arts/RendererTextures/Team1RenderTexture 1.renderTexture" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Manager/GameTimerManager.prefab" beforeDir="false" />
@@ -109,9 +110,6 @@
       <option name="listenPortForConnections" value="false" />
       <option name="pid" />
       <option name="projectPathOnTarget" />
-      <option name="runtimes">
-        <list />
-      </option>
       <option name="selectedOptions">
         <list />
       </option>
@@ -122,9 +120,6 @@
       <option name="listenPortForConnections" value="false" />
       <option name="pid" />
       <option name="projectPathOnTarget" />
-      <option name="runtimes">
-        <list />
-      </option>
       <option name="selectedOptions">
         <list />
       </option>
