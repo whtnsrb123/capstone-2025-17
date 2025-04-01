@@ -17,6 +17,10 @@ public class CharacterController : MonoBehaviourPun
 
     private void Awake()
     {
+        if (GameStateManager.isServerTest)
+        {
+            if (!photonView.IsMine) return;
+        }
         // 마우스 커서를 잠그고 보이지 않게 설정
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -27,6 +31,15 @@ public class CharacterController : MonoBehaviourPun
 
     void Start()
     {
+        if (GameStateManager.isServerTest)
+        {
+            if (!photonView.IsMine) return;
+        }
+        if (!photonView.IsMine)
+        {
+            // 내게 아닌 캐릭터의 카메라는 꺼버림
+            GetComponentInChildren<Camera>().gameObject.SetActive(false);
+        }
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true; // 캐릭터 회전이 물리적으로 영향을 받지 않도록 설정
         cameraTransform = Camera.main.transform; // 메인 카메라의 Transform 가져오기
@@ -35,7 +48,10 @@ public class CharacterController : MonoBehaviourPun
 
     void Update()
     {
-        if( GameStateManager.isServerTest && !photonView.IsMine ) return;
+        if (GameStateManager.isServerTest)
+        {
+            if (!photonView.IsMine) return;
+        }
         //서버테스트중이 아니거나 로컬캐릭터일때만 이동처리
         MoveCharacter();  // 캐릭터 이동 처리
         UpdateRotate();   // 마우스 회전에 따른 캐릭터 회전

@@ -27,7 +27,15 @@ public class GameTimerManager : MonoBehaviourPun, IManager
     
     public void Init()
     {
-        Debug.Log("GameTimerManager 초기화 완료");
+        // photonView는 MonoBehaviourPun이 자동으로 연결해줌
+        if (photonView == null)
+        {
+            Debug.LogError("PhotonView가 연결되지 않았습니다!");
+        }
+        else
+        {
+            Debug.Log("GameTimerManager 초기화 완료");
+        }
     }
 
     public void Clear()
@@ -50,8 +58,6 @@ public class GameTimerManager : MonoBehaviourPun, IManager
     [PunRPC]
     private void RPC_StartTimer(float duration)
     {
-        if (timerText != null) return;
-        
         // 이전 캔버스가 있다면 삭제
         GameObject oldCanvas = GameObject.Find("GameTimerCanvas");
         if (oldCanvas != null)

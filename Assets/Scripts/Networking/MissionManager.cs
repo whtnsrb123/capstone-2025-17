@@ -17,6 +17,10 @@ public class MissionManager : MonoBehaviourPun ,IManager
 
     public void Clear()
     {
+        for (int i = 0; i < missionsStates.Count; i++)
+        {
+            missionsStates[i] = false;
+        }
         Debug.Log("MissionManager 클리어");
     }
     //특정 미션을 성공처리
@@ -45,17 +49,26 @@ public class MissionManager : MonoBehaviourPun ,IManager
         //          return;
         //      }
         // }
-        Managers.GameTimerManager.StartTimer(300f);
-        missionsStates.OrderBy(key => key.Key); 
-
-        foreach (var item in missionsStates)
+        if (!PhotonNetwork.IsMasterClient)
         {
-            if (item.Value == false)
+            Debug.LogWarning("마스터 클라이언트가 아님, 씬 로드 취소");
+            return;
+        }
+
+        Debug.Log("GoNextMission 호출됨");
+        Managers.GameTimerManager.StartTimer(300f);
+
+        foreach (var item in missionsStates.OrderBy(kv => kv.Key))
+        {
+            Debug.Log($"미션 상태 - ID: {item.Key}, 완료 여부: {item.Value}");
+            if (!item.Value)
             {
                 nextMission = item.Key;
                 break;
             }
         }
+
+        Debug.Log($"Mission{nextMission} 로딩 시작");
         PhotonNetwork.LoadLevel($"Mission{nextMission}");
         nextMission++;
     }

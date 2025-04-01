@@ -64,10 +64,31 @@ public class Managers : MonoBehaviour
 
     T CreateManager<T>(GameObject parent, string name) where T : MonoBehaviour, IManager
     {
-        GameObject go = new GameObject(name);
-        go.transform.SetParent(parent.transform);
-        return go.AddComponent<T>();
+        GameObject go = null;
+        
+        if (typeof(T) == typeof(GameTimerManager))
+        {
+            GameObject prefab = Resources.Load<GameObject>("GameTimerManager");
+            if (prefab == null)
+            {
+                Debug.LogError("GameTimerManager 프리팹을 찾을 수 없습니다! Resources/GameTimerManager 위치 확인");
+                return null;
+            }
+            go = Instantiate(prefab);
+            go.name = name;
+            go.transform.SetParent(parent.transform);
+        }
+        else
+        {
+            go = new GameObject(name);
+            go.transform.SetParent(parent.transform);
+            go.AddComponent<T>();
+        }
+        return go.GetComponent<T>();
     }
+    
+    
+
 
     public void Clear()
     {
