@@ -16,7 +16,7 @@ public class StartSceneUI : MonoBehaviour
     void Awake()
     {
         // Master Server 연결 시 실행할 이벤트 등록 
-        NetworkManager.OnConnectedToServer += SetConnectedEvent;
+        NetworkManager.OnConnectedToLobby += SetConnectedEvent;
     }
 
     void Start()
@@ -33,7 +33,7 @@ public class StartSceneUI : MonoBehaviour
 
     private void OnDestroy()
     {
-        NetworkManager.OnConnectedToServer -= SetConnectedEvent;
+        NetworkManager.OnConnectedToLobby -= SetConnectedEvent;
     }
 
     void SetConnectedEvent()

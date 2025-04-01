@@ -11,7 +11,6 @@ public enum ConnectState
     Idle,
     Lobby,
     Room,
-    InGame,
     Disconnected
 }
 
@@ -19,7 +18,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 {
     public static NetworkManager Instance;
 
-    public static Action OnConnectedToServer; // 마스터 서버에 접속했을 때
+    public static Action OnConnectedToLobby; // 마스터 서버에 접속했을 때
     public static Action<List<string>> OnRoomListUpdated; // 방 목록이 업데이트 됐을 때 
     public static Action OnRoomEntered; // 룸에 입장했을 때
     public static Action OnRoomSeatsUpdated; // Seats 정보가 갱신될 때 
@@ -48,16 +47,22 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     // 어플리케이션 내내 존재해야 하는 싱글톤 클래스라서 Destroy 후 Awake, Start를 호출하기 어렵다 
     public void SetUpConnect()
     {
-        // 첫 접속인 경우
-        if (sCurrentState == sClientState)
+        if (sCurrentState == ConnectState.Idle && sClientState == ConnectState.Idle)
         {
+            // 첫 접속인 경우
             DontDestroyOnLoad(gameObject);
 
             ConnectToMasterServer();
         }
-        // 접속이 끊긴 뒤 재접속인 경우
+        else if (PhotonNetwork.IsConnected)
+        {
+            // Room에서 접속이 끊긴 뒤 재시도를 했지만 실패한 경우 
+            OnConnectedToLobby?.Invoke();
+            sClientState = sCurrentState = ConnectState.Lobby;
+        }
         else
         {
+            // 이외 접속이 끊긴 뒤 재접속인 경우
             StartCoroutine(TryReconnectToMasterServer());
         }
     }
@@ -109,7 +114,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         sCurrentState = sClientState = ConnectState.Lobby;
 
         // StartSceneUI.cs 에서 등록된 이벤트 실행
-        OnConnectedToServer?.Invoke();
+        OnConnectedToLobby?.Invoke();
     }
 
     public override void OnJoinedRoom()
@@ -193,10 +198,19 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public override void OnJoinRoomFailed(short returnCode, string message)
     {
         base.OnJoinRoomFailed(returnCode, message);
-
+        
         // 조인 예외 처리
-        NetworkHandler.Instance.SetJoinExceptionPanel(returnCode);
-
+        if ( sClientState == ConnectState.Room)
+        {
+            // ReconnectAndRejoin이 실패한 경우에 호출된 OnJOinRoomFailed()를 처리한다
+            sClientState = ConnectState.Lobby;  // sClientState가 Room이면 다시 Room 재참여를 시도하므로, Lobby로 수정한다 
+            NetworkHandler.Instance.SetDisconnectedExceptionPanel(0);
+        }
+        else
+        {
+            // 일반적인 Join의 실패 사례 
+            NetworkHandler.Instance.SetJoinExceptionPanel(returnCode);
+        }
     }
 
     public override void OnDisconnected(DisconnectCause cause)
@@ -205,7 +219,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         sCurrentState = ConnectState.Disconnected;
 
         // Disconnected 예외 처리
-        NetworkHandler.Instance.SetDisconnectedExceptionPanel((int)cause, sClientState);
+        NetworkHandler.Instance.SetDisconnectedExceptionPanel((int)cause);
     }
     #endregion
 
@@ -227,5 +241,4 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         }
 
     }
-
 }

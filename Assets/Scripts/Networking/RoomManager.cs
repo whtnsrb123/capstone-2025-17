@@ -15,6 +15,14 @@ public class RoomManager : MonoBehaviour
     const string NicknameKey = "Nickname";
     const string CharacterIdKey = "CharacterId";
 
+    // 접속이 끊긴 플레이어를 룸에 유지할 시간
+    private int playerTtl = 30000;
+    
+    // 아무도 없는 룸을 유지할 시간 
+    private int roomTtl = 0;
+
+    // ========================== 매치 메이킹 ====================================
+
     // 랜덤 매치를 요청한다 
     public void JoinRandomRoom(string roomName)
     {
@@ -36,9 +44,10 @@ public class RoomManager : MonoBehaviour
         RoomOptions room = new RoomOptions
         {
             MaxPlayers = RequiredPlayerCount,
+            PlayerTtl = playerTtl,
             CustomRoomProperties = customProperties,
             CustomRoomPropertiesForLobby = new string[] {"MatchType"}, // 로비에서 검색할 방 속성 지정
-            EmptyRoomTtl = 0
+            EmptyRoomTtl = roomTtl,
         };
 
         bool sent = PhotonNetwork.JoinRandomOrCreateRoom
@@ -75,9 +84,10 @@ public class RoomManager : MonoBehaviour
         RoomOptions room = new RoomOptions
         {
             MaxPlayers = RequiredPlayerCount,
+            PlayerTtl = playerTtl,
             CustomRoomProperties = customProperties,
             CustomRoomPropertiesForLobby = new string[] { "MatchType" },
-            EmptyRoomTtl = 0
+            EmptyRoomTtl = roomTtl,
         };
 
         bool sent = PhotonNetwork.CreateRoom
@@ -103,9 +113,6 @@ public class RoomManager : MonoBehaviour
             code
        );
 
-        // 클라이언트는 방 입장을 요청한 상태
-        NetworkManager.Instance.SetClientState(ConnectState.Room);
-
         // 접속이 끊겨, 요청이 전송되지 않은 경우
         if (!sent)
             NetworkHandler.Instance.SetJoinExceptionPanel(NetworkHandler.RequestNotSent);
@@ -121,6 +128,7 @@ public class RoomManager : MonoBehaviour
         NetworkManager.Instance.SetClientState(ConnectState.Lobby);
     }
 
+    // =========================== 플레이어 정보 처리 =================================
 
     // 클라이언트의 정보를 전송한다 
     bool isFirstSend = true;
@@ -150,14 +158,14 @@ public class RoomManager : MonoBehaviour
     // MasterClient는 새로운 플레이어 입장 시, 플레이어 표시 순서를 갱신한다
     public void UpdateEnteredPlayerSeats(int actorNumber)
     {
-        if (!PhotonNetwork.IsMasterClient)
+        if (!IsMasterClient())
             return;
 
         Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
 
         int[] seats = (int[])hash["Seats"];
 
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < RequiredPlayerCount; i++)
         {
             // 빈 자리를 발견
             if (seats[i] == -1)
@@ -175,14 +183,14 @@ public class RoomManager : MonoBehaviour
     // MasterClient는 플레이어 퇴장 시, 플레이어 표시 순서를 갱신한다
     public void UpdateLeftPlayerSeats(int actorNumber)
     {
-        if (!PhotonNetwork.IsMasterClient)
+        if (!IsMasterClient())
             return;
 
         Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
 
         int[] seats = (int[])hash["Seats"];
 
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < RequiredPlayerCount; i++)
         {
             // 떠난 플레이어 발견 
             if (seats[i] == actorNumber)
@@ -198,7 +206,7 @@ public class RoomManager : MonoBehaviour
     }
 
     // 갱신된 플레이어 표시 순서 정보를 받아온다 
-    public int[] GetUpdatedPlayerSeats()
+    public int[] GetPlayerSeats()
     {
         Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
 
@@ -207,7 +215,7 @@ public class RoomManager : MonoBehaviour
     }
 
     // 대기방에서 플레이어 표시를 위해 현재 방의 플레이어 정보를 받아온다
-    public Dictionary<int, System.Collections.Hashtable> RenderPlayersUI()
+    public Dictionary<int, System.Collections.Hashtable> GetPlayerInRoomInfos()
     {
         s_players = PhotonNetwork.CurrentRoom.Players;
 
@@ -242,6 +250,16 @@ public class RoomManager : MonoBehaviour
         return playersInfo;
     }
 
+    // 현재 방에서의 actorNumber를 받아온다
+    public int GetActorNumber()
+    {
+        return PhotonNetwork.LocalPlayer.ActorNumber;
+    }
+
+    public bool IsMasterClient()
+    {
+        return PhotonNetwork.IsMasterClient;
+    }
 
     // 현재 방의 룸 코드를 받아온다
     public string GetRoomCode()
@@ -249,11 +267,4 @@ public class RoomManager : MonoBehaviour
         string roomCode = PhotonNetwork.CurrentRoom.Name;
         return roomCode;
     }
-
-    // 현재 방에서의 actorNumber를 받아온다
-    public int GetActorNumber()
-    {
-        return PhotonNetwork.LocalPlayer.ActorNumber;
-    }
-
 }

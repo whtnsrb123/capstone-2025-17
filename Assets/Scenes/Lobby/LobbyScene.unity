@@ -14444,6 +14444,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   randomBtn: {fileID: 27779881}
+  StartOrReadyButton: {fileID: 1589561524}
   leaveBtn: {fileID: 1774149301}
   roomCode: {fileID: 250580132}
   playersUI:
