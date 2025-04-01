@@ -1,6 +1,7 @@
 using UnityEngine;
+using Photon.Pun;
 
-public class InputManager : MonoBehaviour
+public class InputManager : MonoBehaviourPun
 {
     private Player_Push_Controller pushController;
     private PickUpController pickUpController;
@@ -18,6 +19,9 @@ public class InputManager : MonoBehaviour
 
     void Update()
     {
+        if (GameStateManager.isServerTest)
+            if (!photonView.IsMine) return;
+
         // F 키: 물체 잡기/놓기
         if (Input.GetKeyDown(KeyCode.F))
         {
