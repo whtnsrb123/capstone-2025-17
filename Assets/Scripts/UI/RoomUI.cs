@@ -11,7 +11,7 @@ public class RoomUI : MonoBehaviour
     public Button randomBtn;
 
     // room panel
-    public Button StartOrReadyButton;
+    public Button startBtn;
     public Button leaveBtn;
     public TextMeshProUGUI roomCode;
 

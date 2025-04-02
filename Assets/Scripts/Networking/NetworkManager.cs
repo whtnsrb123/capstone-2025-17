@@ -140,7 +140,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
         // Lobby가 아닌 곳에서는 해당 콜백을 무시한다
-        // if ((sCurrentState == ConnectState.Lobby) && (sClientState == ConnectState.Lobby))
+        if ((sCurrentState == ConnectState.Lobby) && (sClientState == ConnectState.Lobby))
         {
             base.OnRoomListUpdate(roomList);
 

@@ -16,7 +16,7 @@ public class RoomManager : MonoBehaviour
     const string CharacterIdKey = "CharacterId";
 
     // 접속이 끊긴 플레이어를 룸에 유지할 시간
-    private int playerTtl = 30000;
+    private int playerTtl = 10000;
     
     // 아무도 없는 룸을 유지할 시간 
     private int roomTtl = 0;
@@ -131,24 +131,27 @@ public class RoomManager : MonoBehaviour
     // =========================== 플레이어 정보 처리 =================================
 
     // 클라이언트의 정보를 전송한다 
-    bool isFirstSend = true;
-
     public void SendClientInfo(string nickname, int characterId)
     {
-        Hashtable hash = new Hashtable();
-        if (isFirstSend)
+        Hashtable hash = PhotonNetwork.LocalPlayer.CustomProperties;
+        
+       // 닉네임 전송
+        if (!hash.ContainsKey(NicknameKey))
         {
-            // 처음으로 정보를 전송한 경우
-            isFirstSend = false;
-
             hash.Add(NicknameKey, nickname);
+        }
+        else
+        {
+            hash[NicknameKey] = nickname;
+        }
+
+        // 선택한 스킨 정보 전송
+        if (!hash.ContainsKey(CharacterIdKey))
+        {
             hash.Add(CharacterIdKey, characterId);
         }
         else
         {
-            // 이미 정보를 전송한 경우
-            hash = PhotonNetwork.LocalPlayer.CustomProperties;
-            hash[NicknameKey] = nickname;
             hash[CharacterIdKey] = characterId;
         }
 

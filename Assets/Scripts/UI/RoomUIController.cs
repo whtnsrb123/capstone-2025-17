@@ -133,12 +133,13 @@ public class RoomUIController : MonoBehaviour
             // MasterClient일 때, OnPlayerEntered()가 호출되지 않으므로 나의 ActorNumber를 스스로 전송한다 
             roomManager.UpdateEnteredPlayerSeats(roomManager.GetActorNumber());
             // 시작하기 버튼을 비활성화 한다 
-            roomView.StartOrReadyButton.GetComponentInChildren<TMP_Text>().text = "Start Game zzzz";
-            roomView.StartOrReadyButton.enabled = false;
+            roomView.startBtn.GetComponentInChildren<TMP_Text>().text = "Start Game zzzz";
+            roomView.startBtn.enabled = false;
         }
         else
         {
-            roomView.StartOrReadyButton.GetComponentInChildren<TMP_Text>().text = "Ready~!";
+            roomView.startBtn.GetComponentInChildren<TMP_Text>().text = "you are not\nmasterclient";
+            roomView.startBtn.enabled = false;
         }
         
         NetworkManager.Instance.SetClientState(ConnectState.Room);
@@ -148,11 +149,6 @@ public class RoomUIController : MonoBehaviour
     {
         // 룸 나가기
         roomManager.LeaveRoom();
-    }
-
-    void OnClickReadyButton()
-    {
-        // TODO : RoomManager에게 ready true인지 확인하기 
     }
 
     public void SaveProfileInfo()
@@ -198,11 +194,13 @@ public class RoomUIController : MonoBehaviour
                 // 플레이 인원 수가 채워지지 않은 경우
                 if (seats[i] == -1)
                 {
-                    roomView.StartOrReadyButton.enabled = false;
+                    roomView.startBtn.enabled = false;
+                    roomView.startBtn.GetComponentInChildren<TMP_Text>().text = "not yet";
+                    return;
                 }
             }
-
-            roomView.StartOrReadyButton.enabled = true;
+            roomView.startBtn.GetComponentInChildren<TMP_Text>().text = "go go";
+            roomView.startBtn.enabled = true;
         }
     }
 
@@ -212,8 +210,7 @@ public class RoomUIController : MonoBehaviour
         roomView.GetPlayerSeats(GetUpdatedPlayerSeats());
 
         // room view에 플레이어의 정보 전달
-        Dictionary<int, Hashtable> playersInfo = roomManager.GetPlayerInRoomInfos();
-        roomView.UpdatePlayerUI(playersInfo);
+        roomView.UpdatePlayerUI(roomManager.GetPlayerInRoomInfos());
 
     }
 
