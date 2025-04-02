@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class NetworkHandler : MonoBehaviour
+public class NetworkHandler : MonoBehaviourPunCallbacks
 {
     public static NetworkHandler Instance;
 
@@ -58,7 +58,7 @@ public class NetworkHandler : MonoBehaviour
         }
 
 
-        if (NetworkManager.Instance.GetClienttState() == ConnectState.Room)
+        if (NetworkManager.sClientState == ConnectState.Room)
         {
             // 대기방 혹은 인게임에서 Disconnected -> Rejoin 시도
             OnDisconnect = ReconnectAndRejoin;
@@ -124,7 +124,7 @@ public class NetworkHandler : MonoBehaviour
     public void SetJoinExceptionPanel(int code)
     {
         //  예외를 중복으로 처리하지 않도록 return  
-        if (NetworkManager.Instance.GetCurrenttState() == ConnectState.Disconnected) return;
+        if (NetworkManager.sClientState != ConnectState.Lobby) return;
 
         Action OnJoinFailed = null;
 
@@ -213,8 +213,58 @@ public class NetworkHandler : MonoBehaviour
         else
         {
             Debug.Log("돌아갈 룸 있음");
-            NetworkManager.Instance.SetCurrenttState(ConnectState.Room);
-            NetworkManager.Instance.SetClientState(ConnectState.Room);
+            NetworkManager.sCurrentState = ConnectState.Room;
+            NetworkManager.sClientState = ConnectState.Room;
         }
     }
+
+
+    #region 서버 예외 처리 콜백 함수들
+
+    public override void OnJoinRandomFailed(short returnCode, string message)
+    {
+        base.OnJoinRandomFailed(returnCode, message);
+
+        // 랜덤 매치 예외 처리
+        SetJoinExceptionPanel(returnCode);
+    }
+    public override void OnCreateRoomFailed(short returnCode, string message)
+    {
+        base.OnCreateRoomFailed(returnCode, message);
+
+        // 방 생성 예외 처리
+        SetCreateExceptionPanel(returnCode);
+    }
+
+    public override void OnJoinRoomFailed(short returnCode, string message)
+    {
+        base.OnJoinRoomFailed(returnCode, message);
+
+        // 조인 예외 처리
+        if (NetworkManager.sClientState == ConnectState.Room)
+        {
+            // ReconnectAndRejoin()이 실패한 경우에 호출된 OnJOinRoomFailed()를 처리한다
+
+            // sClientState가 Room이면 다시 Room 재참여를 시도하므로, Lobby로 수정한다 
+            NetworkManager.sClientState = ConnectState.Lobby; 
+            SetDisconnectedExceptionPanel(0);
+        }
+        else
+        {
+            // 일반적인 Join의 실패를 처리한다
+            SetJoinExceptionPanel(returnCode);
+        }
+    }
+
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        Debug.Log("On Disconnected");
+        NetworkManager.sCurrentState = ConnectState.Disconnected;
+
+        // Disconnected 예외 처리
+        SetDisconnectedExceptionPanel((int)cause);
+    }
+    #endregion
+
+
 }

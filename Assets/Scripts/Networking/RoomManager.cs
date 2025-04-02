@@ -63,7 +63,7 @@ public class RoomManager : MonoBehaviour
         );
 
         // 클라이언트는 방 입장을 요청한 상태
-        NetworkManager.Instance.SetClientState(ConnectState.Room);
+        NetworkManager.sClientState = ConnectState.Room;
 
         // 접속이 끊겨, 요청이 전송되지 않은 경우
         if (!sent)
@@ -98,7 +98,7 @@ public class RoomManager : MonoBehaviour
        );
 
         // 클라이언트는 방 입장을 요청한 상태
-        NetworkManager.Instance.SetClientState(ConnectState.Room);
+        NetworkManager.sClientState = ConnectState.Room;
 
         // 접속이 끊겨, 요청이 전송되지 않은 경우
         if (!sent)
@@ -125,7 +125,7 @@ public class RoomManager : MonoBehaviour
         s_players.Clear();
 
         // 클라이언트는 방 퇴장을 요청한 상태
-        NetworkManager.Instance.SetClientState(ConnectState.Lobby);
+        NetworkManager.sClientState = ConnectState.Lobby;
     }
 
     // =========================== 플레이어 정보 처리 =================================

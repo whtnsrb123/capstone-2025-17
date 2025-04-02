@@ -25,8 +25,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public static Action<int, bool> OnRoomPlayerUpdated; // 룸 플레이어 리스트가 변동됐을 때
 
     // 플레이어의 연결 상태
-    static ConnectState sCurrentState = ConnectState.Idle; // 실제 네트워크 접속 상태
-    static ConnectState sClientState = ConnectState.Idle; // 클라이언트 요청에 따른 접속 상태 
+
+    private static ConnectState _current = ConnectState.Idle; // 실제 네트워크 접속 상태
+    private static ConnectState _client = ConnectState.Idle; // 클라이언트 요청에 따른 접속 상태 
+    public static ConnectState sCurrentState { get => _current; set => _current = value; } 
+    public static ConnectState sClientState { get => _client; set => _client = value; } 
 
     const string _gameVersion = "1";
     const bool PlayerEntered = true; // 대기방의 플레이어가 입장/퇴장인지 구분하기 위해 매개변수로 쓰일 const 변수
@@ -56,7 +59,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         }
         else if (PhotonNetwork.IsConnected)
         {
-            // Room에서 접속이 끊긴 뒤 재시도를 했지만 실패한 경우 
+            // Room에서 접속이 끊긴 뒤 ReconnectAndRejoin()을 했지만 실패한 경우 
+            Debug.Log("Room 재접속 실패 후, 네트워크 재연결");
             OnConnectedToLobby?.Invoke();
             sClientState = sCurrentState = ConnectState.Lobby;
         }
@@ -79,27 +83,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             PhotonNetwork.ConnectUsingSettings();
         }
     }
-
-    # region 연결 상태에 대한 프로퍼티 함수들
-    public ConnectState GetCurrenttState()
-    {
-        return sCurrentState;
-    }
-
-    public void SetCurrenttState(ConnectState state)
-    {
-        sCurrentState = state;
-    }
-    public ConnectState GetClienttState()
-    {
-        return sClientState;
-    }
-
-    public void SetClientState(ConnectState state)
-    {
-        sClientState = state;
-    }
-    #endregion
 
     #region 네트워크 작업 요청 콜백 함수들
     public override void OnConnectedToMaster()
@@ -131,8 +114,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         // 방을 나간 경우
         // 클라이언트의 요청이거나, 네트워크 오류로 발생한다
         sCurrentState = ConnectState.Lobby;
-
-        Debug.Log("On Left Room()");
     }
     #endregion
 
@@ -173,55 +154,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         base.OnRoomPropertiesUpdate(propertiesThatChanged);
 
         OnRoomSeatsUpdated?.Invoke();
-
-        Debug.Log("OnRoomPropertiesUpdate");
     }
 
-
-    #region 서버 예외 처리 콜백 함수들
-
-    public override void OnJoinRandomFailed(short returnCode, string message)
-    {
-        base.OnJoinRandomFailed(returnCode, message);
-
-        // 랜덤 매치 예외 처리
-        NetworkHandler.Instance.SetJoinExceptionPanel(returnCode);
-    }
-    public override void OnCreateRoomFailed(short returnCode, string message)
-    {
-        base.OnCreateRoomFailed(returnCode, message);
-
-        // 방 생성 예외 처리
-        NetworkHandler.Instance.SetCreateExceptionPanel(returnCode);
-    }
-
-    public override void OnJoinRoomFailed(short returnCode, string message)
-    {
-        base.OnJoinRoomFailed(returnCode, message);
-        
-        // 조인 예외 처리
-        if ( sClientState == ConnectState.Room)
-        {
-            // ReconnectAndRejoin이 실패한 경우에 호출된 OnJOinRoomFailed()를 처리한다
-            sClientState = ConnectState.Lobby;  // sClientState가 Room이면 다시 Room 재참여를 시도하므로, Lobby로 수정한다 
-            NetworkHandler.Instance.SetDisconnectedExceptionPanel(0);
-        }
-        else
-        {
-            // 일반적인 Join의 실패 사례 
-            NetworkHandler.Instance.SetJoinExceptionPanel(returnCode);
-        }
-    }
-
-    public override void OnDisconnected(DisconnectCause cause)
-    {
-        Debug.Log("On Disconnected");
-        sCurrentState = ConnectState.Disconnected;
-
-        // Disconnected 예외 처리
-        NetworkHandler.Instance.SetDisconnectedExceptionPanel((int)cause);
-    }
-    #endregion
 
     // 서버와의 접속이 끊겼을 경우, 재시도 함수
     IEnumerator TryReconnectToMasterServer()

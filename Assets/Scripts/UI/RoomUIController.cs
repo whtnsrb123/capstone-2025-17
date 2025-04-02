@@ -61,7 +61,7 @@ public class RoomUIController : MonoBehaviour
     void OnClickRandomBtn()
     {
         // 이미 room 생성 관련 작업을 처리 중이라면 중복 요청되지 않도록 한다 
-        if (NetworkManager.Instance.GetClienttState() == ConnectState.Room) return;
+        if (NetworkManager.sClientState == ConnectState.Room) return;
 
         // 랜덤 매치 버튼 클릭 시 
         SaveProfileInfo();
@@ -83,7 +83,7 @@ public class RoomUIController : MonoBehaviour
     void OnClickCreateConfirmBtn()
     {
         // 이미 room 생성 관련 작업을 처리 중이라면 중복 요청되지 않도록 한다 
-        if (NetworkManager.Instance.GetClienttState() == ConnectState.Room) return;
+        if (NetworkManager.sClientState == ConnectState.Room) return;
 
         // 방 생성 확인 버튼 클릭 시 
         SaveProfileInfo();
@@ -142,7 +142,7 @@ public class RoomUIController : MonoBehaviour
             roomView.startBtn.enabled = false;
         }
         
-        NetworkManager.Instance.SetClientState(ConnectState.Room);
+        NetworkManager.sClientState = ConnectState.Room;
     }
 
     void OnClickLeaveBtn()
