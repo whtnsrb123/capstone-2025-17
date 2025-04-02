@@ -21,8 +21,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public static Action OnConnectedToLobby; // 마스터 서버에 접속했을 때
     public static Action<List<string>> OnRoomListUpdated; // 방 목록이 업데이트 됐을 때 
     public static Action OnRoomEntered; // 룸에 입장했을 때
-    public static Action OnRoomSeatsUpdated; // Seats 정보가 갱신될 때 
-    public static Action<int, bool> OnRoomPlayerUpdated; // 룸 플레이어 리스트가 변동됐을 때
+    public static Action OnRoomPropsUpdated; // Seats 정보가 갱신될 때 
+    public static Action<int, bool> OnRoomPlayerInOut; // 룸 플레이어 리스트가 변동됐을 때
 
     // 플레이어의 연결 상태
 
@@ -140,20 +140,19 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
         // 다른 플레이어가 방에 입장한 경우
-        OnRoomPlayerUpdated?.Invoke(newPlayer.ActorNumber, PlayerEntered);
+        OnRoomPlayerInOut?.Invoke(newPlayer.ActorNumber, PlayerEntered);
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
         // 다른 플레이어가 방을 나간 경우 
-        OnRoomPlayerUpdated?.Invoke(otherPlayer.ActorNumber, !PlayerEntered);
+        OnRoomPlayerInOut?.Invoke(otherPlayer.ActorNumber, !PlayerEntered);
     }
 
     public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
     {
         base.OnRoomPropertiesUpdate(propertiesThatChanged);
-
-        OnRoomSeatsUpdated?.Invoke();
+        OnRoomPropsUpdated?.Invoke();
     }
 
 
