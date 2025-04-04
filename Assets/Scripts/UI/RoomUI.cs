@@ -11,13 +11,14 @@ public class RoomUI : MonoBehaviour
     public Button randomBtn;
 
     // room panel
-    public Button StartOrReadyButton;
+    public Button readyOrStartBtn;
     public Button leaveBtn;
     public TextMeshProUGUI roomCode;
 
     public GameObject[] playersUI;
     public TextMeshProUGUI[] nicknamesUI;
     public GameObject[] playersRawImage;
+    public TextMeshProUGUI[] playersReadyStatesUI;
 
     // create panel
     public Button c_confirmBtn;
@@ -35,6 +36,7 @@ public class RoomUI : MonoBehaviour
     SkinnedMeshRenderer[] smRenderers;
     static Dictionary<int, Hashtable> viewPlayerList;
     static int[] viewSeats;
+    static bool[] viewReadyStates;
 
     private void Start()
     {
@@ -43,9 +45,13 @@ public class RoomUI : MonoBehaviour
 
     public void GetPlayerSeats(int[] para)
     {
-        Debug.Log("GetPlayerSeats");
         viewSeats = para;
     }
+    public void GetPlayerReadyStates(bool[] para)
+    {
+        viewReadyStates = para;
+    }
+
 
     void SetSkinnedMeshRenderers()
     {
@@ -68,6 +74,7 @@ public class RoomUI : MonoBehaviour
                 playersUI[i].SetActive(false);
                 nicknamesUI[i].text = string.Empty;
                 playersRawImage[i].SetActive(false);
+                playersReadyStatesUI[i].text = string.Empty;
             }
             else
             {
@@ -80,6 +87,7 @@ public class RoomUI : MonoBehaviour
 
                         playersUI[i].SetActive(true);
                         playersRawImage[i].SetActive(true);
+                        playersReadyStatesUI[i].text = (viewReadyStates[i] ? "Ready" : "Not Ready");
 
                         smRenderers[i].material = storage.GetMesh(characterId);
                         nicknamesUI[i].text = nickname;
@@ -88,6 +96,13 @@ public class RoomUI : MonoBehaviour
             }
 
         }
+    }
+
+    public void InitPanel()
+    {
+        viewPlayerList.Clear();
+        viewSeats = null;
+        viewReadyStates = null;
     }
 
 }
