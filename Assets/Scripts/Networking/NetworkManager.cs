@@ -16,7 +16,7 @@ public enum ConnectState
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
-    public static NetworkManager Instance;
+    public static NetworkManager Instance { get; private set; }
 
     public static Action OnConnectedToLobby; // 마스터 서버에 접속했을 때
     public static Action<List<string>> OnRoomListUpdated; // 방 목록이 업데이트 됐을 때 
@@ -36,14 +36,12 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     private void Awake()
     {
-        if(Instance == null)
-        {
-            Instance = this;
-        }
-        else
+        if (Instance != null)
         {
             Destroy(gameObject);
         }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
     // StartScene 씬이 시작될 때 StartSceneUI.cs에서 호출한다

@@ -5,7 +5,9 @@ using TMPro;
 
 // Controller
 public class RoomUIController : MonoBehaviour
-{ 
+{
+
+    // TODO : 생각해보니 RoomManager가 중복생성되어서도 안 되고 게임 입장시에도 살아있어야 하나 고민이 든다
     [SerializeField]
     RoomManager roomManager;
 
@@ -33,14 +35,13 @@ public class RoomUIController : MonoBehaviour
 
         // create view 이벤트 등록
         roomView.c_confirmBtn.onClick.AddListener(OnClickCreateConfirmBtn);
-        
+
         // join view 이벤트 등록
         roomView.j_confirmBtn.onClick.AddListener(OnClickJoinConfirmBtn);
 
         // room panel 이벤트 등록
-        roomView.readyOrStartBtn.onClick.AddListener(OnClickReadyBtn);
+        roomView.readyOrStartBtn.onClick.AddListener(OnClickReadyOrStartBtn);
         roomView.leaveBtn.onClick.AddListener(OnClickLeaveBtn);
-
 
         // NetworkManager 이벤트 등록 
         NetworkManager.OnRoomListUpdated += GetRoomNameList;
@@ -129,7 +130,7 @@ public class RoomUIController : MonoBehaviour
 
         string roomCode = roomManager.GetRoomCode();
         roomView.roomCode.text = $"Room Code : {roomCode}";
-        
+
         bool isMasterClient = roomManager.IsMasterClient();
 
         if (isMasterClient)
@@ -140,14 +141,14 @@ public class RoomUIController : MonoBehaviour
             roomManager.ChangeReadyState();
             // 시작하기 버튼을 비활성화 한다 
             roomView.readyOrStartBtn.GetComponentInChildren<TMP_Text>().text = "Start Game zzzz";
-            roomView.readyOrStartBtn.enabled = false;
+            // roomView.readyOrStartBtn.enabled = false;
         }
         else
         {
             roomView.readyOrStartBtn.enabled = true;
             roomView.readyOrStartBtn.GetComponentInChildren<TMP_Text>().text = "Ready";
         }
-        
+
         NetworkManager.sClientState = ConnectState.Room;
     }
 
@@ -170,17 +171,17 @@ public class RoomUIController : MonoBehaviour
     void UpdatePlayerSeats(int actorNumber, bool isEntered)
     {
         // RoomMananger는 현재 룸의 CustomProperties의 "Seats" 정보를 업데이트 한다.
-        if (isEntered) 
+        if (isEntered)
         {
             // 입장한 경우
             roomManager.UpdateEnteredPlayerSeats(actorNumber); // 입장한 플레이어의 actorNumber
         }
-        else 
+        else
         {
             // 퇴장한 경우
             roomManager.UpdateLeftPlayerSeats(actorNumber); // 나간 플레이어의 actorNumber
         }
-            
+
     }
 
     int[] GetUpdatedPlayerSeats()
@@ -189,10 +190,21 @@ public class RoomUIController : MonoBehaviour
         return seats;
     }
 
-    void OnClickReadyBtn()
+    public MissionManager mm;
+
+    void OnClickReadyOrStartBtn()
     {
-        if (roomManager.IsMasterClient()) return;
-        roomManager.ChangeReadyState();
+        if (roomManager.IsMasterClient())
+        {
+            // 마스터 클라이언트
+            mm.GoNextMission();
+            LoadingPanel.Instance.SetLoadingPanelVisibility(true);
+        }
+        else
+        {
+            // 플레이어
+            roomManager.ChangeReadyState();
+        }
     }
 
     void ActivateStartButton()
@@ -206,7 +218,7 @@ public class RoomUIController : MonoBehaviour
             {
                 if (!states[i])
                 {
-                    roomView.readyOrStartBtn.enabled = false;
+                    // roomView.readyOrStartBtn.enabled = false;
                     roomView.readyOrStartBtn.GetComponentInChildren<TMP_Text>().text = "not yet";
                     return;
                 }

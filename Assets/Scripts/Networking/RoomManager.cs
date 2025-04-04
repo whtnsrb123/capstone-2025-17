@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Room 과 관련된 네트워크 작업을 담당하는 클래스
-public class RoomManager : MonoBehaviour
+public class RoomManager : MonoBehaviourPun
 {
     public static Dictionary<int, Player> s_players;
 

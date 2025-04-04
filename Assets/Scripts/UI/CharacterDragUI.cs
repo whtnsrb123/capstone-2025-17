@@ -21,10 +21,6 @@ public class CharacterDragUI : MonoBehaviour, IDragHandler
 
         Vector3 rotate = player.transform.rotation.eulerAngles;
         player.transform.rotation = Quaternion.Euler(rotate.x, rotate.y, 0);
-
-
-        Debug.Log("OnDrag");
-
     }
 
 }

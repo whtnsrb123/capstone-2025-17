@@ -52,6 +52,9 @@ MonoBehaviour:
   - RpcUpdatePlayerEscaped
   - RpcUpdatePlayerState
   - RPC_NextMission
+  - RPC_SetUIVisibility
+  - SetUIVisibility
+  - ClientSceneLoaded
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
