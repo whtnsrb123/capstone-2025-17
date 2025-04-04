@@ -3619,7 +3619,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 864045110}
         m_TargetAssemblyTypeName: ActivePanelUI, Assembly-CSharp
-        m_MethodName: Inactive
+        m_MethodName: Active
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 1268293747}
