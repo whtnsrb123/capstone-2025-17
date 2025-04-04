@@ -1903,10 +1903,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 788517532}
   m_HandleRect: {fileID: 1285676298}
   m_Direction: 0
-  m_MinValue: 0
+  m_MinValue: 0.0001
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 0.0001
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -5446,7 +5446,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 13.7809, y: -22.3}
+  m_AnchoredPosition: {x: 240, y: -22.3}
   m_SizeDelta: {x: 187.5618, y: 64.6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &542662436
@@ -6939,7 +6939,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 13.7809, y: -22.3}
+  m_AnchoredPosition: {x: 127, y: -22.3}
   m_SizeDelta: {x: 187.5618, y: 64.6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &660204054
@@ -7646,10 +7646,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 1179092121}
   m_HandleRect: {fileID: 1514126261}
   m_Direction: 0
-  m_MinValue: 0
+  m_MinValue: 0.0001
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 0.0001
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -7771,7 +7771,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 720823937}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 864045110}
+        m_TargetAssemblyTypeName: ActivePanelUI, Assembly-CSharp
+        m_MethodName: Inactive
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 1268293747}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &720823937
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14536,10 +14548,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 1476634426}
   m_HandleRect: {fileID: 1349083156}
   m_Direction: 0
-  m_MinValue: 0
+  m_MinValue: 0.0001
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 0.0001
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
