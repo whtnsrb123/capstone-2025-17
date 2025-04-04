@@ -5,12 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7ca77f44-c133-4a41-b675-4d0220a63863" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.capstone-2025-17/.idea/projectSettingsUpdater.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.capstone-2025-17/.idea/projectSettingsUpdater.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.capstone-2025-17/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.capstone-2025-17/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Player.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Player.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Arts/RendererTextures/Team1RenderTexture 2.renderTexture" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Arts/RendererTextures/Team1RenderTexture 2.renderTexture" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Arts/RendererTextures/Team1RenderTexture 3.renderTexture" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Arts/RendererTextures/Team1RenderTexture 3.renderTexture" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Arts/RendererTextures/Team1RenderTexture 4.renderTexture" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Arts/RendererTextures/Team1RenderTexture 4.renderTexture" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Environment/PlayerSpawner.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Environment/PlayerSpawner.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Resources/Player_0326.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Player_0326.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/Ingame/Mission1.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Ingame/Mission1.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Networking/MissionSpawner.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Networking/MissionSpawner.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/build_info" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/build_info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -39,7 +39,7 @@
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;test#중간평가용-테스트&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;bug/#22-입력이-다른-캐릭터에게-적용되는-현상&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -48,7 +48,7 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
+  <component name="RunManager" selected="Unity 에디터에 연결.Unity 에디터에 연결">
     <configuration name="유닛 테스트(배치 모드)" type="RunUnityExe" factoryName="Unity Executable">
       <option name="EXE_PATH" value="D:\2022.3.56f1\Editor\Unity.exe" />
       <option name="PROGRAM_PARAMETERS" value="-runTests -batchmode -projectPath E:\capstone-2025-17 -testResults Logs/results.xml -logFile Logs/Editor.log -testPlatform EditMode -debugCodeOptimization" />
@@ -97,7 +97,7 @@
       <option name="USE_EXTERNAL_CONSOLE" value="0" />
       <method v="2" />
     </configuration>
-    <configuration name="Attach to Unity Editor &amp; Play" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="UNITY_ATTACH_AND_PLAY" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
+    <configuration name="Unity 에디터에 연결" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
       <option name="allowRunningInParallel" value="false" />
       <option name="listenPortForConnections" value="false" />
       <option name="pid" />
@@ -110,7 +110,7 @@
       </option>
       <method v="2" />
     </configuration>
-    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
+    <configuration name="Unreal 에디터에 연결 후 재생" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="UNITY_ATTACH_AND_PLAY" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
       <option name="allowRunningInParallel" value="false" />
       <option name="listenPortForConnections" value="false" />
       <option name="pid" />
@@ -142,6 +142,7 @@
       <workItem from="1743661350523" duration="1256000" />
       <workItem from="1743662612896" duration="1953000" />
       <workItem from="1743664796983" duration="4229000" />
+      <workItem from="1743773106545" duration="735000" />
     </task>
     <servers />
   </component>

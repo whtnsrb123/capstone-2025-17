@@ -35,11 +35,7 @@ public class CharacterController : MonoBehaviourPun
         {
             if (!photonView.IsMine) return;
         }
-        if (!photonView.IsMine)
-        {
-            // 내게 아닌 캐릭터의 카메라는 꺼버림
-            GetComponentInChildren<Camera>().gameObject.SetActive(false);
-        }
+        
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true; // 캐릭터 회전이 물리적으로 영향을 받지 않도록 설정
         cameraTransform = Camera.main.transform; // 메인 카메라의 Transform 가져오기
