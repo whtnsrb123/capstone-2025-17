@@ -55,6 +55,7 @@ MonoBehaviour:
   - RPC_SetUIVisibility
   - SetUIVisibility
   - ClientSceneLoaded
+  - SetLoaded
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

@@ -1800,7 +1800,7 @@ public class Reporter : MonoBehaviour
 		}
 	}
 
-	//calculate the start index of visible log
+	//calculate the start index of loaded log
 	void calculateStartIndex()
 	{
 		startIndex = (int)(scrollPosition.y / size.y);

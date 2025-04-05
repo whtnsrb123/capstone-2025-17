@@ -197,8 +197,8 @@ public class RoomUIController : MonoBehaviour
         if (roomManager.IsMasterClient())
         {
             // 마스터 클라이언트
-            mm.GoNextMission();
             LoadingPanel.Instance.SetLoadingPanelVisibility(true);
+            mm.GoNextMission();
         }
         else
         {
