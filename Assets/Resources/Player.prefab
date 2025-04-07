@@ -168,11 +168,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d732acaa1bf77426aa3cfa9baf61ed5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  holdPosition: {fileID: 7700307957036737518}
-  interactionText: {fileID: 0}
+  raycastPosition: {fileID: 0}
+  pickPosition: {fileID: 0}
+  detectedObject: {fileID: 0}
   detectionRange: 0.5
-  fieldOfView: 90
-  rayCount: 20
+  pickUpOffset: 0.5
+  pickUpUI: {fileID: 0}
+  throwForce: 2
+  trajectoryPoints: 50
+  timeBetweenPoints: 0.03
+  crosshairSize: 50
 --- !u!114 &7649671672246846584
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -202,7 +207,7 @@ MonoBehaviour:
   Group: 0
   prefixField: -1
   Synchronization: 3
-  OwnershipTransfer: 0
+  OwnershipTransfer: 1
   observableSearch: 2
   ObservedComponents:
   - {fileID: -7162756696795763389}
