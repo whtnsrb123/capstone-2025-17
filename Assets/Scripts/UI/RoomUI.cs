@@ -34,9 +34,9 @@ public class RoomUI : MonoBehaviour
     MaterialStorage storage;
 
     SkinnedMeshRenderer[] smRenderers;
-    static Dictionary<int, Hashtable> viewPlayerList;
-    static int[] viewSeats;
-    static bool[] viewReadyStates;
+    Dictionary<int, Hashtable> viewPlayerList;
+    int[] viewSeats;
+    bool[] viewReadyStates;
 
     private void Start()
     {
@@ -82,8 +82,8 @@ public class RoomUI : MonoBehaviour
                 {
                     if(kvp.Key == viewSeats[i])
                     {
-                        int characterId = (int)kvp.Value["CharacterId"];
-                        string nickname = (string)kvp.Value["Nickname"];
+                        int characterId = (int)kvp.Value[ClientInfo.CharacterIdKey];
+                        string nickname = (string)kvp.Value[ClientInfo.NicknameKey];
 
                         playersUI[i].SetActive(true);
                         playersRawImage[i].SetActive(true);
