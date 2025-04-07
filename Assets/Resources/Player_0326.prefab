@@ -3977,7 +3977,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6573833916740835843
 Transform:
   m_ObjectHideFlags: 0
@@ -4125,6 +4125,7 @@ GameObject:
   - component: {fileID: 3934586117699718432}
   - component: {fileID: 3856897848918877843}
   - component: {fileID: 7302792646974106302}
+  - component: {fileID: 6895079524738165611}
   - component: {fileID: 71584351869923029}
   - component: {fileID: 3466459489178873580}
   - component: {fileID: 7082332086100491608}
@@ -4281,6 +4282,18 @@ MonoBehaviour:
   rayCount: 20
   pushUI: {fileID: 7333348393558561752}
   pushDelay: 1
+--- !u!114 &6895079524738165611
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6683843909272647973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b14642458b8ac9342a554e04ff61e67a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &71584351869923029
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4337,11 +4350,10 @@ MonoBehaviour:
   Group: 0
   prefixField: -1
   Synchronization: 3
-  OwnershipTransfer: 0
+  OwnershipTransfer: 1
   observableSearch: 2
   ObservedComponents:
   - {fileID: -1712344856210753338}
-  - {fileID: 0}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
