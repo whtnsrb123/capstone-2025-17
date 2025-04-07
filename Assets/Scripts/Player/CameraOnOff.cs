@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
 
-public class CmeraOnOff : MonoBehaviourPun
+public class CameraOnOff : MonoBehaviourPun
 {
     // Start is called before the first frame update
     void Start()

@@ -42,8 +42,9 @@ public class MissionSpawner : MonoBehaviourPun
     }
     private void SpawnPlayer()
     {
-        Vector3 spawnPos = spawnPoints[PhotonNetwork.CurrentRoom.PlayerCount-1].position;
-        Quaternion spawnRot = spawnPoints[PhotonNetwork.CurrentRoom.PlayerCount-1].rotation;
+        int spawnIndex = PhotonNetwork.LocalPlayer.ActorNumber - 1;
+        Vector3 spawnPos = spawnPoints[spawnIndex].position;
+        Quaternion spawnRot = spawnPoints[spawnIndex].rotation;
         Debug.Log($"Spawn Player 호출 : {PhotonNetwork.LocalPlayer.ActorNumber}");
         
         GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawnPos, spawnRot);
