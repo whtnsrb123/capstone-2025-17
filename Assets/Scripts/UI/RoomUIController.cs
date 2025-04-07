@@ -30,7 +30,6 @@ public class RoomUIController : MonoBehaviour
     {
         // room view 이벤트 등록
         roomView.randomBtn.onClick.AddListener(OnClickRandomBtn);
-        roomView.leaveBtn.onClick.AddListener(OnClickLeaveBtn);
 
         // create view 이벤트 등록
         roomView.c_confirmBtn.onClick.AddListener(OnClickCreateConfirmBtn);
@@ -38,11 +37,16 @@ public class RoomUIController : MonoBehaviour
         // join view 이벤트 등록
         roomView.j_confirmBtn.onClick.AddListener(OnClickJoinConfirmBtn);
 
+        // room panel 이벤트 등록
+        roomView.readyOrStartBtn.onClick.AddListener(OnClickReadyBtn);
+        roomView.leaveBtn.onClick.AddListener(OnClickLeaveBtn);
+
+
         // NetworkManager 이벤트 등록 
         NetworkManager.OnRoomListUpdated += GetRoomNameList;
-        NetworkManager.OnRoomPlayerUpdated += UpdatePlayerSeats;
-        NetworkManager.OnRoomSeatsUpdated += UpdatePlayersUI;
-        NetworkManager.OnRoomSeatsUpdated += ActivateStartButton;
+        NetworkManager.OnRoomPlayerInOut += UpdatePlayerSeats;
+        NetworkManager.OnRoomPropsUpdated += UpdatePlayersUI;
+        NetworkManager.OnRoomPropsUpdated += ActivateStartButton;
         NetworkManager.OnRoomEntered += OnEnteredRoom;
 
     }
@@ -51,9 +55,9 @@ public class RoomUIController : MonoBehaviour
     {
         // NetworkManager 이벤트 해제
         NetworkManager.OnRoomListUpdated -= GetRoomNameList;
-        NetworkManager.OnRoomPlayerUpdated -= UpdatePlayerSeats;
-        NetworkManager.OnRoomSeatsUpdated -= UpdatePlayersUI;
-        NetworkManager.OnRoomSeatsUpdated -= ActivateStartButton;
+        NetworkManager.OnRoomPlayerInOut -= UpdatePlayerSeats;
+        NetworkManager.OnRoomPropsUpdated -= UpdatePlayersUI;
+        NetworkManager.OnRoomPropsUpdated -= ActivateStartButton;
         NetworkManager.OnRoomEntered -= OnEnteredRoom;
     }
 
@@ -61,7 +65,7 @@ public class RoomUIController : MonoBehaviour
     void OnClickRandomBtn()
     {
         // 이미 room 생성 관련 작업을 처리 중이라면 중복 요청되지 않도록 한다 
-        if (NetworkManager.Instance.GetClienttState() == ConnectState.Room) return;
+        if (NetworkManager.sClientState == ConnectState.Room) return;
 
         // 랜덤 매치 버튼 클릭 시 
         SaveProfileInfo();
@@ -83,7 +87,7 @@ public class RoomUIController : MonoBehaviour
     void OnClickCreateConfirmBtn()
     {
         // 이미 room 생성 관련 작업을 처리 중이라면 중복 요청되지 않도록 한다 
-        if (NetworkManager.Instance.GetClienttState() == ConnectState.Room) return;
+        if (NetworkManager.sClientState == ConnectState.Room) return;
 
         // 방 생성 확인 버튼 클릭 시 
         SaveProfileInfo();
@@ -130,29 +134,28 @@ public class RoomUIController : MonoBehaviour
 
         if (isMasterClient)
         {
+            Debug.Log("나는 마스터");
             // MasterClient일 때, OnPlayerEntered()가 호출되지 않으므로 나의 ActorNumber를 스스로 전송한다 
             roomManager.UpdateEnteredPlayerSeats(roomManager.GetActorNumber());
+            roomManager.ChangeReadyState();
             // 시작하기 버튼을 비활성화 한다 
-            roomView.StartOrReadyButton.GetComponentInChildren<TMP_Text>().text = "Start Game zzzz";
-            roomView.StartOrReadyButton.enabled = false;
+            roomView.readyOrStartBtn.GetComponentInChildren<TMP_Text>().text = "Start Game zzzz";
+            roomView.readyOrStartBtn.enabled = false;
         }
         else
         {
-            roomView.StartOrReadyButton.GetComponentInChildren<TMP_Text>().text = "Ready~!";
+            roomView.readyOrStartBtn.enabled = true;
+            roomView.readyOrStartBtn.GetComponentInChildren<TMP_Text>().text = "Ready";
         }
         
-        NetworkManager.Instance.SetClientState(ConnectState.Room);
+        NetworkManager.sClientState = ConnectState.Room;
     }
 
     void OnClickLeaveBtn()
     {
         // 룸 나가기
         roomManager.LeaveRoom();
-    }
-
-    void OnClickReadyButton()
-    {
-        // TODO : RoomManager에게 ready true인지 확인하기 
+        // ToDo : room View 초기화하기 
     }
 
     public void SaveProfileInfo()
@@ -186,23 +189,30 @@ public class RoomUIController : MonoBehaviour
         return seats;
     }
 
+    void OnClickReadyBtn()
+    {
+        if (roomManager.IsMasterClient()) return;
+        roomManager.ChangeReadyState();
+    }
+
     void ActivateStartButton()
     {
         // 필요 인원 충족 시 start button 활성화 
         if (roomManager.IsMasterClient())
         {
-            int[] seats = GetUpdatedPlayerSeats();
+            bool[] states = roomManager.GetPlayerReadyStates();
 
-            for (int i = 0; i < seats.Length; i++)
+            for (int i = 0; i < states.Length; i++)
             {
-                // 플레이 인원 수가 채워지지 않은 경우
-                if (seats[i] == -1)
+                if (!states[i])
                 {
-                    roomView.StartOrReadyButton.enabled = false;
+                    roomView.readyOrStartBtn.enabled = false;
+                    roomView.readyOrStartBtn.GetComponentInChildren<TMP_Text>().text = "not yet";
+                    return;
                 }
             }
-
-            roomView.StartOrReadyButton.enabled = true;
+            roomView.readyOrStartBtn.GetComponentInChildren<TMP_Text>().text = "go go";
+            roomView.readyOrStartBtn.enabled = true;
         }
     }
 
@@ -211,10 +221,11 @@ public class RoomUIController : MonoBehaviour
         // room view에 플레이어의 ActorNumber 전달
         roomView.GetPlayerSeats(GetUpdatedPlayerSeats());
 
-        // room view에 플레이어의 정보 전달
-        Dictionary<int, Hashtable> playersInfo = roomManager.GetPlayerInRoomInfos();
-        roomView.UpdatePlayerUI(playersInfo);
+        // room view에 플레이어의 Ready State 전달
+        roomView.GetPlayerReadyStates(roomManager.GetPlayerReadyStates());
 
+        // room view에 플레이어의 정보 전달
+        roomView.UpdatePlayerUI(roomManager.GetPlayerInRoomInfos());
     }
 
     // ====================== Room Name 생성하기 =========================
