@@ -25,6 +25,10 @@ public class PickUpController : MonoBehaviour
     [SerializeField] private float holdFollowSpeed = 60f;  // 손 위치로 빠르게 이동
     [SerializeField] private float holdRotateSpeed = 10f;  // 손 회전 따라오는 속도
 
+    private Quaternion originalRotation; // 처음 잡았던 회전값 저장
+    private bool isTouching = false;     // 다른 물체에 닿아 있는지 여부
+    private Quaternion heldRotationOffset = Quaternion.identity; // R키로 회전한 상태 누적 저장
+
     void Start()
     {
         // 카메라 기준으로 레이 시작 위치 지정
@@ -88,22 +92,30 @@ public class PickUpController : MonoBehaviour
     }
 
     void FixedUpdate()
+{
+    // 궤적 그리기
+    DisplayTrajectory();
+
+    // 들고 있는 물체 손 위치로 이동
+    if (heldObject != null && heldObjectRb != null && pickPosition != null)
     {
-        // 궤적 그리기
-        DisplayTrajectory();
+        // 위치 이동
+        Vector3 targetPosition = pickPosition.position + pickPosition.forward * pickUpOffset;
+        Vector3 moveDirection = (targetPosition - heldObjectRb.position);
+        heldObjectRb.MovePosition(heldObjectRb.position + moveDirection * holdFollowSpeed * Time.fixedDeltaTime);
 
-        // 들고 있는 물체 손 위치로 이동
-        if (heldObject != null && heldObjectRb != null && pickPosition != null)
-        {
-            Vector3 targetPosition = pickPosition.position + pickPosition.forward * pickUpOffset;
-            Vector3 moveDirection = (targetPosition - heldObjectRb.position);
-            heldObjectRb.MovePosition(heldObjectRb.position + moveDirection * holdFollowSpeed * Time.fixedDeltaTime);
+        // 충돌 감지
+        Vector3 checkSize = heldObject.transform.localScale * 0.5f;
+        isTouching = Physics.CheckBox(heldObjectRb.position, checkSize, heldObjectRb.rotation, ~LayerMask.GetMask("HeldObject"));
 
-            // 회전도 손 방향 따라감
-            Quaternion targetRotation = pickPosition.rotation;
-            heldObjectRb.MoveRotation(Quaternion.Slerp(heldObjectRb.rotation, targetRotation, holdRotateSpeed * Time.fixedDeltaTime));
-        }
+        //  회전: pickPosition의 회전에 R 키 누적 회전 추가
+        Quaternion targetRotation = isTouching
+            ? pickPosition.rotation * heldRotationOffset
+            : originalRotation * heldRotationOffset;
+
+        heldObjectRb.MoveRotation(Quaternion.Slerp(heldObjectRb.rotation, targetRotation, holdRotateSpeed * Time.fixedDeltaTime));
     }
+}
 
     void OnGUI()
     {
@@ -148,6 +160,9 @@ public class PickUpController : MonoBehaviour
 
             // Ray 충돌 제외를 위해 레이어 변경
             heldObject.layer = LayerMask.NameToLayer("HeldObject");
+
+            // 현재 회전값 저장
+            originalRotation = heldObject.transform.rotation;
 
             Debug.Log("물체 잡기 성공: " + heldObject.name);
         }
@@ -254,10 +269,7 @@ public class PickUpController : MonoBehaviour
     {
         if (heldObject != null)
         {
-            Quaternion currentRotation = heldObject.transform.rotation;
-            Quaternion newRotation = currentRotation * Quaternion.Euler(0, 0, -90);
-            heldObject.transform.rotation = newRotation;
-
+            heldRotationOffset *= Quaternion.Euler(0, 0, -90);
             Debug.Log("물체 회전");
         }
     }

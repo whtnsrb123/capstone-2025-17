@@ -3,10 +3,12 @@ using TMPro;
 
 public class InteractManager : MonoBehaviour
 {
-    public Transform raycastPosition;
+    public Transform cameraMount; // 카메라 기준 위치 (CameraMount)
+    private Transform raycastPosition; // 내부에서 사용하는 레이 발사 위치
+
     public float detectionRange = 10f;
     public TMP_Text descriptionText;
-    private bool canpush = false;
+
     [SerializeField]
     private bool isPickable;
 
@@ -26,13 +28,15 @@ public class InteractManager : MonoBehaviour
         pickUpController = GetComponent<PickUpController>();
         interactController = GetComponent<InteractController>();
 
-        Camera mainCamera = Camera.main;
-        raycastPosition = mainCamera.transform;
+        // cameraMount 자동 연결
+        if (cameraMount == null && Camera.main != null)
+            cameraMount = Camera.main.transform;
+
+        raycastPosition = cameraMount;
 
         if (descriptionText != null)
             descriptionText.enabled = false;
 
-        // 애니메이터 컴포넌트 가져오기
         animator = GetComponent<Animator>();
     }
 
@@ -44,7 +48,6 @@ public class InteractManager : MonoBehaviour
 
     private void DetectObject()
     {
-        canpush = false;
         detectedObject = null;
         RaycastHit hit;
 
