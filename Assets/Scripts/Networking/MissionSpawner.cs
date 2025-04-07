@@ -11,6 +11,9 @@ public class MissionSpawner : MonoBehaviourPun
     [Header("플레이어 프리팹")] public GameObject playerPrefab;
     [Header("스폰 포인트(4명)")] public Transform[] spawnPoints;
 
+    [SerializeField] MaterialStorage storage; // Skin 저장소
+    public SkinnedMeshRenderer sm;
+
     private bool isReady = false;
     
     void Start()
@@ -27,7 +30,7 @@ public class MissionSpawner : MonoBehaviourPun
         while (!isReady)
         {
             Debug.Log("전원 입장 기다리는 중");
-            if (PhotonNetwork.CurrentRoom.PlayerCount == ServerInfo.CMaxPlayer)
+            if (PhotonNetwork.CurrentRoom.PlayerCount == ServerInfo.RequiredPlayerCount)
             {
                 if (PhotonNetwork.IsMasterClient)
                 {
@@ -42,7 +45,22 @@ public class MissionSpawner : MonoBehaviourPun
     }
     private void SpawnPlayer()
     {
-        int spawnIndex = PhotonNetwork.LocalPlayer.ActorNumber - 1;
+        int spawnIndex = -1;
+
+        // ActorNubmer는 0부터 순차 증가를 보장하지 않으므로, Player의  ActorNumber가 기록된 Room의 CustomProperties를 사용한다
+        int[] seats = (int[])PhotonNetwork.CurrentRoom.CustomProperties["PlayerActorNumbers"];
+
+        for (var i = 0; i < seats.Length; i++)
+        {
+            if (seats[i] == PhotonNetwork.LocalPlayer.ActorNumber)
+            {
+                spawnIndex = i;
+            }
+        }
+        
+        // 입장 전 seats 정보를 확인하지만, 만에 하나 0으로 처리한다 
+        spawnIndex = spawnIndex == -1 ? 0 : spawnIndex;
+
         Vector3 spawnPos = spawnPoints[spawnIndex].position;
         Quaternion spawnRot = spawnPoints[spawnIndex].rotation;
         Debug.Log($"Spawn Player 호출 : {PhotonNetwork.LocalPlayer.ActorNumber}");
@@ -50,6 +68,15 @@ public class MissionSpawner : MonoBehaviourPun
         GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawnPos, spawnRot);
         PhotonView view = player.GetComponent<PhotonView>();
         Debug.Log($"[소유권 확인] {view.ViewID} → {view.OwnerActorNr}");
+
+        int meshId = (int) PhotonNetwork.LocalPlayer.CustomProperties[ClientInfo.CharacterIdKey];
+        // string nickname = PhotonNetwork.LocalPlayer.CustomProperties[ClientInfo.NicknameKey].ToString();
+
+        sm = player.GetComponentInChildren<SkinnedMeshRenderer>();
+        sm.material = storage.GetMesh(meshId);
+        Debug.Assert(sm != null, "sm is null");
+        Debug.Log($"선택한 {meshId} 스킨 적용");
+
         //playerProperties = new Dictionary<PlayerProperty, GameObject>();
 
     //     string[] names = new string[PhotonNetwork.CurrentRoom.Players.Count];

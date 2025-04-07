@@ -170,7 +170,7 @@ public class RoomUIController : MonoBehaviour
 
     void UpdatePlayerSeats(int actorNumber, bool isEntered)
     {
-        // RoomMananger는 현재 룸의 CustomProperties의 "Seats" 정보를 업데이트 한다.
+        // RoomMananger는 현재 룸의 CustomProperties의 "PlayerActorNumbers" 정보를 업데이트 한다.
         if (isEntered)
         {
             // 입장한 경우
@@ -186,7 +186,7 @@ public class RoomUIController : MonoBehaviour
 
     int[] GetUpdatedPlayerSeats()
     {
-        int[] seats = roomManager.GetPlayerSeats();
+        int[] seats = roomManager.GetPlayerActorNumbers();
         return seats;
     }
 
@@ -197,6 +197,7 @@ public class RoomUIController : MonoBehaviour
         if (roomManager.IsMasterClient())
         {
             // 마스터 클라이언트
+            roomManager.ValidPlayerInRoom();
             LoadingPanel.Instance.SetLoadingPanelVisibility(true);
             mm.GoNextMission();
         }
