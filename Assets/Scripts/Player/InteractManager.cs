@@ -23,7 +23,7 @@ public class InteractManager : MonoBehaviour
         pickUpController = GetComponent<PickUpController>();
         interactController = GetComponent<InteractController>();
 
-        Camera mainCamera = Camera.main;
+        Camera mainCamera = gameObject.GetComponentInChildren<Camera>();
         raycastPosition = mainCamera.transform;
 
         if(descriptionText != null)
