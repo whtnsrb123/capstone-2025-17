@@ -3,7 +3,9 @@ using TMPro;
 
 public class InteractManager : MonoBehaviour
 {
-    public Transform raycastPosition;
+    public Transform cameraMount; // 카메라 기준 위치 (CameraMount)
+    private Transform raycastPosition; // 내부에서 사용하는 레이 발사 위치
+
     public float detectionRange = 10f;
     public TMP_Text descriptionText;
 
@@ -14,25 +16,34 @@ public class InteractManager : MonoBehaviour
     private GameObject heldObject;
 
     private PickUpController pickUpController;
+    private PlayerPushController pushController;
     private InteractController interactController;
 
-    private Outline targetOutline;
+    // 애니메이터 관련 변수
+    public Animator animator; // 애니메이터 컴포넌트 연결
+    public string liftTriggerName = "IsLift"; // 애니메이터 트리거 이름
 
     void Start()
     {
         pickUpController = GetComponent<PickUpController>();
         interactController = GetComponent<InteractController>();
 
-        Camera mainCamera = Camera.main;
-        raycastPosition = mainCamera.transform;
+        // cameraMount 자동 연결
+        if (cameraMount == null && Camera.main != null)
+            cameraMount = Camera.main.transform;
 
-        if(descriptionText != null)
+        raycastPosition = cameraMount;
+
+        if (descriptionText != null)
             descriptionText.enabled = false;
+
+        animator = GetComponent<Animator>();
     }
 
     void Update()
     {
         DetectObject();
+        heldObject = pickUpController.heldObject; // PickUpController에서 들고 있는 물체 정보를 가져옴
     }
 
     private void DetectObject()
@@ -40,15 +51,17 @@ public class InteractManager : MonoBehaviour
         detectedObject = null;
         RaycastHit hit;
 
-        if(raycastPosition == null)
+        if (raycastPosition == null)
             return;
 
-        if(Physics.Raycast(raycastPosition.position, raycastPosition.forward, out hit, detectionRange))
+        if (Physics.Raycast(raycastPosition.position, raycastPosition.forward, out hit, detectionRange))
         {
             detectedObject = hit.collider.gameObject;
 
-            if(hit.collider.CompareTag("Pickable"))
+            if (hit.collider.CompareTag("Pickable"))
             {
+                Debug.Log("Pickable 감지: " + hit.collider.gameObject.name);
+
                 if (descriptionText != null && heldObject == null)
                 {
                     descriptionText.enabled = true;
@@ -57,53 +70,45 @@ public class InteractManager : MonoBehaviour
                     pickUpController.detectedObject = detectedObject;
                 }
             }
-            else if(hit.collider.CompareTag("Interactable"))
+            else if (hit.collider.CompareTag("Interactable"))
             {
-                if(descriptionText != null)
+                Debug.Log("Interactable 감지: " + hit.collider.gameObject.name);
+                if (descriptionText != null)
                 {
                     descriptionText.enabled = true;
                     descriptionText.text = "Press F to Interact";
                     isPickable = false;
                 }
             }
-
-            Outline outline = hit.collider.gameObject.GetComponent<Outline>();
-            if(outline != null)
-            {
-                if(targetOutline != outline)
-                {
-                    ClearOutline();
-                    targetOutline = outline;
-                    targetOutline.enabled = true;
-                }
-            } else {
-                ClearOutline();
-            }
-        } else {
-            ClearOutline();
         }
-        
+
         if (detectedObject == null && heldObject == null && descriptionText != null)
             descriptionText.enabled = false;
     }
 
-    private void ClearOutline()
-    {
-        if(targetOutline != null)
-        {
-            targetOutline.enabled = false;
-            targetOutline = null;
-        }
-    }
-
     public void OnInput()
     {
-        if(detectedObject == null)
+        if (heldObject != null) // 들고 있는 물체가 있다면
+        {
+            pickUpController.HandlePickUpOrDrop(); // 물체를 내려놓습니다.
+            if (isPickable) // 들 수 있는 물체였다면
+            {
+                animator.SetTrigger("IsPut"); // IsPut 트리거 활성화
+            }
+            return;
+        }
+
+        if (detectedObject == null)
             return;
 
-        if(isPickable)
+        if (isPickable)
+        {
             pickUpController.HandlePickUpOrDrop();
-        else
+            animator.SetTrigger(liftTriggerName); // PickUp 시 애니메이터 트리거 활성화
+        }
+        else if (isPickable == false)
+        {
             interactController.Interact(detectedObject);
+        }
     }
 }

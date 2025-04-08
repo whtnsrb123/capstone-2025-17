@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Pickable
+  - Ground
+  - WaterParticle
   - Interactable
   layers:
   - Default
@@ -14,7 +16,6 @@ TagManager:
   - Water
   - UI
   - Character
-  - 
   - 
   - 
   - 

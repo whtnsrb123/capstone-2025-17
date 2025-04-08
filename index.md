@@ -1,37 +1,68 @@
-## Welcome to GitHub Pages
+# 팀 17 - Toyland Trials
 
-You can use the [editor on GitHub](https://github.com/kookmin-sw/cap-template/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
+<br>
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## 목차
 
-### Markdown
+- 프로젝트 소개
+- 주요 기능
+- 팀 소개
+- 게임 플레이 방법
+- 기타
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+<br>
 
-```markdown
-Syntax highlighted code block
+## 프로젝트 소개
 
-# Header 1
-## Header 2
-### Header 3
+인형 공장에서 눈을 뜬 인형 캐릭터들이 공장을 탈출하기 위해 힘을 합치는 협동 게임입니다.
 
-- Bulleted
-- List
+플레이어들은 곰인형이 되어 다양한 장애물을 피하고, 공장 곳곳에 숨겨진 아이템을 활용하며 탈출을 시도해야 합니다. 캐릭터가 물에 닿으면 느려지거나, 장애물이 지나다니는 컨베이어 벨트 같은 각종 기믹을 파훼하며 플레이 합니다. 함께 협력하여 문을 열고, 길을 개척하며 무사히 공장에서 벗어나는 것이 목표입니다.
 
-1. Numbered
-2. List
+유니티 엔진으로 개발하며, Photon을 채용해 최대 4인의 멀티플레이를 지원합니다.
 
-**Bold** and _Italic_ and `Code` text
+<br>
 
-[Link](url) and ![Image](src)
-```
+## 주요 기능
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+**상호작용 시스템**
 
-### Jekyll Themes
+플레이어는 공장 내 다양한 오브젝트와 상호작용하여 탈출을 시도할 수 있습니다. 문을 열거나 기계를 조작하고, 숨겨진 아이템을 활용하여 장애물을 극복하는 등 환경과의 상호작용이 핵심 요소입니다.
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/kookmin-sw/cap-template/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+**탈출 시스템**
 
-### Support or Contact
+플레이어들은 제한된 시간 내에 공장에서 탈출해야 합니다. 특정 조건을 충족해야만 문이 열리거나 길이 생기는 구조로, 협력과 전략적인 플레이가 요구됩니다.
 
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+**미션 시스템**
+
+플레이어는 특정 목표를 수행하며 탈출해야 합니다. NPC의 시선을 피하며 이동해야 하며, 물을 건너거나 점프하는 등 다양한 기믹을 활용해야 합니다. 미션을 완료하면 새로운 탈출 경로가 열리며, 팀워크와 전략적인 플레이가 요구됩니다.
+
+**멀티플레이 협력**
+
+최대 4명의 플레이어가 함께 협력하여 탈출을 시도하는 멀티플레이 게임입니다. Photon을 활용하여 실시간으로 협동할 수 있으며, 역할을 나누어 퍼즐을 해결하거나 상대를 돕는 등 팀워크가 중요한 요소로 작용합니다.
+
+<br>
+
+## 팀 소개
+
+| 이름 | 학번 | 역할 |
+| --- | --- | --- |
+| 곽우진 | 20203026 | 팀장, 레벨 디자인, 기믹, 배경 등 구현 |
+| 김유진 | 20203045 | 사운드, 이펙트, 시네머신, 애니메이션 등 연출 |
+| 조순규 | 20203144 | 플레이어, 카메라 등 |
+| 김대성 | 20203033 | 네트워크 동기화 및 게임 상태 관리 |
+| 정지연 | 20200592 | 네트워크 연결 및 동기화 |
+
+<br>
+
+## 게임 플레이 방법
+
+- 플레이어는 룸을 생성하거나, 빠른 매치 혹은 방 코드를 입력하여 게임에 참여합니다.
+- 게임 내 여러 오브젝트와 상호작용하여 장애물을 극복하고 탈출을 시도합니다. 사다리, 나무 판자 등 다양한 환경 요소를 활용할 수 있습니다.
+- 상호작용이 가능한 오브젝트에는 마우스를 올리면 직관적인 UI 힌트를 제공하여, 플레이어가 필요한 정보를 얻을 수 있습니다.
+- 물에 젖으면 캐릭터가 무거워져 이동 속도가 느려지고, 컨베이어 벨트에서는 장애물이 날아와 플레이어의 이동을 방해할 수 있습니다.
+- 특정 구간에는 공장 관리자 NPC가 존재하며, 플레이어는 NPC의 시선을 피해 조심스럽게 행동해야 합니다.
+- 플레이어는 제한된 시간 내에 협력하여 공장에서 탈출해야 합니다. 주어진 시간 안에 탈출에 성공하려면 팀워크와 빠른 판단이 필수입니다.
+
+<br>
+
+## 기타
