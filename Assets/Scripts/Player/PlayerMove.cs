@@ -37,6 +37,7 @@ public class CharacterController : MonoBehaviour
     public Animator animator; // 애니메이터 컴포넌트 연결
     public int MoveType = 0; // MoveType 변수 선언 및 초기화
     public string jumpTriggerName = "IsJump"; // 점프 트리거 이름
+    public const string carryJumpTriggerName = "IsCarryJump"; // 점프 트리거 이름
 
     void Start()
     {
@@ -132,7 +133,16 @@ public class CharacterController : MonoBehaviour
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse); // 위쪽 방향으로 힘을 가해 점프
             isGrounded = false; // 점프 후 공중 상태로 변경
-            animator.SetTrigger(jumpTriggerName); // 점프 트리거 활성화
+
+            bool isHolding = GetComponent<PickUpController>().IsHoldingObject();
+            if(isHolding)
+            {
+                animator.SetTrigger(carryJumpTriggerName); // carry 점프 트리거 활성화
+            }
+            else
+            {
+                animator.SetTrigger(jumpTriggerName); // 점프 트리거 활성화
+            }
         }
     }
 
