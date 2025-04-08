@@ -11,6 +11,11 @@ public class InteractController : MonoBehaviour
 
     public void Interact(GameObject target)
     {
-        Debug.Log(target.name);
+        IInteractable interactable = target.GetComponent<IInteractable>();
+
+        if (interactable == null)
+            return;
+
+        interactable.Interact();
     }
 }

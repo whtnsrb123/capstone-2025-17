@@ -92,30 +92,30 @@ public class PickUpController : MonoBehaviour
     }
 
     void FixedUpdate()
-{
-    // 궤적 그리기
-    DisplayTrajectory();
-
-    // 들고 있는 물체 손 위치로 이동
-    if (heldObject != null && heldObjectRb != null && pickPosition != null)
     {
-        // 위치 이동
-        Vector3 targetPosition = pickPosition.position + pickPosition.forward * pickUpOffset;
-        Vector3 moveDirection = (targetPosition - heldObjectRb.position);
-        heldObjectRb.MovePosition(heldObjectRb.position + moveDirection * holdFollowSpeed * Time.fixedDeltaTime);
+        // 궤적 그리기
+        DisplayTrajectory();
 
-        // 충돌 감지
-        Vector3 checkSize = heldObject.transform.localScale * 0.5f;
-        isTouching = Physics.CheckBox(heldObjectRb.position, checkSize, heldObjectRb.rotation, ~LayerMask.GetMask("HeldObject"));
+        // 들고 있는 물체 손 위치로 이동
+        if (heldObject != null && heldObjectRb != null && pickPosition != null)
+        {
+            // 위치 이동
+            Vector3 targetPosition = pickPosition.position + pickPosition.forward * pickUpOffset;
+            Vector3 moveDirection = (targetPosition - heldObjectRb.position);
+            heldObjectRb.MovePosition(heldObjectRb.position + moveDirection * holdFollowSpeed * Time.fixedDeltaTime);
 
-        //  회전: pickPosition의 회전에 R 키 누적 회전 추가
-        Quaternion targetRotation = isTouching
-            ? pickPosition.rotation * heldRotationOffset
-            : originalRotation * heldRotationOffset;
+            // 충돌 감지
+            Vector3 checkSize = heldObject.transform.localScale * 0.5f;
+            isTouching = Physics.CheckBox(heldObjectRb.position, checkSize, heldObjectRb.rotation, ~LayerMask.GetMask("HeldObject"));
 
-        heldObjectRb.MoveRotation(Quaternion.Slerp(heldObjectRb.rotation, targetRotation, holdRotateSpeed * Time.fixedDeltaTime));
+            // 회전: pickPosition의 회전에 R 키 누적 회전 추가
+            Quaternion targetRotation = isTouching
+                ? pickPosition.rotation * heldRotationOffset
+                : originalRotation * heldRotationOffset;
+
+            heldObjectRb.MoveRotation(Quaternion.Slerp(heldObjectRb.rotation, targetRotation, holdRotateSpeed * Time.fixedDeltaTime));
+        }
     }
-}
 
     void OnGUI()
     {
@@ -153,6 +153,7 @@ public class PickUpController : MonoBehaviour
             heldObjectRb.useGravity = false;     // 중력 제거
 
             Collider heldObjectCollider = heldObject.GetComponent<Collider>();
+
             if (heldObjectCollider != null && heldObject.CompareTag("Pickable"))
             {
                 heldObjectCollider.isTrigger = false; // 충돌 유지

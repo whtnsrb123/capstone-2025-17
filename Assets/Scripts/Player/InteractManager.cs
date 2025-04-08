@@ -61,6 +61,7 @@ public class InteractManager : MonoBehaviour
             if (hit.collider.CompareTag("Pickable"))
             {
                 Debug.Log("Pickable 감지: " + hit.collider.gameObject.name);
+
                 if (descriptionText != null && heldObject == null)
                 {
                     descriptionText.enabled = true;
