@@ -7,9 +7,8 @@ using UnityEngine.UI;
 
 public class NetworkHandler : MonoBehaviourPunCallbacks
 {
-    public static NetworkHandler Instance;
-
     // ===== 에러 패널 UI 오브젝트 변수 =====
+    // 잘 사용되지 않으므로 동적으로 할당 및 생성
     GameObject errorPanelPrefab; // 에러 패널 프리팹
     GameObject currentErrorPanel = null; // 씬에 존재하는 패널
     TextMeshProUGUI errorTypeTMP; // 에러 메시지 유형
@@ -21,20 +20,26 @@ public class NetworkHandler : MonoBehaviourPunCallbacks
     #region 사용자정의 에러 코드
     public const int RequestNotSent = 0; // 접속이 끊겨, 요청이 전송되지 않은 경우
     public const int MakeNameFailed = 1; // 방 이름을 생성하지 못한 경우
-    # endregion
+    #endregion
 
-    private void Awake()
+    public static NetworkHandler Instance { get; private set; }
+
+    private void Start()
     {
+        if (Instance != null)
         {
-            // 테스트용~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
+            Destroy(gameObject);
         }
+        Instance = this;
+
+        DontDestroyOnLoad(gameObject);
+
         errorPanelPrefab = Resources.Load<GameObject>("Prefabs/UI/ErrorPanel");
     }
 
+
     // 접속이 끊겼을 때 예외 처리 
-   public  void SetDisconnectedExceptionPanel(int code)
+    public  void SetDisconnectedExceptionPanel(int code)
     {
         Action OnDisconnect = null;
         switch (code)
