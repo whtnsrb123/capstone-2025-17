@@ -8,10 +8,13 @@ public class GeneratorForElevator : MonoBehaviour
     public Generator secondGenerator;
     public Elevator elevator;
     public ShortCutSceneCamera cutSceneCamera;
-
     void Update()
     {
-        if(firstGenerator.isOn && secondGenerator.isOn)
+        if (firstGenerator.isOn && secondGenerator.isOn)
+        {
+            Managers.GimmickManager.ActivateGimmick("Generator");
+        }
+        if(Managers.GimmickManager.IsGimmickActivated("Generator"))
         {
             cutSceneCamera.PlayShortCutScene();
 

@@ -21,10 +21,12 @@ public class Managers : MonoBehaviour
     public static GameStateManager GameStateManager => Instance._gameState;
     public static GameTimerManager GameTimerManager => Instance._gameTimer;
     public static MissionManager MissionManager => Instance._missionManager;
+    public static GimmickManager GimmickManager => Instance._gimmickManager;
 
     GameStateManager _gameState;
     GameTimerManager _gameTimer;
     MissionManager _missionManager;
+    GimmickManager _gimmickManager;
     // ----------------------------------------------------------------------------------------------------------
     List<IManager> _managerList = new List<IManager>();
     
@@ -53,10 +55,12 @@ public class Managers : MonoBehaviour
         _gameState = CreateManager<GameStateManager>(parent, "GameStateManager");
         _gameTimer = CreateManager<GameTimerManager>(parent, "GameTimerManager");
         _missionManager = CreateManager<MissionManager>(parent, "MissionManager");
+        _gimmickManager = CreateManager<GimmickManager>(parent, "GimmickManager");
 
         _managerList.Add(_gameState);
         _managerList.Add(_gameTimer);
         _managerList.Add(_missionManager);
+        _managerList.Add(_gimmickManager);
 
         foreach (var m in _managerList)
             m.Init();
@@ -74,7 +78,20 @@ public class Managers : MonoBehaviour
                 Debug.LogError("GameTimerManager 프리팹을 찾을 수 없습니다! Resources/GameTimerManager 위치 확인");
                 return null;
             }
-            go = Instantiate(prefab);
+
+            go = PhotonNetwork.Instantiate(prefab.name, prefab.transform.position, prefab.transform.rotation);
+            go.name = name;
+            go.transform.SetParent(parent.transform);
+        }
+        else if (typeof(T) == typeof(GimmickManager))
+        {
+            GameObject prefab = Resources.Load<GameObject>("GimmickManager");
+            if (prefab == null)
+            {
+                Debug.LogError("GimmickManager 프리팹을 찾을 수 없습니다! Resources/GimmickManager 위치 확인");
+                return null;
+            }
+            go = PhotonNetwork.Instantiate(prefab.name, prefab.transform.position, prefab.transform.rotation);
             go.name = name;
             go.transform.SetParent(parent.transform);
         }
