@@ -2,6 +2,7 @@
 using Photon.Pun;
 using Photon.Realtime;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 // Room 과 관련된 네트워크 작업을 담당하는 클래스
@@ -12,10 +13,10 @@ public class RoomManager : MonoBehaviourPun
     const int RequiredPlayerCount = 4;
 
     // 해시 키
-    const string NicknameKey = "Nickname";
-    const string CharacterIdKey = "CharacterId";
+    string NicknameKey = ClientInfo.NicknameKey;
+    string CharacterIdKey = ClientInfo.CharacterIdKey;
 
-    const string SeatsKey = "Seats";
+    const string PlayerActorNumbersKey = ServerInfo.PlayerActorNumbers;
     const string ReadyStatesKey = "ReadyStates";
 
     // 접속이 끊긴 플레이어를 룸에 유지할 시간
@@ -33,7 +34,7 @@ public class RoomManager : MonoBehaviourPun
         Hashtable customProperties = new Hashtable
         {
             // 플레이어 ActorNumber를 기록하는 배열이다
-            { SeatsKey, new int[] {-1, -1, -1, -1} },
+            { PlayerActorNumbersKey, new int[] {-1, -1, -1, -1} },
             // 플레이어 Ready State를 기록하는 배열이다 
             { ReadyStatesKey, new bool[] { false, false, false, false } },
             // 랜덤 매치인 방을 검색하거나, 생성하는 데 사용된다
@@ -81,7 +82,7 @@ public class RoomManager : MonoBehaviourPun
     {
         Hashtable customProperties = new Hashtable
         {
-            { SeatsKey, new int[] {-1, -1, -1, -1} },
+            { PlayerActorNumbersKey, new int[] {-1, -1, -1, -1} },
             { ReadyStatesKey, new bool[] { false, false, false, false } },
             // 랜덤 매치를 시도하는 클라이언트에게 제외되도록 한다
             { "MatchType",  "Create"}
@@ -168,12 +169,12 @@ public class RoomManager : MonoBehaviourPun
     {
         Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
 
-        int[] seats = (int[])hash[SeatsKey];
+        int[] playerActorNumbers = (int[])hash[PlayerActorNumbersKey];
 
         for (int i = 0; i < RequiredPlayerCount; i++)
         {
             // 내 자리를 발견
-            if (seats[i] == GetActorNumber())
+            if (playerActorNumbers[i] == GetActorNumber())
             {
 
                 ((bool[])hash[ReadyStatesKey])[i] = !((bool[]) hash[ReadyStatesKey])[i];
@@ -193,15 +194,15 @@ public class RoomManager : MonoBehaviourPun
 
         Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
 
-        int[] seats = (int[])hash[SeatsKey];
+        int[] playerActorNumbers = (int[])hash[PlayerActorNumbersKey];
 
         for (int i = 0; i < RequiredPlayerCount; i++)
         {
             // 빈 자리를 발견
-            if (seats[i] == -1)
+            if (playerActorNumbers[i] == -1)
             {
-                seats[i] = actorNumber;
-                hash[SeatsKey] = seats;
+                playerActorNumbers[i] = actorNumber;
+                hash[PlayerActorNumbersKey] = playerActorNumbers;
 
                 PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
 
@@ -218,17 +219,17 @@ public class RoomManager : MonoBehaviourPun
 
         Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
 
-        int[] seats = (int[])hash[SeatsKey];
+        int[] playerActorNumbers = (int[])hash[PlayerActorNumbersKey];
         bool[] states = (bool[])hash[ReadyStatesKey];
 
         for (int i = 0; i < RequiredPlayerCount; i++)
         {
             // 떠난 플레이어 발견 
-            if (seats[i] == actorNumber)
+            if (playerActorNumbers[i] == actorNumber)
             {
-                seats[i] = -1;
+                playerActorNumbers[i] = -1;
                 states[i] = false;
-                hash[SeatsKey] = seats;
+                hash[PlayerActorNumbersKey] = playerActorNumbers;
                 hash[ReadyStatesKey] = states;
 
                 PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
@@ -243,12 +244,12 @@ public class RoomManager : MonoBehaviourPun
 
 
     // 갱신된 플레이어 표시 순서 정보를 받아온다 
-    public int[] GetPlayerSeats()
+    public int[] GetPlayerActorNumbers()
     {
         Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
 
-        int[] seats = (int[])hash[SeatsKey];
-        return seats;
+        int[] playerActorNumbers = (int[])hash[PlayerActorNumbersKey];
+        return playerActorNumbers;
     }
     public bool[] GetPlayerReadyStates()
     {
@@ -293,6 +294,27 @@ public class RoomManager : MonoBehaviourPun
         }
         return playersInfo;
     }
+
+    // 게임 시작 전 발생할 수 있는 오류를 방지한다 
+    public void ValidPlayerInRoom()
+    {
+        Dictionary<int, Player> currentPlayers = PhotonNetwork.CurrentRoom.Players;
+
+        // 현재 실제 접속 중인 actorNumber로 배열 재구성
+        int[] validActorNumbers = currentPlayers.Keys.ToArray();
+
+        // Room의 CustomProperties를 수정해서 동기화
+        Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
+        hash[PlayerActorNumbersKey] = validActorNumbers;
+
+        for (int i = 0; i < validActorNumbers.Length; i++)
+        {
+            Debug.Log(validActorNumbers[i] + " 플레이어 존재");
+        }
+
+        PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
+    }
+
 
     // 현재 방에서의 actorNumber를 받아온다
     public int GetActorNumber()

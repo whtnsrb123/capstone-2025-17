@@ -19195,6 +19195,7 @@ MonoBehaviour:
   - {fileID: 596717376}
   - {fileID: 826962797}
   - {fileID: 13737791}
+  storage: {fileID: 11400000, guid: 14ab9b203f06437438b947f1d7e55801, type: 2}
 --- !u!4 &1857236884
 Transform:
   m_ObjectHideFlags: 0

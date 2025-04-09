@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class ClientInfo : MonoBehaviour
 {
+    public const string NicknameKey = "NicknameKey";
+    public const string CharacterIdKey = "CharacterIdKey";
+
     string nickname;
     int characterId;
 
@@ -15,14 +18,14 @@ public class ClientInfo : MonoBehaviour
     {
         get 
         {
-            nickname = PlayerPrefs.GetString("Nickname", DefaultNickname());
+            nickname = PlayerPrefs.GetString(NicknameKey, DefaultNickname());
             return nickname;
         }
         set 
         {
             nickname = value;
             NicknameUpdate?.Invoke(nickname);
-            PlayerPrefs.SetString("Nickname", value);
+            PlayerPrefs.SetString(NicknameKey, value);
         }
     }
 

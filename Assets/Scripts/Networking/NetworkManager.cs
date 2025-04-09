@@ -21,7 +21,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public static Action OnConnectedToLobby; // 마스터 서버에 접속했을 때
     public static Action<List<string>> OnRoomListUpdated; // 방 목록이 업데이트 됐을 때 
     public static Action OnRoomEntered; // 룸에 입장했을 때
-    public static Action OnRoomPropsUpdated; // Seats 정보가 갱신될 때 
+    public static Action OnRoomPropsUpdated; // PlayerActorNumbers 정보가 갱신될 때 
     public static Action<int, bool> OnRoomPlayerInOut; // 룸 플레이어 리스트가 변동됐을 때
 
     // 플레이어의 연결 상태

@@ -4,7 +4,11 @@ using UnityEngine;
 
 public class ServerInfo : MonoBehaviour
 {
-    public const int CMaxPlayer = 4;
+    public const int RequiredPlayerCount = 4;
+
+    // 해시 키
+    public const string PlayerActorNumbers = "PlayerActorNumbers";
+
     public enum RoomTypes
     {
         Random,
@@ -24,7 +28,6 @@ public class ServerInfo : MonoBehaviour
     public int MaxPlayer
     {
         get { return _maxPlayer; }
-        set { _maxPlayer = value; }
     }
 
 }
