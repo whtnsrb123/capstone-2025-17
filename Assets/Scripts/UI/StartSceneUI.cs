@@ -10,8 +10,8 @@ public class StartSceneUI : MonoBehaviour
     public Button connectButton;
     public TextMeshProUGUI connectInfoTMP;
 
-    const string CONNECT_SUCCESS = "CONNECT COMPLETED!";
-    const string CONNECT_TRY = "ON CONNECTING...";
+    const string CONNECT_SUCCESS = "네트워크에 접속했습니다!";
+    const string CONNECT_TRY = "네트워크 접속 중...";
 
 
     void Start()

@@ -87,7 +87,7 @@ public class RoomUI : MonoBehaviour
 
                         playersUI[i].SetActive(true);
                         playersRawImage[i].SetActive(true);
-                        playersReadyStatesUI[i].text = (viewReadyStates[i] ? "Ready" : "Not Ready");
+                        playersReadyStatesUI[i].text = (viewReadyStates[i] ? "준비 완료" : "준비 중...");
 
                         smRenderers[i].material = storage.GetMesh(characterId);
                         nicknamesUI[i].text = nickname;

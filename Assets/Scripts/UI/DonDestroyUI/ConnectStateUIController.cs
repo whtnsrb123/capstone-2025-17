@@ -14,17 +14,17 @@ public class ConnectStateUIController : MonoBehaviour
     {
         if(PhotonNetwork.IsConnected)
         {
-            regionTMP.text = $"Server Region : {PhotonNetwork.CloudRegion}";
+            regionTMP.text = $"연결된 국가 : {PhotonNetwork.CloudRegion}";
         }
         else
         {
-            regionTMP.text = "Disconnected";
+            regionTMP.text = "접속 끊김";
         }
     }
 
     private void Update()
     {
-        pingTMP.text = $"now {PhotonNetwork.GetPing()}ms ";
-        connectStateTMP.text = $"Connect Status : { (PhotonNetwork.IsConnected ? "Connecting" : "Disconnected")} ";
+        pingTMP.text = $"Ping :  {PhotonNetwork.GetPing()}ms ";
+        connectStateTMP.text = $"연결 상태 : { (PhotonNetwork.IsConnected ? "연결됨" : "연결 끊김")} ";
     }
 }

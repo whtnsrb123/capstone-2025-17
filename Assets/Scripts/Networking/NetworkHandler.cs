@@ -170,6 +170,7 @@ public class NetworkHandler : MonoBehaviourPunCallbacks
 
         // 패널을 프리팹으로 생성한다
         currentErrorPanel = Instantiate(errorPanelPrefab, canvas.transform, false);
+        Debug.Assert(canvas != null, "핸들러 프리팹을 찾지 못함");
 
         // 패널의 자식들 중 사용할 UI 요소 찾아 변수에 할당한다
         TextMeshProUGUI[] allTMPsChildren = currentErrorPanel.GetComponentsInChildren<TextMeshProUGUI>();
