@@ -10,12 +10,12 @@ public class Autodoor : MonoBehaviour
 
     void Start()
     {
-        OpenDoor();
+        
     }
 
     public void OpenDoor()
     {
-        leftDoor.DOMove(leftDoor.position + Vector3.left * 2.5f, 5f);
-        rightDoor.DOMove(rightDoor.position + Vector3.right * 2.5f, 5f);
+        leftDoor.DOMove(leftDoor.position + Vector3.left * 1.2f, 5f);
+        rightDoor.DOMove(rightDoor.position + Vector3.right * 1.2f, 5f);
     }
 }
