@@ -240,8 +240,8 @@ public class SoundManager : MonoBehaviour
     private void Start()
     {
         // Test용 - 일반 사운드 효과음, 배경음
-        Play("BGM", ESoundType.BGM);
-        Play("SFX", ESoundType.SFX);
+        //Play("BGM", ESoundType.BGM);
+        //Play("SFX", ESoundType.SFX);
     }
 
     private void Update()
@@ -260,20 +260,20 @@ public class SoundManager : MonoBehaviour
         //    delay = 0.0f;
         //}
 
-        if(Input.GetKeyDown(KeyCode.T))
-        {
-            Stop("BGM");
-        }
-
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            Play("TestError", ESoundType.BGM);
-        }
-
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            Play("SFX", ESoundType.SFX);
-        }
+        //if(Input.GetKeyDown(KeyCode.T))
+        //{
+        //    Stop("BGM");
+        //}
+        //
+        //if (Input.GetKeyDown(KeyCode.D))
+        //{
+        //    Play("TestError", ESoundType.BGM);
+        //}
+        //
+        //if (Input.GetKeyDown(KeyCode.A))
+        //{
+        //    Play("SFX", ESoundType.SFX);
+        //}
     }
 
     private void ConnectUI()
