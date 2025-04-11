@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -7,23 +7,23 @@ using UnityEngine.UI;
 
 /// <summary>
 /// 2025.03.03 KimYuJin
-/// SliderÀÇ min Value´Â 0.001f·Î »ç¿ëÇØ¾ß ÇÑ´Ù. 
-/// Sound(3D Æ÷ÇÔ) Àç»ı ¹× °ü¸®¸¦ ´ã´çÇÏ´Â Å¬·¡½º 
+/// Sliderì˜ min ValueëŠ” 0.001fë¡œ ì‚¬ìš©í•´ì•¼ í•œë‹¤. 
+/// Sound(3D í¬í•¨) ì¬ìƒ ë° ê´€ë¦¬ë¥¼ ë‹´ë‹¹í•˜ëŠ” í´ë˜ìŠ¤ 
 /// 
-/// 3D Sound°¡ ÇÊ¿äÇÑ Sound - Ä³¸¯ÅÍ°¡ ³»´Â È¿°úÀ½, NPC³ª ¹°Ã¼ÀÇ ¼Ò¸® È¿°úÀ½ µîÀº 
-/// ´Ù¸£°Ô Àç»ıÇØ¾ßÇÔ. -> AudioSourceInstance.PlayClipAtPoint(clip, Vector3)À» »ç¿ëÇÏ¸é Àç»ıÇÒ ¼ö ÀÖÀ½
-/// ±Ùµ¥ ÀÌ ÇÔ¼öÀÇ µ¿ÀÛ ¿ø¸®°¡ °´Ã¼¸¦ »ı¼ºÇÏ°í Àç»ı ³¡³ª¸é ¼Ò¸êÇÏ´Â °Å °°¾Æ¼­ 
-/// Á÷Á¢ audiosource poolÀ» ¸¸µé¾î¼­ °ü¸®ÇÏ´Â °Ô ³ªÀ» ¼öµµ ÀÖÀ» °Å °°´Ù´Â »ı°¢ÀÌ µç´Ù
+/// 3D Soundê°€ í•„ìš”í•œ Sound - ìºë¦­í„°ê°€ ë‚´ëŠ” íš¨ê³¼ìŒ, NPCë‚˜ ë¬¼ì²´ì˜ ì†Œë¦¬ íš¨ê³¼ìŒ ë“±ì€ 
+/// ë‹¤ë¥´ê²Œ ì¬ìƒí•´ì•¼í•¨. -> AudioSourceInstance.PlayClipAtPoint(clip, Vector3)ì„ ì‚¬ìš©í•˜ë©´ ì¬ìƒí•  ìˆ˜ ìˆìŒ
+/// ê·¼ë° ì´ í•¨ìˆ˜ì˜ ë™ì‘ ì›ë¦¬ê°€ ê°ì²´ë¥¼ ìƒì„±í•˜ê³  ì¬ìƒ ëë‚˜ë©´ ì†Œë©¸í•˜ëŠ” ê±° ê°™ì•„ì„œ 
+/// ì§ì ‘ audiosource poolì„ ë§Œë“¤ì–´ì„œ ê´€ë¦¬í•˜ëŠ” ê²Œ ë‚˜ì„ ìˆ˜ë„ ìˆì„ ê±° ê°™ë‹¤ëŠ” ìƒê°ì´ ë“ ë‹¤
 /// 
-/// SoundManager¸¦ »ç¿ëÇÏ´Â ÀÌÀ¯ Áß ÇÏ³ª´Â È¿°úÀ½ °°Àº °æ¿ì ¿ÀºêÁ§Æ®¿¡¼­ 
-/// Àç»ıÇÏ¸é ¿ÀºêÁ§Æ®°¡ »ç¶óÁú ¶§ ¼Ò¸®°¡ ²÷±â±â ¶§¹®
-/// ±×¸®°í Sound Source¿Í ClipÀ» ÇÑ ±ºµ¥¿¡¼­ °ü¸®ÇØ¼­ ÆíÇÏ´Ù´Â ÀåÁ¡ÀÌ ÀÖ´Ù.
+/// SoundManagerë¥¼ ì‚¬ìš©í•˜ëŠ” ì´ìœ  ì¤‘ í•˜ë‚˜ëŠ” íš¨ê³¼ìŒ ê°™ì€ ê²½ìš° ì˜¤ë¸Œì íŠ¸ì—ì„œ 
+/// ì¬ìƒí•˜ë©´ ì˜¤ë¸Œì íŠ¸ê°€ ì‚¬ë¼ì§ˆ ë•Œ ì†Œë¦¬ê°€ ëŠê¸°ê¸° ë•Œë¬¸
+/// ê·¸ë¦¬ê³  Sound Sourceì™€ Clipì„ í•œ êµ°ë°ì—ì„œ ê´€ë¦¬í•´ì„œ í¸í•˜ë‹¤ëŠ” ì¥ì ì´ ìˆë‹¤.
 /// 
-/// Audio Source´Â Sound¸¦ Àç»ıÇØÁÖ´Â UnityÀÇ ÄÄÆ÷³ÍÆ®ÀÌ´Ù.
-/// AudioClipÀº À¯´ÏÆ¼¿¡¼­ À½¾ÇÀ» Àç»ıÇÒ ÆÄÀÏÀ» ÀÇ¹ÌÇÏ´Â °Í °°´Ù.
+/// Audio SourceëŠ” Soundë¥¼ ì¬ìƒí•´ì£¼ëŠ” Unityì˜ ì»´í¬ë„ŒíŠ¸ì´ë‹¤.
+/// AudioClipì€ ìœ ë‹ˆí‹°ì—ì„œ ìŒì•…ì„ ì¬ìƒí•  íŒŒì¼ì„ ì˜ë¯¸í•˜ëŠ” ê²ƒ ê°™ë‹¤.
 /// 
-/// Dictionary´Â ±âº»ÀûÀ¸·Î ÀÚµ¿À¸·Î Á÷·ÄÈ­°¡ ¾ÈµÅ¼­ ¿¡µğÅÍ¿¡ ¾È ¶ç¿öÁø´Ù.
-/// ±×·¡¼­ serializableDictionary ÆĞÅ°Áö¸¦ Ãß°¡Çß´Ù.
+/// DictionaryëŠ” ê¸°ë³¸ì ìœ¼ë¡œ ìë™ìœ¼ë¡œ ì§ë ¬í™”ê°€ ì•ˆë¼ì„œ ì—ë””í„°ì— ì•ˆ ë„ì›Œì§„ë‹¤.
+/// ê·¸ë˜ì„œ serializableDictionary íŒ¨í‚¤ì§€ë¥¼ ì¶”ê°€í–ˆë‹¤.
 /// </summary>
 /// 
 
@@ -31,7 +31,7 @@ public enum ESoundType
 {
     BGM,
     SFX,
-    END // ¸¶Áö¸·À» Ç¥½ÃÇÏ±â À§ÇØ
+    END // ë§ˆì§€ë§‰ì„ í‘œì‹œí•˜ê¸° ìœ„í•´
 }
 
 public class SoundManager : MonoBehaviour
@@ -41,11 +41,11 @@ public class SoundManager : MonoBehaviour
     {
         if (!clips.ContainsKey(soundName) || clips[soundName] == null)
         {
-            Debug.Log($"soundName: \"{soundName}\",ÀÌ¸§À» °¡Áø AudioClipÀÌ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù. ");
+            Debug.Log($"soundName: \"{soundName}\",ì´ë¦„ì„ ê°€ì§„ AudioClipì´ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤. ");
             return;
         }
 
-        // AudioSource °¡Á®¿À±â
+        // AudioSource ê°€ì ¸ì˜¤ê¸°
         AudioSource source;
         if (audioSourcePool.Count > 0)
         {
@@ -57,13 +57,13 @@ public class SoundManager : MonoBehaviour
         }
         source.gameObject.SetActive(true);
 
-        // SoundType¿¡ µû¶ó Loop ¼³Á¤
+        // SoundTypeì— ë”°ë¼ Loop ì„¤ì •
         if (eSoundType == ESoundType.BGM)
         {
             source.loop = true;
             source.outputAudioMixerGroup = bgmAudioMixerGroup;
         }
-        else // È¿°úÀ½
+        else // íš¨ê³¼ìŒ
         {
             source.loop = false;
             source.outputAudioMixerGroup = sfxAudioMixerGroup;
@@ -74,7 +74,7 @@ public class SoundManager : MonoBehaviour
         source.Play();
 
         playingAudioSource[soundName] = source;
-        // BGMÀÇ °æ¿ì Loop¸¦ µ¹±â ¶§¹®¿¡ ¹Ù·Î source¸¦ ¹İ³³ÇÏÁö ¾Ê´Â´Ù.
+        // BGMì˜ ê²½ìš° Loopë¥¼ ëŒê¸° ë•Œë¬¸ì— ë°”ë¡œ sourceë¥¼ ë°˜ë‚©í•˜ì§€ ì•ŠëŠ”ë‹¤.
         if (eSoundType == ESoundType.SFX)
         {
             StartCoroutine(ReturnToPool(source, soundName, clips[soundName].length));
@@ -85,7 +85,7 @@ public class SoundManager : MonoBehaviour
     {
         if (!clips.ContainsKey(soundName) || clips[soundName] == null)
         {
-            Debug.Log($"soundName: \"{soundName}\",ÀÌ¸§À» °¡Áø AudioClipÀÌ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù. ");
+            Debug.Log($"soundName: \"{soundName}\",ì´ë¦„ì„ ê°€ì§„ AudioClipì´ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤. ");
             return;
         }
 
@@ -114,7 +114,7 @@ public class SoundManager : MonoBehaviour
     {
         if (!playingAudioSource.ContainsKey(soundName) || playingAudioSource[soundName] == null)
         {
-            Debug.Log($"soundName: \"{soundName}\", ÇØ´ç sound´Â Àç»ıÇÏ°í ÀÖÁö ¾Ê½À´Ï´Ù.");
+            Debug.Log($"soundName: \"{soundName}\", í•´ë‹¹ soundëŠ” ì¬ìƒí•˜ê³  ìˆì§€ ì•ŠìŠµë‹ˆë‹¤.");
             return;
         }
         playingAudioSource[soundName].Stop();
@@ -188,18 +188,18 @@ public class SoundManager : MonoBehaviour
     }
 
     /// ------------------------------------- private --------------------------------
-    // PoolSize´Â ÇÃÁ§ÇÒ ¶§ ·Î±× ³²±â¸é¼­ Á¶ÀıÇÒ ÇÊ¿ä°¡ ÀÖÀ» µí
+    // PoolSizeëŠ” í”Œì í•  ë•Œ ë¡œê·¸ ë‚¨ê¸°ë©´ì„œ ì¡°ì ˆí•  í•„ìš”ê°€ ìˆì„ ë“¯
     private const int audioSourcePoolSize = 50;
 
-    // º¼·ı Á¶Àı
+    // ë³¼ë¥¨ ì¡°ì ˆ
     [Header("Audio Mixer Setting")]
     [SerializeField] private AudioMixer audioMixer;
 
-    [SerializeField] private AudioMixerGroup masterAudioMixerGroup; // audioMixer.find ·Î °¡Á®¿Íµµ µÇ±ä ÇÏ´Âµ¥ ¹Ù·Î Á¢±ÙÀÌ ¾ÈµÇ°í °Ë»öÇØ¼­ °¡Á®¿À´Â °Å °°¾Æ¼­ ±×³É ¸Ş¸ğ¸®¿¡ ÀúÀåÇÏ±â·Î ÇÔ
+    [SerializeField] private AudioMixerGroup masterAudioMixerGroup; // audioMixer.find ë¡œ ê°€ì ¸ì™€ë„ ë˜ê¸´ í•˜ëŠ”ë° ë°”ë¡œ ì ‘ê·¼ì´ ì•ˆë˜ê³  ê²€ìƒ‰í•´ì„œ ê°€ì ¸ì˜¤ëŠ” ê±° ê°™ì•„ì„œ ê·¸ëƒ¥ ë©”ëª¨ë¦¬ì— ì €ì¥í•˜ê¸°ë¡œ í•¨
     [SerializeField] private AudioMixerGroup bgmAudioMixerGroup;
     [SerializeField] private AudioMixerGroup sfxAudioMixerGroup;
 
-    [Header("Audio UI ¿¬°á")]
+    [Header("Audio UI ì—°ê²°")]
     [SerializeField] private Slider masterSlider;
     [SerializeField] private Slider BGMSlider;
     [SerializeField] private Slider SFXSlider;
@@ -207,13 +207,13 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private Toggle BGMMute;
     [SerializeField] private Toggle SFXMute;
 
-    [Header("Sound °ü¸®")]
-    // Sound °ü¸®
+    [Header("Sound ê´€ë¦¬")]
+    // Sound ê´€ë¦¬
     [SerializeField] private SerializableDictionary<string, AudioClip> clips;
 
     [SerializeField] private AudioSource audioSourcePrefab;
     private Queue<AudioSource> audioSourcePool = new Queue<AudioSource>();
-    private Dictionary<string, AudioSource> playingAudioSource = new Dictionary<string, AudioSource>(); // ÇØ´ç string¿¡ ÇØ´çÇÏ´Â clipÀ» Àç»ıÁßÀÎ source
+    private Dictionary<string, AudioSource> playingAudioSource = new Dictionary<string, AudioSource>(); // í•´ë‹¹ stringì— í•´ë‹¹í•˜ëŠ” clipì„ ì¬ìƒì¤‘ì¸ source
 
     private string masterVolumeStr = "MasterVolume";
     private string BGMVolumeStr = "BGMVolume";
@@ -222,7 +222,7 @@ public class SoundManager : MonoBehaviour
     private string BGMMuteStr = "BGMMute";
     private string SFXMuteStr = "SFXMute";
 
-    // test¿ë - 3D »ç¿îµå 
+    // testìš© - 3D ì‚¬ìš´ë“œ 
     //Vector3 soundPlayPosition;
     //float delay = 0.0f;
 
@@ -239,14 +239,14 @@ public class SoundManager : MonoBehaviour
 
     private void Start()
     {
-        // Test¿ë - ÀÏ¹İ »ç¿îµå È¿°úÀ½, ¹è°æÀ½
+        // Testìš© - ì¼ë°˜ ì‚¬ìš´ë“œ íš¨ê³¼ìŒ, ë°°ê²½ìŒ
         //Play("BGM", ESoundType.BGM);
         //Play("SFX", ESoundType.SFX);
     }
 
     private void Update()
     {
-        // Test¿ë - 3D »ç¿îµå 
+        // Testìš© - 3D ì‚¬ìš´ë“œ 
         //delay += Time.deltaTime;
         //
         //if(delay >= 1.0f)
@@ -289,7 +289,7 @@ public class SoundManager : MonoBehaviour
 
     private void LoadVolume()
     {
-        // volume ºÒ·¯¿À±â
+        // volume ë¶ˆëŸ¬ì˜¤ê¸°
         if (PlayerPrefs.HasKey(masterVolumeStr))
         {
             masterSlider.value = PlayerPrefs.GetFloat(masterVolumeStr);
@@ -314,7 +314,7 @@ public class SoundManager : MonoBehaviour
         {
             SFXSlider.value = 0.7f;
         }
-        // Mute ºÒ·¯¿À±â
+        // Mute ë¶ˆëŸ¬ì˜¤ê¸°
         if (PlayerPrefs.HasKey(masterMuteStr))
         {
             masterMute.isOn = PlayerPrefs.GetInt(masterMuteStr) == 1;
@@ -350,7 +350,7 @@ public class SoundManager : MonoBehaviour
         return newSource;
     }
 
-    // ÀÏÁ¤ ½Ã°£ ÈÄ ´Ù½Ã Ç®¿¡ ¹İÈ¯
+    // ì¼ì • ì‹œê°„ í›„ ë‹¤ì‹œ í’€ì— ë°˜í™˜
     private IEnumerator ReturnToPool(AudioSource source, string soundName,  float delay)
     {
         yield return new WaitForSeconds(delay);
