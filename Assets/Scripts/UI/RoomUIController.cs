@@ -129,7 +129,7 @@ public class RoomUIController : MonoBehaviour
         roomPanel.SetActive(true);
 
         string roomCode = roomManager.GetRoomCode();
-        roomView.roomCode.text = $"Room Code : {roomCode}";
+        roomView.roomCode.text = $"방 코드 : {roomCode}";
 
         bool isMasterClient = roomManager.IsMasterClient();
 
@@ -140,13 +140,13 @@ public class RoomUIController : MonoBehaviour
             roomManager.UpdateEnteredPlayerSeats(roomManager.GetActorNumber());
             roomManager.ChangeReadyState();
             // 시작하기 버튼을 비활성화 한다 
-            roomView.readyOrStartBtn.GetComponentInChildren<TMP_Text>().text = "Start Game zzzz";
+            roomView.readyOrStartBtn.GetComponentInChildren<TMP_Text>().text = "준비 중...";
             // roomView.readyOrStartBtn.enabled = false;
         }
         else
         {
             roomView.readyOrStartBtn.enabled = true;
-            roomView.readyOrStartBtn.GetComponentInChildren<TMP_Text>().text = "Ready";
+            roomView.readyOrStartBtn.GetComponentInChildren<TMP_Text>().text = "준비하기";
         }
 
         NetworkManager.sClientState = ConnectState.Room;
@@ -220,11 +220,11 @@ public class RoomUIController : MonoBehaviour
                 if (!states[i])
                 {
                     // roomView.readyOrStartBtn.enabled = false;
-                    roomView.readyOrStartBtn.GetComponentInChildren<TMP_Text>().text = "not yet";
+                    roomView.readyOrStartBtn.GetComponentInChildren<TMP_Text>().text = "준비 중...";
                     return;
                 }
             }
-            roomView.readyOrStartBtn.GetComponentInChildren<TMP_Text>().text = "go go";
+            roomView.readyOrStartBtn.GetComponentInChildren<TMP_Text>().text = "게임 시작";
             roomView.readyOrStartBtn.enabled = true;
         }
     }

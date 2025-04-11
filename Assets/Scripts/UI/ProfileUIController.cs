@@ -55,23 +55,23 @@ public class ProfileUIController : MonoBehaviour
 
         if (string.IsNullOrWhiteSpace(updatedNickname))
         {
-            guideToNickname = "blank";
+            guideToNickname = "닉네임이 공백입니다.";
             Debug.Log("닉네임 공백 상태");
         }
         else if (updatedNickname.Length >= maxNicknameLength)
         {
-            guideToNickname = "Too long";
+            guideToNickname = $"최대 {maxNicknameLength} 글자 입력 가능합니다.";
             Debug.Log("너무 길어");
         }
         else if (!nicknameRegex.IsMatch(updatedNickname))
         {
-            guideToNickname = "You can use [kor, eng, 0-9, ), -]";
+            guideToNickname = "한글, 영어, 0-9, -만 입력 가능합니다.";
             Debug.Log("이상한 문자들도 사용함");
         }
         else
         {
             // 정상적인 닉네임이 입력된 경우
-            guideToNickname = "OK";
+            guideToNickname = "수정됐습니다.";
             profileModel.Nickname = updatedNickname;
         }
 
