@@ -6,7 +6,7 @@ using UnityEngine;
 public class CameraOnOff : MonoBehaviourPun
 {
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         if (photonView.IsMine)
         {
