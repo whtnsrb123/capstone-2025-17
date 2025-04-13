@@ -13,7 +13,7 @@ public class InteractController : MonoBehaviour
     {
         IInteractable interactable = target.GetComponent<IInteractable>();
 
-        if(interactable == null)
+        if (interactable == null)
             return;
 
         interactable.Interact();
