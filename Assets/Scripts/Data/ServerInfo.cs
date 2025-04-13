@@ -6,8 +6,13 @@ public class ServerInfo : MonoBehaviour
 {
     public const int RequiredPlayerCount = 4;
 
+    public const string PlayerActorNumbersKey = "PlayerActorNumbers";
+    public const string ReadyStatesKey = "ReadyStates";
+
+    public static ObservableArray<int> PlayerActorNumbers { get; private set; } = new ObservableArray<int>(4, -1);
+    public static ObservableArray<bool> ReadyStates { get; private set; } = new ObservableArray<bool>(4, false);
+
     // 해시 키
-    public const string PlayerActorNumbers = "PlayerActorNumbers";
 
     public enum RoomTypes
     {
@@ -29,5 +34,24 @@ public class ServerInfo : MonoBehaviour
     {
         get { return _maxPlayer; }
     }
+
+    public static void InitServerInfo()
+    {
+        PlayerActorNumbers.EventOff = true;
+        ReadyStates.EventOff = true;
+
+        for (int i = 0; i < RequiredPlayerCount; i++)
+        {
+            PlayerActorNumbers[i] = -1;
+            ReadyStates[i] = false;
+        }
+        PlayerActorNumbers.EventOff = false;
+        ReadyStates.EventOff = false;
+
+
+    }
+
+
+
 
 }

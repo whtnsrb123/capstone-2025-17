@@ -1,8 +1,17 @@
 ﻿using System;
 using UnityEngine;
-
+public enum ConnectState
+{
+    Idle,
+    Lobby,
+    Room,
+    Disconnected
+}
 public class ClientInfo : MonoBehaviour
 {
+    public static ConnectState sCurrentState;
+    public static ConnectState sClientState;
+
     public const string NicknameKey = "NicknameKey";
     public const string CharacterIdKey = "CharacterIdKey";
 

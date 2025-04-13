@@ -63,7 +63,7 @@ public class NetworkHandler : MonoBehaviourPunCallbacks
         }
 
 
-        if (NetworkManager.sClientState == ConnectState.Room)
+        if (ClientInfo.sClientState == ConnectState.Room)
         {
             // 대기방 혹은 인게임에서 Disconnected -> Rejoin 시도
             OnDisconnect = ReconnectAndRejoin;
@@ -129,7 +129,7 @@ public class NetworkHandler : MonoBehaviourPunCallbacks
     public void SetJoinExceptionPanel(int code)
     {
         //  예외를 중복으로 처리하지 않도록 return  
-        if (NetworkManager.sClientState != ConnectState.Lobby) return;
+        if (ClientInfo.sClientState != ConnectState.Lobby) return;
 
         Action OnJoinFailed = null;
 
@@ -219,8 +219,8 @@ public class NetworkHandler : MonoBehaviourPunCallbacks
         else
         {
             Debug.Log("돌아갈 룸 있음");
-            NetworkManager.sCurrentState = ConnectState.Room;
-            NetworkManager.sClientState = ConnectState.Room;
+            ClientInfo.sCurrentState = ConnectState.Room;
+            ClientInfo.sClientState = ConnectState.Room;
         }
     }
 
@@ -247,12 +247,12 @@ public class NetworkHandler : MonoBehaviourPunCallbacks
         base.OnJoinRoomFailed(returnCode, message);
 
         // 조인 예외 처리
-        if (NetworkManager.sClientState == ConnectState.Room)
+        if (ClientInfo.sClientState == ConnectState.Room)
         {
             // ReconnectAndRejoin()이 실패한 경우에 호출된 OnJOinRoomFailed()를 처리한다
 
             // sClientState가 Room이면 다시 Room 재참여를 시도하므로, Lobby로 수정한다 
-            NetworkManager.sClientState = ConnectState.Lobby; 
+            ClientInfo.sClientState = ConnectState.Lobby; 
             SetDisconnectedExceptionPanel(0);
         }
         else
@@ -265,7 +265,7 @@ public class NetworkHandler : MonoBehaviourPunCallbacks
     public override void OnDisconnected(DisconnectCause cause)
     {
         Debug.Log("On Disconnected");
-        NetworkManager.sCurrentState = ConnectState.Disconnected;
+        ClientInfo.sCurrentState = ConnectState.Disconnected;
 
         // Disconnected 예외 처리
         SetDisconnectedExceptionPanel((int)cause);

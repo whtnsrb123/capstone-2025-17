@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Photon.Pun;
+using Photon.Pun.Demo.PunBasics;
+using Sirenix.OdinInspector;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -7,9 +10,11 @@ using UnityEngine.UI;
 
 public class RoomUI : MonoBehaviour
 {
+    [Header("Match Making Button")]
     // lobby 
     public Button randomBtn;
 
+    [Header("Room")]
     // room panel
     public Button readyOrStartBtn;
     public Button leaveBtn;
@@ -20,10 +25,12 @@ public class RoomUI : MonoBehaviour
     public GameObject[] playersRawImage;
     public TextMeshProUGUI[] playersReadyStatesUI;
 
+    [Header("Create Room")]
     // create panel
     public Button c_confirmBtn;
     public Button c_cancelBtn;
 
+    [Header("Join Room")]
     // joine panel
     public TMP_InputField roomCodeTMPInp;
     public Button j_confirmBtn;
@@ -62,47 +69,44 @@ public class RoomUI : MonoBehaviour
         }
     }
 
-
-    public void UpdatePlayerUI(Dictionary<int, Hashtable> updatedPlayers)
+    public void UpdatePlayer(int index, int actorNumber)
     {
-        viewPlayerList = updatedPlayers;
-
-        for (int i = 0; i < viewSeats.Length; i++)
+        if (actorNumber == -1)
         {
-            if (viewSeats[i] == -1)
-            {
-                playersUI[i].SetActive(false);
-                nicknamesUI[i].text = string.Empty;
-                playersRawImage[i].SetActive(false);
-                playersReadyStatesUI[i].text = string.Empty;
-            }
-            else
-            {
-                foreach (KeyValuePair<int, Hashtable> kvp in updatedPlayers)
-                {
-                    if(kvp.Key == viewSeats[i])
-                    {
-                        int characterId = (int)kvp.Value[ClientInfo.CharacterIdKey];
-                        string nickname = (string)kvp.Value[ClientInfo.NicknameKey];
-
-                        playersUI[i].SetActive(true);
-                        playersRawImage[i].SetActive(true);
-                        playersReadyStatesUI[i].text = (viewReadyStates[i] ? "준비 완료" : "준비 중...");
-
-                        smRenderers[i].material = storage.GetMesh(characterId);
-                        nicknamesUI[i].text = nickname;
-                    }
-                }
-            }
-
+            // 플레이어 퇴장
+            playersUI[index].SetActive(false);
+            nicknamesUI[index].text = string.Empty;
+            playersRawImage[index].SetActive(false);
+            playersReadyStatesUI[index].text = string.Empty;
         }
+        else
+        {
+            int characterId = (int)PhotonNetwork.CurrentRoom.Players[actorNumber].CustomProperties[ClientInfo.CharacterIdKey];
+            string nickname = (string)PhotonNetwork.CurrentRoom.Players[actorNumber].CustomProperties[ClientInfo.NicknameKey];
+
+            Debug.Log($"{index} 번째 플레이어의 아이디는 {actorNumber} 닉네임은 {nickname}");
+
+            playersUI[index].SetActive(true);
+            playersRawImage[index].SetActive(true);
+            playersReadyStatesUI[index].text = ServerInfo.ReadyStates[index] ? "준비 완료" : "준비 중";
+
+            smRenderers[index].material = storage.GetMesh(characterId);
+            nicknamesUI[index].text = nickname;
+        }
+    }
+
+    public void UpdateReadyState(int index, bool ready)
+    {
+        playersReadyStatesUI[index].text = ServerInfo.ReadyStates[index] ? "준비 완료" : "준비 중";
     }
 
     public void InitPanel()
     {
-        viewPlayerList.Clear();
-        viewSeats = null;
-        viewReadyStates = null;
+        for (int i = 0; i < ServerInfo.PlayerActorNumbers.Length; i++)
+        {
+            UpdatePlayer(i, ServerInfo.PlayerActorNumbers[i]);
+            Debug.Log($"{i} 번째에  {ServerInfo.PlayerActorNumbers[i]} 를 그리다");
+        }
     }
 
 }

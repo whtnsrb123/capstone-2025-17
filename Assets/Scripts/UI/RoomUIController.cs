@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿/*using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
 using TMPro;
@@ -42,31 +42,19 @@ public class RoomUIController : MonoBehaviour
         // room panel 이벤트 등록
         roomView.readyOrStartBtn.onClick.AddListener(OnClickReadyOrStartBtn);
         roomView.leaveBtn.onClick.AddListener(OnClickLeaveBtn);
-
-        // NetworkManager 이벤트 등록 
-        NetworkManager.OnRoomListUpdated += GetRoomNameList;
-        NetworkManager.OnRoomPlayerInOut += UpdatePlayerSeats;
-        NetworkManager.OnRoomPropsUpdated += UpdatePlayersUI;
-        NetworkManager.OnRoomPropsUpdated += ActivateStartButton;
-        NetworkManager.OnRoomEntered += OnEnteredRoom;
-
     }
 
     private void OnDestroy()
     {
-        // NetworkManager 이벤트 해제
-        NetworkManager.OnRoomListUpdated -= GetRoomNameList;
-        NetworkManager.OnRoomPlayerInOut -= UpdatePlayerSeats;
-        NetworkManager.OnRoomPropsUpdated -= UpdatePlayersUI;
-        NetworkManager.OnRoomPropsUpdated -= ActivateStartButton;
-        NetworkManager.OnRoomEntered -= OnEnteredRoom;
+        // ServerConnector 이벤트 해제
+
     }
 
     // =================== Lobby Buttons =====================
     void OnClickRandomBtn()
     {
         // 이미 room 생성 관련 작업을 처리 중이라면 중복 요청되지 않도록 한다 
-        if (NetworkManager.sClientState == ConnectState.Room) return;
+        if (ServerConnector.sClientState == ConnectState.Room) return;
 
         // 랜덤 매치 버튼 클릭 시 
         SaveProfileInfo();
@@ -88,7 +76,7 @@ public class RoomUIController : MonoBehaviour
     void OnClickCreateConfirmBtn()
     {
         // 이미 room 생성 관련 작업을 처리 중이라면 중복 요청되지 않도록 한다 
-        if (NetworkManager.sClientState == ConnectState.Room) return;
+        if (ServerConnector.sClientState == ConnectState.Room) return;
 
         // 방 생성 확인 버튼 클릭 시 
         SaveProfileInfo();
@@ -149,7 +137,7 @@ public class RoomUIController : MonoBehaviour
             roomView.readyOrStartBtn.GetComponentInChildren<TMP_Text>().text = "준비하기";
         }
 
-        NetworkManager.sClientState = ConnectState.Room;
+        ServerConnector.sClientState = ConnectState.Room;
     }
 
     void OnClickLeaveBtn()
@@ -252,7 +240,7 @@ public class RoomUIController : MonoBehaviour
     // 중복된 Room Name인지 확인한다
     bool IsDuplicateRoomName(string myRoom)
     {
-        foreach(string name in sRoomNameList)
+        foreach (string name in sRoomNameList)
         {
             if (myRoom == name)
             {
@@ -267,7 +255,7 @@ public class RoomUIController : MonoBehaviour
     {
         int maxTry = 10;
 
-        string roomName =  $"{Random.Range(10000, 99999)}";
+        string roomName = $"{Random.Range(10000, 99999)}";
 
         while (IsDuplicateRoomName(roomName))
         {
@@ -285,3 +273,4 @@ public class RoomUIController : MonoBehaviour
     }
 
 }
+*/

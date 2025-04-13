@@ -4040,7 +4040,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &379783230
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6777,7 +6777,6 @@ GameObject:
   - component: {fileID: 642424960}
   - component: {fileID: 642424959}
   - component: {fileID: 642424963}
-  - component: {fileID: 642424964}
   m_Layer: 5
   m_Name: Main Canvas
   m_TagString: Untagged
@@ -6882,18 +6881,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ce0896321b06bae4390cb90125a8933e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &642424964
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 642424958}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d75ef5ba275a7b40b69be260c61d34e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &649812065
@@ -15947,9 +15934,9 @@ RectTransform:
   - {fileID: 1270311217}
   m_Father: {fileID: 863547832}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 178.59998, y: -111.74029}
   m_SizeDelta: {x: 332.4471, y: 119.1039}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1589561524
@@ -17343,9 +17330,9 @@ RectTransform:
   - {fileID: 1965232412}
   m_Father: {fileID: 863547832}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 178.59998, y: -260.84418}
   m_SizeDelta: {x: 332.4471, y: 119.1039}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1774149301
@@ -18559,9 +18546,12 @@ GameObject:
   - component: {fileID: 1973008134}
   - component: {fileID: 1973008131}
   - component: {fileID: 1973008136}
-  - component: {fileID: 1973008135}
+  - component: {fileID: 1973008139}
+  - component: {fileID: 1973008138}
   - component: {fileID: 1973008132}
   - component: {fileID: 1973008137}
+  - component: {fileID: 1973008141}
+  - component: {fileID: 1973008140}
   m_Layer: 5
   m_Name: ====== Lobby Pannel ======
   m_TagString: Untagged
@@ -18678,21 +18668,6 @@ MonoBehaviour:
   nicknameInp: {fileID: 1920151495}
   nicknameTMP: {fileID: 1664985356}
   nicknameGuideTMP: {fileID: 985303246}
---- !u!114 &1973008135
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1973008126}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 65b2bb675505eda4ca02feb693608b9d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  roomManager: {fileID: 642424964}
-  roomPanel: {fileID: 379783229}
-  mm: {fileID: 662659945}
 --- !u!114 &1973008136
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18747,6 +18722,63 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b529ad1f1936b754eb264a8ee9cb5e75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1973008138
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973008126}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db74f996887d6554485546b03f731f5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  network: {fileID: 1973008139}
+  roomView: {fileID: 1973008136}
+  profileModel: {fileID: 1973008132}
+--- !u!114 &1973008139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973008126}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bde6c7ec046e9642825acc86ca5bc27, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ui: {fileID: 1973008138}
+--- !u!114 &1973008140
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973008126}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 649ecd47d5716ab4ab2111c7658d8a34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  roomPanel: {fileID: 379783229}
+  network: {fileID: 1973008141}
+  roomView: {fileID: 1973008136}
+  mm: {fileID: 662659945}
+--- !u!114 &1973008141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973008126}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf576cf32a6041b49992ff70c4fbdf40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ui: {fileID: 1973008140}
 --- !u!1 &1975328832
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,4 +1,4 @@
-﻿using ExitGames.Client.Photon;
+﻿/*using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using System.Collections.Generic;
@@ -21,7 +21,7 @@ public class RoomManager : MonoBehaviourPun
 
     // 접속이 끊긴 플레이어를 룸에 유지할 시간
     private int playerTtl = 10000;
-    
+
     // 아무도 없는 룸을 유지할 시간 
     private int roomTtl = 0;
 
@@ -52,7 +52,7 @@ public class RoomManager : MonoBehaviourPun
             MaxPlayers = RequiredPlayerCount,
             PlayerTtl = playerTtl,
             CustomRoomProperties = customProperties,
-            CustomRoomPropertiesForLobby = new string[] {"MatchType"}, // 로비에서 검색할 방 속성 지정
+            CustomRoomPropertiesForLobby = new string[] { "MatchType" }, // 로비에서 검색할 방 속성 지정
             EmptyRoomTtl = roomTtl,
         };
 
@@ -69,7 +69,7 @@ public class RoomManager : MonoBehaviourPun
         );
 
         // 클라이언트는 방 입장을 요청한 상태
-        NetworkManager.sClientState = ConnectState.Room;
+        ServerConnector.sClientState = ConnectState.Room;
 
         // 접속이 끊겨, 요청이 전송되지 않은 경우
         if (!sent)
@@ -105,7 +105,7 @@ public class RoomManager : MonoBehaviourPun
        );
 
         // 클라이언트는 방 입장을 요청한 상태
-        NetworkManager.sClientState = ConnectState.Room;
+        ServerConnector.sClientState = ConnectState.Room;
 
         // 접속이 끊겨, 요청이 전송되지 않은 경우
         if (!sent)
@@ -132,7 +132,7 @@ public class RoomManager : MonoBehaviourPun
         s_players.Clear();
 
         // 클라이언트는 방 퇴장을 요청한 상태
-        NetworkManager.sClientState = ConnectState.Lobby;
+        ServerConnector.sClientState = ConnectState.Lobby;
     }
 
     // =========================== 플레이어 정보 전송 =================================
@@ -141,8 +141,8 @@ public class RoomManager : MonoBehaviourPun
     public void SendClientInfo(string nickname, int characterId)
     {
         Hashtable hash = PhotonNetwork.LocalPlayer.CustomProperties;
-        
-       // 닉네임 전송
+
+        // 닉네임 전송
         if (!hash.ContainsKey(NicknameKey))
         {
             hash.Add(NicknameKey, nickname);
@@ -177,7 +177,7 @@ public class RoomManager : MonoBehaviourPun
             if (playerActorNumbers[i] == GetActorNumber())
             {
 
-                ((bool[])hash[ReadyStatesKey])[i] = !((bool[]) hash[ReadyStatesKey])[i];
+                ((bool[])hash[ReadyStatesKey])[i] = !((bool[])hash[ReadyStatesKey])[i];
 
                 PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
 
@@ -334,3 +334,4 @@ public class RoomManager : MonoBehaviourPun
         return roomCode;
     }
 }
+*/
