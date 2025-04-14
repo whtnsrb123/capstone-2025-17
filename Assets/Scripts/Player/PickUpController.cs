@@ -209,7 +209,7 @@ public class PickUpController : MonoBehaviourPun
         PhotonView objView = PhotonView.Find(objectViewID);
         if (objView == null) return;
 
-        objView.transform.SetParent(null);
+        objView.transform.parent = null;
 
         Rigidbody rb = objView.GetComponent<Rigidbody>();
         if (rb != null)
@@ -238,6 +238,11 @@ public class PickUpController : MonoBehaviourPun
     {
         if (heldObject != null && heldObjectRb != null)
         {
+            int viewID = heldObject.GetPhotonView().ViewID;
+            Vector3 throwDirection = (pickPosition.forward + Vector3.up * 0.5f).normalized;
+            
+            photonView.RPC(nameof(RPC_ThrowObject), RpcTarget.All, viewID, throwDirection);
+            
             Collider heldObjectCollider = heldObject.GetComponent<Collider>();
             if (heldObjectCollider != null)
             {
@@ -250,7 +255,6 @@ public class PickUpController : MonoBehaviourPun
             // 던질 방향과 힘 설정
             if (pickPosition != null)
             {
-                Vector3 throwDirection = (pickPosition.forward + Vector3.up * 0.5f).normalized;
                 heldObjectRb.AddForce(throwDirection * throwForce, ForceMode.VelocityChange);
 
                 heldObject.transform.parent = null;
@@ -264,6 +268,34 @@ public class PickUpController : MonoBehaviourPun
                 Debug.LogError("pickPosition이 설정되지 않았습니다.");
             }
         }
+    }
+
+    [PunRPC]
+    void RPC_ThrowObject(int objectViewID, Vector3 throwDirection)
+    {
+       PhotonView objView = PhotonView.Find(objectViewID);
+       if (objView == null) return;
+       
+       Transform objTransform = objView.transform;
+       Rigidbody rb = objTransform.GetComponent<Rigidbody>();
+       Collider col = objTransform.GetComponent<Collider>();
+       Collider heldObjectCollider = objView.gameObject.GetComponent<Collider>();
+
+       if (col != null)
+       {
+           col.isTrigger = false;
+       }
+       
+       if (rb != null)
+       {
+           rb.isKinematic = false;
+           rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+           rb.AddForce(throwDirection * throwForce, ForceMode.VelocityChange);
+       }
+       objTransform.parent = null;
+       objTransform.position += Vector3.up * 0.1f;
+
+       Debug.Log("RPC 던지기 완료");
     }
 
     private void DisplayTrajectory()
