@@ -7,7 +7,12 @@ using UnityEngine;
 public class MissionManager : MonoBehaviourPun ,IManager
 {
     private Dictionary<int, bool> missionsStates = new Dictionary<int, bool>();
-    
+    private int currentMission = 0;
+    public int CurrentMission {
+        get
+        {
+            return currentMission;
+        }}
     int nextMission = 1; //다음 미션 번호
     
     public void Init()
@@ -26,7 +31,7 @@ public class MissionManager : MonoBehaviourPun ,IManager
     //특정 미션을 성공처리
     public void CompleteMission(int missionId)
     {
-        photonView.RPC("MissionComplete", RpcTarget.All, missionId);
+        photonView.RPC(nameof(MissionComplete), RpcTarget.All, missionId);
     }
     
     //모든 미션을 성공했는지 확인
@@ -70,6 +75,7 @@ public class MissionManager : MonoBehaviourPun ,IManager
 
         Debug.Log($"Mission{nextMission} 로딩 시작");
         PhotonNetwork.LoadLevel($"Mission{nextMission}");
+        currentMission = nextMission;
         nextMission++;
     }
 
