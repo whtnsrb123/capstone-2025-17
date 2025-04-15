@@ -190,8 +190,6 @@ public class RoomUIController : MonoBehaviour
         return seats;
     }
 
-    public MissionManager mm;
-
     void OnClickReadyOrStartBtn()
     {
         if (roomManager.IsMasterClient())
@@ -199,7 +197,7 @@ public class RoomUIController : MonoBehaviour
             // 마스터 클라이언트
             roomManager.ValidPlayerInRoom();
             LoadingPanel.Instance.SetLoadingPanelVisibility(true);
-            mm.GoNextMission();
+            GameStarter.GameStart();
         }
         else
         {

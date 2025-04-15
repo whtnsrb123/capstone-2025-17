@@ -7,7 +7,7 @@ using UnityEngine;
 public class GoalArea : MonoBehaviourPun
 {
     private HashSet<int> goaledPlayers = new HashSet<int>();
-    private const int requiredPlayerCount = PhotonNetwork.CurrentRoom.PlayerCount;
+    private int requiredPlayerCount = PhotonNetwork.CurrentRoom.PlayerCount;
     // Start is called before the first frame update
 
     private void OnTriggerEnter(Collider other)

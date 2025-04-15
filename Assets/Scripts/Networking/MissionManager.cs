@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,13 +8,13 @@ using UnityEngine;
 public class MissionManager : MonoBehaviourPun ,IManager
 {
     private Dictionary<int, bool> missionsStates = new Dictionary<int, bool>();
-    private int currentMission = 0;
+    private int currentMission = 1;
     public int CurrentMission {
         get
         {
             return currentMission;
         }}
-    int nextMission = 1; //다음 미션 번호
+    int nextMission = 2; //다음 미션 번호
     
     public void Init()
     {
@@ -28,6 +29,12 @@ public class MissionManager : MonoBehaviourPun ,IManager
         }
         Debug.Log("MissionManager 클리어");
     }
+
+    private void Start()
+    {
+        Managers.GameTimerManager.StartTimer(300f);
+    }
+
     //특정 미션을 성공처리
     public void CompleteMission(int missionId)
     {
@@ -59,9 +66,9 @@ public class MissionManager : MonoBehaviourPun ,IManager
             Debug.LogWarning("마스터 클라이언트가 아님, 씬 로드 취소");
             return;
         }
-
+        
+        //Managers.GameTimerManager.StartTimer(300f);
         Debug.Log("GoNextMission 호출됨");
-        Managers.GameTimerManager.StartTimer(300f);
 
         foreach (var item in missionsStates.OrderBy(kv => kv.Key))
         {
