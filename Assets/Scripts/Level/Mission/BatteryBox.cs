@@ -20,12 +20,19 @@ public class BatteryBox : MonoBehaviour, IInteractable
         
     }
 
-    public void Interact()
+    public void Interact(GameObject player)
     {
+        if(player.GetComponent<PickUpController>().heldObject.GetComponent<Battery>() == null)
+            return;
+        
+        GameObject targetBattery = player.GetComponent<PickUpController>().heldObject;
+        player.GetComponent<PickUpController>().DropObject();
+        targetBattery.tag = "Untagged";
+        targetBattery.GetComponent<Rigidbody>().useGravity = false;
+        targetBattery.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+        targetBattery.transform.position = batteryPositions[batteryCount].position;
+        targetBattery.transform.eulerAngles = new Vector3(-90f, 90f, 0f);
 
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // 손에 들고 있는 배터리 오브젝트를 강제로 옮기는 과정이 필요함
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         lights[batteryCount].GetComponent<MeshRenderer>().material = greenLightMaterial;
         lights[batteryCount].GetComponent<Light>().color = greenLightColor;
         batteryCount++;
@@ -35,5 +42,10 @@ public class BatteryBox : MonoBehaviour, IInteractable
             door.OpenDoor();
             cutScene.PlayShortCutScene();
         }
+    }
+
+    public void Interact()
+    {
+
     }
 }

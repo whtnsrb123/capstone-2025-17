@@ -90,6 +90,12 @@ public class InteractManager : MonoBehaviour
     {
         if (heldObject != null) // 들고 있는 물체가 있다면
         {
+            if(detectedObject.GetComponent<BatteryBox>() != null)
+            {
+                detectedObject.GetComponent<BatteryBox>().Interact(gameObject);
+                return;
+            }
+
             pickUpController.HandlePickUpOrDrop(); // 물체를 내려놓습니다.
             if (isPickable) // 들 수 있는 물체였다면
             {
