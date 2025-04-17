@@ -1,7 +1,8 @@
+using Photon.Pun;
 using UnityEngine;
 using TMPro;
 
-public class InteractManager : MonoBehaviour
+public class InteractManager : MonoBehaviourPun
 {
     public Transform raycastPosition;
     public float detectionRange = 10f;
@@ -22,16 +23,17 @@ public class InteractManager : MonoBehaviour
     {
         pickUpController = GetComponent<PickUpController>();
         interactController = GetComponent<InteractController>();
-
+        
         Camera mainCamera = gameObject.GetComponentInChildren<Camera>();
         raycastPosition = mainCamera.transform;
 
-        if(descriptionText != null)
+        if(pickUpController.IsHoldingObject() && descriptionText != null)
             descriptionText.enabled = false;
     }
 
     void Update()
     {
+        if (!photonView.IsMine) return;
         DetectObject();
     }
 

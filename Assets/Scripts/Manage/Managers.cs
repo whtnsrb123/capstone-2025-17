@@ -95,6 +95,18 @@ public class Managers : MonoBehaviour
             go.name = name;
             go.transform.SetParent(parent.transform);
         }
+        else if (typeof(T) == typeof(MissionManager))
+        {
+            GameObject prefab = Resources.Load<GameObject>("MissionManager");
+            if (prefab == null)
+            {
+                Debug.LogError("MissionManager 프리팹을 찾을 수 없습니다! Resources/MissionManager 위치 확인");
+                return null;
+            }
+            go = PhotonNetwork.Instantiate(prefab.name, prefab.transform.position, prefab.transform.rotation);
+            go.name = name;
+            go.transform.SetParent(parent.transform);
+        }
         else
         {
             go = new GameObject(name);
