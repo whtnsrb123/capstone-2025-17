@@ -233,8 +233,11 @@ public class SoundManager : MonoBehaviour
             CreateNewSource();
         }
 
-        LoadVolume();
-        ConnectUI();
+        if(masterSlider)
+        {
+            LoadVolume();
+            ConnectUI();
+        }
     }
 
     private void Start()
