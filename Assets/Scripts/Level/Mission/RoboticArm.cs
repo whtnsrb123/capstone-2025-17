@@ -5,7 +5,7 @@ using UnityEngine;
 public class RoboticArm : MonoBehaviour
 {
     [SerializeField]
-    private RoboticArmHead collider;
+    private RoboticArmHead head;
     private Animator animator;
 
     public Transform pickedTarget;
@@ -13,7 +13,9 @@ public class RoboticArm : MonoBehaviour
     void Start()
     {
         animator = GetComponent<Animator>();
-        collider = GetHead()[0];
+        head = GetHead()[0];
+
+        Invoke("RunArm", 5f);
     }
 
     private RoboticArmHead[] GetHead()
@@ -24,5 +26,11 @@ public class RoboticArm : MonoBehaviour
     public void RunArm()
     {
         animator.SetTrigger("Run");
+    }
+
+    public void TryDropPlayer()
+    {
+        if(head.target == null) return;
+        head.DropPlayer();
     }
 }
