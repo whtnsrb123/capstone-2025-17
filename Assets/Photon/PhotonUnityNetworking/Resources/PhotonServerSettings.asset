@@ -58,6 +58,11 @@ MonoBehaviour:
   - SetLoaded
   - ActivateGimmickRPC
   - InteractRPC
+  - RegisterPlayerGoal
+  - RPC_DropObject
+  - RPC_SetParent
+  - RPC_ThrowObject
+  - UnRegisterPlayerGoal
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

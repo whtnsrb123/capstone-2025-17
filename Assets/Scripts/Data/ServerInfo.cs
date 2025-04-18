@@ -47,11 +47,5 @@ public class ServerInfo : MonoBehaviour
         }
         PlayerActorNumbers.EventOff = false;
         ReadyStates.EventOff = false;
-
-
     }
-
-
-
-
 }

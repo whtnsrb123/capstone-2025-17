@@ -10,55 +10,47 @@ using UnityEngine.UI;
 
 public class RoomUI : MonoBehaviour
 {
-    [Header("Match Making Button")]
-    // lobby 
-    public Button randomBtn;
 
-    [Header("Room")]
-    // room panel
-    public Button readyOrStartBtn;
-    public Button leaveBtn;
-    public TextMeshProUGUI roomCode;
+    #region Room UI 
 
-    public GameObject[] playersUI;
-    public TextMeshProUGUI[] nicknamesUI;
-    public GameObject[] playersRawImage;
-    public TextMeshProUGUI[] playersReadyStatesUI;
+    [Header("Random UI")]
+    [TabGroup("Buttons")] public Button randomBtn;
 
-    [Header("Create Room")]
+    [Header("Room UI")]
+    [TabGroup("Buttons")] public Button readyOrStartBtn;
+    [TabGroup("Buttons")] public Button leaveBtn;
+    [TabGroup("Buttons")] public TextMeshProUGUI roomCode;
+
+    [TabGroup("Character Objects")] public GameObject[] playersUI;
+    [TabGroup("Nicknames")] public TextMeshProUGUI[] nicknamesUI;
+    [TabGroup("RawImage")] public GameObject[] playersRawImage;
+    [TabGroup("Ready")] public TextMeshProUGUI[] playersReadyStatesUI;
+    [TabGroup("Crown")] public Image[] masterClientCrown;
+    
     // create panel
-    public Button c_confirmBtn;
+    [Header("Create Room")]
+     public Button c_confirmBtn;
     public Button c_cancelBtn;
 
-    [Header("Join Room")]
     // joine panel
+
+    [Header("Join Room")]
     public TMP_InputField roomCodeTMPInp;
     public Button j_confirmBtn;
     public Button j_cancelBtn;
+    #endregion
+
 
     // 캐릭터 모델의 메시가 저장된 Scriptable Object 변수 
-    [SerializeField]
-    MaterialStorage storage;
-
+    [SerializeField] MaterialStorage storage;
     SkinnedMeshRenderer[] smRenderers;
-    Dictionary<int, Hashtable> viewPlayerList;
-    int[] viewSeats;
-    bool[] viewReadyStates;
+    TMP_Text readyOrStartButtonTMP;
 
     private void Start()
     {
         SetSkinnedMeshRenderers();
+        readyOrStartButtonTMP = readyOrStartBtn.GetComponentInChildren<TMP_Text>();
     }
-
-    public void GetPlayerSeats(int[] para)
-    {
-        viewSeats = para;
-    }
-    public void GetPlayerReadyStates(bool[] para)
-    {
-        viewReadyStates = para;
-    }
-
 
     void SetSkinnedMeshRenderers()
     {
@@ -84,8 +76,6 @@ public class RoomUI : MonoBehaviour
             int characterId = (int)PhotonNetwork.CurrentRoom.Players[actorNumber].CustomProperties[ClientInfo.CharacterIdKey];
             string nickname = (string)PhotonNetwork.CurrentRoom.Players[actorNumber].CustomProperties[ClientInfo.NicknameKey];
 
-            Debug.Log($"{index} 번째 플레이어의 아이디는 {actorNumber} 닉네임은 {nickname}");
-
             playersUI[index].SetActive(true);
             playersRawImage[index].SetActive(true);
             playersReadyStatesUI[index].text = ServerInfo.ReadyStates[index] ? "준비 완료" : "준비 중";
@@ -98,14 +88,18 @@ public class RoomUI : MonoBehaviour
     public void UpdateReadyState(int index, bool ready)
     {
         playersReadyStatesUI[index].text = ServerInfo.ReadyStates[index] ? "준비 완료" : "준비 중";
+        if (ServerInfo.PlayerActorNumbers[index] == PhotonNetwork.LocalPlayer.ActorNumber)
+        {
+            readyOrStartBtn.GetComponentInChildren<TMP_Text>().text = ServerInfo.ReadyStates[index] ? "준비 완료" : "준비 중";
+        }
     }
 
     public void InitPanel()
     {
         for (int i = 0; i < ServerInfo.PlayerActorNumbers.Length; i++)
         {
+            Debug.Log($"{i} 번째에  {ServerInfo.PlayerActorNumbers[i]} 표시");
             UpdatePlayer(i, ServerInfo.PlayerActorNumbers[i]);
-            Debug.Log($"{i} 번째에  {ServerInfo.PlayerActorNumbers[i]} 를 그리다");
         }
     }
 

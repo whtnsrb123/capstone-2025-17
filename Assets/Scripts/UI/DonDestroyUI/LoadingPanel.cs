@@ -14,11 +14,8 @@ public class LoadingPanel : MonoBehaviourPun
     [SerializeField] private Slider progressBar;
     [SerializeField] private TextMeshProUGUI progressTMP;
 
-    [SerializeField] private float move = 0.003f;
-
     private bool loaded;
     private float currentTick;
-    private float epsilon = 0.1f;
 
     private void Awake()
     {

@@ -11,22 +11,26 @@ public class PlayerInRoomUIController : MonoBehaviour
     [SerializeField] PlayerInRoomController network;
     [SerializeField] RoomUI roomView;
 
+    TMP_Text readyOrStartButtonTMP;
+
     private void Start()
     {
         ServerInfo.PlayerActorNumbers.OnValueChanged += UpdatePlayers;
-        ServerInfo.PlayerActorNumbers.OnValueChanged += ActivateStartButton;
         ServerInfo.ReadyStates.OnValueChanged += UpdateReadyStates;
+        ServerInfo.ReadyStates.OnValueChanged += ActivateStartButton;
 
         // room panel 이벤트 등록
         roomView.readyOrStartBtn.onClick.AddListener(OnClickReadyOrStartBtn);
         roomView.leaveBtn.onClick.AddListener(OnClickLeaveBtn);
+
+        readyOrStartButtonTMP = roomView.readyOrStartBtn.GetComponentInChildren<TMP_Text>();
     }
 
     private void OnDestroy()
     {
         ServerInfo.PlayerActorNumbers.OnValueChanged -= UpdatePlayers;
-        ServerInfo.PlayerActorNumbers.OnValueChanged -= ActivateStartButton;
         ServerInfo.ReadyStates.OnValueChanged -= UpdateReadyStates;
+        ServerInfo.ReadyStates.OnValueChanged -= ActivateStartButton;
 
         roomView.readyOrStartBtn.onClick.RemoveAllListeners();
         roomView.leaveBtn.onClick.RemoveAllListeners();
@@ -50,13 +54,13 @@ public class PlayerInRoomUIController : MonoBehaviour
             network.DetectEnteredPlayer(PhotonNetwork.LocalPlayer.ActorNumber);
             network.ChangeReadyState();
             // 시작하기 버튼을 비활성화 한다 
-            roomView.readyOrStartBtn.GetComponentInChildren<TMP_Text>().text = "준비 중...";
+            readyOrStartButtonTMP.text = "대기 ...";
             roomView.readyOrStartBtn.enabled = false;
         }
         else
         {
             roomView.readyOrStartBtn.enabled = true;
-            roomView.readyOrStartBtn.GetComponentInChildren<TMP_Text>().text = "준비하기";
+            readyOrStartButtonTMP.text = "준비하기";
         }
 
         roomView.InitPanel();
@@ -89,7 +93,7 @@ public class PlayerInRoomUIController : MonoBehaviour
         }
     }
 
-    void ActivateStartButton(int trash1 = 0, int trash2 = 0)
+    public void ActivateStartButton(int trash1 = 0, bool trash2 = false)
     {
         // 필요 인원 충족 시 start button 활성화 
         if (PhotonNetwork.IsMasterClient)
@@ -100,11 +104,11 @@ public class PlayerInRoomUIController : MonoBehaviour
                 if (!ServerInfo.ReadyStates[i])
                 {
                     roomView.readyOrStartBtn.enabled = false;
-                    roomView.readyOrStartBtn.GetComponentInChildren<TMP_Text>().text = "준비 중...";
+                    readyOrStartButtonTMP.text = "대기 중...";
                     return;
                 }
             }
-            roomView.readyOrStartBtn.GetComponentInChildren<TMP_Text>().text = "게임 시작";
+            readyOrStartButtonTMP.text = "게임 시작";
             roomView.readyOrStartBtn.enabled = true;
         }
     }
@@ -118,4 +122,22 @@ public class PlayerInRoomUIController : MonoBehaviour
     {
         roomView.UpdateReadyState(index, ready);
     }
+
+    public void UpdateMasterClient(int actorNumber)
+    {
+        // Debug.Log($"Master Client Actor Number : {actorNumber}");
+        for (int i = 0; i < ServerInfo.PlayerActorNumbers.Length; i++)
+        {
+            // Debug.Log($"playerActorNumber[{i}] = {ServerInfo.PlayerActorNumbers[i]}");
+            if (ServerInfo.PlayerActorNumbers[i] == actorNumber)
+            {
+                roomView.masterClientCrown[i].gameObject.SetActive(true);
+            }
+            else
+            {
+                roomView.masterClientCrown[i].gameObject.SetActive(false);
+            }
+        }
+    }
+
 }

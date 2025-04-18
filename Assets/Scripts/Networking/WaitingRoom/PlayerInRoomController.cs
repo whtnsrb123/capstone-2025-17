@@ -8,7 +8,6 @@ public class PlayerInRoomController : MonoBehaviourPunCallbacks
 {
     [SerializeField] PlayerInRoomUIController ui;
 
-
     public void ChangeReadyState()
     {
         Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
@@ -31,6 +30,28 @@ public class PlayerInRoomController : MonoBehaviourPunCallbacks
             }
         }
     }
+    public void ChangeReadyState(int actorNumber, bool isReady)
+    {
+        Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
+
+        int[] playerActorNumbers = (int[])hash[ServerInfo.PlayerActorNumbersKey];
+
+        for (int i = 0; i < ServerInfo.RequiredPlayerCount; i++)
+        {
+            // 내 자리를 발견
+            if (playerActorNumbers[i] == actorNumber)
+            {
+
+                ((bool[])hash[ServerInfo.ReadyStatesKey])[i] = isReady;
+
+                ServerInfo.ReadyStates[i] = isReady;
+
+                PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
+
+                break;
+            }
+        }
+    }
 
     // 게임 시작 전 발생할 수 있는 오류를 방지한다 
     public void ValidPlayerInRoom()
@@ -44,6 +65,8 @@ public class PlayerInRoomController : MonoBehaviourPunCallbacks
         Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
         hash[ServerInfo.PlayerActorNumbersKey] = validActorNumbers;
 
+        ServerInfo.PlayerActorNumbers.EventOff = true;
+
         for (int i = 0; i < validActorNumbers.Length; i++)
         {
             if (ServerInfo.PlayerActorNumbers[i] != validActorNumbers[i])
@@ -54,6 +77,8 @@ public class PlayerInRoomController : MonoBehaviourPunCallbacks
         }
 
         PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
+        ServerInfo.PlayerActorNumbers.EventOff = true;
+
     }
 
 
@@ -114,7 +139,7 @@ public class PlayerInRoomController : MonoBehaviourPunCallbacks
         }
     }
 
-    // 대기방에서 플레이어 표시를 위해 현재 방의 플레이어 정보를 받아온다
+/*    // 대기방에서 플레이어 표시를 위해 현재 방의 플레이어 정보를 받아온다
     public Dictionary<int, System.Collections.Hashtable> GetPlayerInRoomInfos()
     {
         Dictionary <int, Player> s_players = PhotonNetwork.CurrentRoom.Players;
@@ -148,7 +173,7 @@ public class PlayerInRoomController : MonoBehaviourPunCallbacks
             }
         }
         return playersInfo;
-    }
+    }*/
 
     public string GetRoomCode()
     {
@@ -158,6 +183,10 @@ public class PlayerInRoomController : MonoBehaviourPunCallbacks
 
     public void LeaveRoom()
     {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            DetectLeftPlayer(PhotonNetwork.LocalPlayer.ActorNumber);
+        }
         PhotonNetwork.LeaveRoom();
 
         // 클라이언트는 방 퇴장을 요청한 상태
@@ -171,15 +200,13 @@ public class PlayerInRoomController : MonoBehaviourPunCallbacks
 
         ServerInfo.PlayerActorNumbers.EventOff = true;
         ServerInfo.ReadyStates.EventOff = true;
-        Debug.Log("======================================");
 
         for (int i = 0; i < ServerInfo.RequiredPlayerCount; i++)
         {
             ServerInfo.PlayerActorNumbers[i] = playerActorNumbers[i];
-            Debug.Log($"playerActorNumber{i} = {ServerInfo.PlayerActorNumbers[i]}  = {playerActorNumbers[i]}");
+            //Debug.Log($"playerActorNumber{i} = {ServerInfo.PlayerActorNumbers[i]}  = {playerActorNumbers[i]}");
             ServerInfo.ReadyStates[i] = readyStates[i];
         }
-        Debug.Log("======================================");
 
         ServerInfo.PlayerActorNumbers.EventOff = false;
         ServerInfo.ReadyStates.EventOff = false;
@@ -196,17 +223,27 @@ public class PlayerInRoomController : MonoBehaviourPunCallbacks
         GetPlayerActorNumbers();
 
         ui.OnEnteredRoom();
+        ui.UpdateMasterClient(PhotonNetwork.MasterClient.ActorNumber);
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
         base.OnJoinRandomFailed(returnCode, message);
         Debug.Log(message);
-        Debug.Log("실해");
     }
 
     void DetectRoomPropertiesChange(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
     {
+        var changedReadyStates = (bool[])propertiesThatChanged[ServerInfo.ReadyStatesKey];
+
+        for (int i = 0; i < ServerInfo.RequiredPlayerCount; i++)
+        {
+            if (ServerInfo.ReadyStates[i] != changedReadyStates[i])
+            {
+                ServerInfo.ReadyStates[i] = changedReadyStates[i];
+                break;
+            }
+        }
 
         var changedPlayerActorNumbers = (int[])propertiesThatChanged[ServerInfo.PlayerActorNumbersKey];
 
@@ -218,18 +255,6 @@ public class PlayerInRoomController : MonoBehaviourPunCallbacks
                 break;
             }
         }
-
-        var changedReadyStates = (bool[]) propertiesThatChanged[ServerInfo.ReadyStatesKey];
-        
-        for (int i = 0; i < ServerInfo.RequiredPlayerCount; i++)
-        {
-            if (ServerInfo.ReadyStates[i] != changedReadyStates[i])
-            {
-                ServerInfo.ReadyStates[i] = changedReadyStates[i];
-                return;
-            }
-        }
-             
     }
 
     public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
@@ -251,6 +276,14 @@ public class PlayerInRoomController : MonoBehaviourPunCallbacks
         base.OnPlayerLeftRoom(otherPlayer);
 
         DetectLeftPlayer(otherPlayer.ActorNumber);
+    }
+
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        ChangeReadyState(newMasterClient.ActorNumber, true);
+
+        ui.ActivateStartButton();
+        ui.UpdateMasterClient(newMasterClient.ActorNumber);
     }
 
 }
