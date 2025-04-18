@@ -3,8 +3,6 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
-using Photon.Pun.Demo.Cockpit;
 
 public class LoadingPanel : MonoBehaviourPun
 {

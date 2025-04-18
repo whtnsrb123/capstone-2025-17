@@ -235,10 +235,10 @@ public class PlayerInRoomController : MonoBehaviourPunCallbacks
     void DetectRoomPropertiesChange(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
     {
         var changedReadyStates = (bool[])propertiesThatChanged[ServerInfo.ReadyStatesKey];
+        Debug.Log(changedReadyStates == null ? "null info": "not null");
 
         for (int i = 0; i < ServerInfo.RequiredPlayerCount; i++)
         {
-            if (ServerInfo.ReadyStates[i] != changedReadyStates[i])
             {
                 ServerInfo.ReadyStates[i] = changedReadyStates[i];
                 break;

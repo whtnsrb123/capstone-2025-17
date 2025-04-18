@@ -59,6 +59,7 @@ public class MatchMakingController : MonoBehaviourPunCallbacks
     // 방 생성을 요청한다 
     public void CreateRoom(string roomName)
     {
+        Debug.Log("생성 시도");
         Hashtable customProperties = new Hashtable
         {
             // 플레이어 ActorNumber를 기록하는 배열이다

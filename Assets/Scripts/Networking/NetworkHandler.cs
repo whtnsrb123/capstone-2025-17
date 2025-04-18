@@ -45,20 +45,20 @@ public class NetworkHandler : MonoBehaviourPunCallbacks
         switch (code)
         {
             case (int) DisconnectCause.DisconnectByOperationLimit:
-                errorText = "Too many Operation Call... No More Please";
+                errorText = "요청이 너무 많습니다.\n잠시 뒤 다시 시도해주세요.";
                 break;
             case (int) DisconnectCause.ServerTimeout:
             case (int) DisconnectCause.ClientTimeout:
-                errorText = "Too long response time hurry up next time~";
+                errorText = "응답 시간을 초과했습니다.";
                 break;
             case (int) DisconnectCause.CustomAuthenticationFailed:
-                errorText = "You InJeung failed";
+                errorText = "인증에 실패했습니다.";
                 break;
             case (int) DisconnectCause.MaxCcuReached:
-                errorText = "Server Too Many People.. sorry";
+                errorText = "서버 인원이 너무 많습니다.";
                 break;
             default:
-                errorText = "Server is BoorAnJeong, Try Later~";
+                errorText = "서버가 불안정합니다.\n 다시 시도해주세요.";
                 break;
         }
 
@@ -73,7 +73,7 @@ public class NetworkHandler : MonoBehaviourPunCallbacks
             // 그 외 모든 곳에서 Disconnected -> StartScene으로 돌아가서 재접속
             OnDisconnect = BackToStartScene;
         }
-        ShowExceptionPanel("====Disconnected====", errorText, OnDisconnect);
+        ShowExceptionPanel("네트워크 접속 끊김", errorText, OnDisconnect);
     }
 
     // 랜덤 매치 시, 예외 처리
@@ -85,17 +85,17 @@ public class NetworkHandler : MonoBehaviourPunCallbacks
         {
             // 재접속이 필수인 경우
             case MakeNameFailed:
-                errorText = "I dont know reason bur failed random match";
+                errorText = "알 수 없는 원인으로 매칭이 실패했습니다.";
                 break;
             case RequestNotSent:
-                errorText = "Disconnect, You failed";
+                errorText = "요청이 전송되지 않았습니다.";
                 break;
             default:
-                errorText = "You Can't random match Now :(";
+                errorText = "랜덤 매치에 실패했습니다.\n 잠시 뒤 다시 시도해주세요.";
                 break;
         }
 
-        ShowExceptionPanel("No Random Now", errorText, OnRandomMathFailed);
+        ShowExceptionPanel("랜덤 매치 실패", errorText, OnRandomMathFailed);
     }
 
 
@@ -108,21 +108,21 @@ public class NetworkHandler : MonoBehaviourPunCallbacks
             // 재접속이 필수인 경우
             case ErrorCode.AuthenticationTicketExpired:
             case ErrorCode.InternalServerError:
-                errorText = "You Need to be ReConnected";
+                errorText = "연결이 끊겼습니다.\n재접속을 시도해주세요.";
                 OnCreateFailed = BackToStartScene;
                 break;
             case RequestNotSent:
-                errorText = "Disconnect, You failed";
+                errorText = "요청이 전송되지 않았습니다.";
                 break;
             case MakeNameFailed:
-                errorText = "I dont know reason bur failed random match";
+                errorText = "알 수 없는 원인으로 방 생성에 실패했습니다.";
                 break;
             default:
-                errorText = "You Can't Create Room Now :(";
+                errorText = "현재는 방 생성이 불가합니다.";
                 break;
         }
 
-        ShowExceptionPanel("====You Can't Create====", errorText, OnCreateFailed);
+        ShowExceptionPanel("방 생성 실패", errorText, OnCreateFailed);
     }
 
     // 방 조인 시, 예외 처리 
@@ -137,23 +137,23 @@ public class NetworkHandler : MonoBehaviourPunCallbacks
         {
             // 조인과 관련된 에러 코드
             case ErrorCode.GameClosed:
-                errorText = "Game Closed : The Room Was Closed :(";
+                errorText = "이미 게임이 시작된 방입니다.";
                 break;
             case ErrorCode.GameDoesNotExist:
-                errorText = "Game Does Not Exist : The Room Name Does Not Exists Now :(";
+                errorText = "존재하지 않는 방입니다.";
                 break;
             case ErrorCode.GameFull:
-                errorText = "Game Full : The Room is Full :(";
+                errorText = "인원이 가득 찼습니다.";
                 break;
             case RequestNotSent:
-                errorText = "Disconnect, You failed";
+                errorText = "요청이 전송되지 않았습니다.";
                 break;
             default:
-                errorText = "Join Room Failed :(";
+                errorText = "알 수 없는 원인으로 참가가 불가합니다.";
                 break;
         }
 
-        ShowExceptionPanel("====You Can't Join====", errorText, OnJoinFailed);
+        ShowExceptionPanel("방 참가 실패", errorText, OnJoinFailed);
     }
 
     // 인게임에서 네트워크 예외 처리

@@ -17,9 +17,6 @@ public class DontDestroyUI : MonoBehaviour
         Instance = this;
 
         DontDestroyOnLoad(gameObject);
-
-        optionPanel.SetActive(false);
-        loadingPanel.SetActive(false);
     }
 
 
