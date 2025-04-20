@@ -25,6 +25,8 @@ public class MatchMakingController : MonoBehaviourPunCallbacks
             { ServerInfo.PlayerActorNumbersKey, ServerInfo.PlayerActorNumbers.ToArray()},
             // 플레이어 Ready State를 기록하는 배열이다 
             { ServerInfo.ReadyStatesKey, ServerInfo.ReadyStates.ToArray()},
+            // 게임이 시작됐는지 확인하는 변수 
+            { ServerInfo.IsGameStartKey, false },
         };
 
         RoomOptions room = new RoomOptions
@@ -66,6 +68,8 @@ public class MatchMakingController : MonoBehaviourPunCallbacks
             { ServerInfo.PlayerActorNumbersKey, ServerInfo.PlayerActorNumbers.ToArray()},
             // 플레이어 Ready State를 기록하는 배열이다 
             { ServerInfo.ReadyStatesKey, ServerInfo.ReadyStates.ToArray()},
+            // 게임이 시작됐는지 확인하는 변수
+            { ServerInfo.IsGameStartKey, false },
         };
 
         RoomOptions room = new RoomOptions

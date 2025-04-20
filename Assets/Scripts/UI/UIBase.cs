@@ -9,9 +9,11 @@ public enum UIType
     StaticPopup,
     OptionPopup, // 메인 팝업
     IngameOption,
+    LoadingPanel,
     TextInfo, // 텍스트 정보 
 }
 
+[RequireComponent(typeof(CanvasGroup))]
 public abstract class UIBase : MonoBehaviour
 {
     public UIType type;
@@ -77,7 +79,7 @@ public abstract class UIBase : MonoBehaviour
 
     public virtual void HideUI()
     {
-        rectTransform.SetAsFirstSibling();
+        rectTransform?.SetAsFirstSibling();
 
         group.DOFade(0, fadeTime).SetUpdate(true);
 

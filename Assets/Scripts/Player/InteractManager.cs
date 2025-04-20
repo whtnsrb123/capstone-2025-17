@@ -1,6 +1,7 @@
 using Photon.Pun;
 using UnityEngine;
 using TMPro;
+using UnityEngine.EventSystems;
 
 public class InteractManager : MonoBehaviourPun
 {
@@ -42,7 +43,7 @@ public class InteractManager : MonoBehaviourPun
         detectedObject = null;
         RaycastHit hit;
 
-        if(raycastPosition == null)
+        if (raycastPosition == null)
             return;
 
         if(Physics.Raycast(raycastPosition.position, raycastPosition.forward, out hit, detectionRange))

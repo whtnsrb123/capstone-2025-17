@@ -86,6 +86,7 @@ public class PlayerInRoomController : MonoBehaviourPunCallbacks
     public void DetectEnteredPlayer(int actorNumber)
     {
         if (!PhotonNetwork.IsMasterClient) return;
+        if (CheckGameStart()) return;
 
         Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
 
@@ -112,6 +113,7 @@ public class PlayerInRoomController : MonoBehaviourPunCallbacks
     public void DetectLeftPlayer(int actorNumber)
     {
         if (!PhotonNetwork.IsMasterClient) return;
+        if (CheckGameStart()) return;
 
         Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
 
@@ -123,9 +125,9 @@ public class PlayerInRoomController : MonoBehaviourPunCallbacks
             // 떠난 플레이어 발견 
             if (ServerInfo.PlayerActorNumbers[i] == actorNumber)
             {
-                ServerInfo.PlayerActorNumbers[i] = -1;
                 ServerInfo.ReadyStates[i] = false;
-
+                ServerInfo.PlayerActorNumbers[i] = -1;
+                
                 playerActorNumbers[i] = -1;
                 readyStates[i] = false;
 
@@ -138,42 +140,6 @@ public class PlayerInRoomController : MonoBehaviourPunCallbacks
             }
         }
     }
-
-/*    // 대기방에서 플레이어 표시를 위해 현재 방의 플레이어 정보를 받아온다
-    public Dictionary<int, System.Collections.Hashtable> GetPlayerInRoomInfos()
-    {
-        Dictionary <int, Player> s_players = PhotonNetwork.CurrentRoom.Players;
-
-        // Player의 ActorNumber와 정보를 담은 HashTable 
-        Dictionary<int, System.Collections.Hashtable> playersInfo = new Dictionary<int, System.Collections.Hashtable>();
-
-        foreach (KeyValuePair<int, Player> p in s_players)
-        {
-            Hashtable hash = p.Value.CustomProperties;
-
-            System.Collections.Hashtable newHash = new System.Collections.Hashtable();
-
-            if (hash != null)
-            {
-                string nickname = (string)hash[ClientInfo.NicknameKey];
-                int characterId = (int)hash[ClientInfo.CharacterIdKey];
-
-                newHash.Add(ClientInfo.NicknameKey, nickname);
-                newHash.Add(ClientInfo.CharacterIdKey, characterId);
-
-                playersInfo.Add(p.Key, newHash);
-            }
-            else
-            {
-                // hash가 비어있는 경우 임시로 기본 값 설정
-                newHash.Add(ClientInfo.NicknameKey, $"USER_{Random.Range(100, 999)}");
-                newHash.Add(ClientInfo.CharacterIdKey, 0);
-
-                playersInfo.Add(p.Key, newHash);
-            }
-        }
-        return playersInfo;
-    }*/
 
     public string GetRoomCode()
     {
@@ -212,7 +178,60 @@ public class PlayerInRoomController : MonoBehaviourPunCallbacks
         ServerInfo.ReadyStates.EventOff = false;
     }
 
-    // ====================== 콜백 ===================== 
+    void DetectRoomPropertiesChange(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
+    {
+        var changedReadyStates = (bool[])propertiesThatChanged[ServerInfo.ReadyStatesKey];
+        if (changedReadyStates == null) return; // 방 생성 시, 방 속성이 등록되기 전 한 번 호출되어 null 참조를 하게 된다 
+
+        for (int i = 0; i < ServerInfo.RequiredPlayerCount; i++)
+        {
+            if (ServerInfo.ReadyStates[i] != changedReadyStates[i])
+            {
+                ServerInfo.ReadyStates[i] = changedReadyStates[i];
+                break;
+            }
+        }
+
+        var changedPlayerActorNumbers = (int[])propertiesThatChanged[ServerInfo.PlayerActorNumbersKey];
+
+        for (int i = 0; i < ServerInfo.RequiredPlayerCount; i++)
+        {
+            if (ServerInfo.PlayerActorNumbers[i] != changedPlayerActorNumbers[i])
+            {
+                ServerInfo.PlayerActorNumbers[i] = changedPlayerActorNumbers[i];
+                break;
+            }
+        }
+    }
+
+    public bool CheckGameStart()
+    {
+        Hashtable props = PhotonNetwork.CurrentRoom.CustomProperties;
+
+        if (props.ContainsKey(ServerInfo.IsGameStartKey))
+        {
+            Debug.Log("key detected");
+
+           return (bool)props[ServerInfo.IsGameStartKey];
+        }
+        return false;
+    }
+
+    public void SetGameStart()
+    {
+        Hashtable props = PhotonNetwork.CurrentRoom.CustomProperties;
+
+        if (props.ContainsKey(ServerInfo.IsGameStartKey))
+        {
+            Debug.Log("key detected");
+
+            props[ServerInfo.IsGameStartKey] = true;
+
+            PhotonNetwork.CurrentRoom.SetCustomProperties(props);
+        }
+    }
+
+    #region Callback Functions
 
     public override void OnJoinedRoom()
     {
@@ -230,31 +249,6 @@ public class PlayerInRoomController : MonoBehaviourPunCallbacks
     {
         base.OnJoinRandomFailed(returnCode, message);
         Debug.Log(message);
-    }
-
-    void DetectRoomPropertiesChange(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
-    {
-        var changedReadyStates = (bool[])propertiesThatChanged[ServerInfo.ReadyStatesKey];
-        Debug.Log(changedReadyStates == null ? "null info": "not null");
-
-        for (int i = 0; i < ServerInfo.RequiredPlayerCount; i++)
-        {
-            {
-                ServerInfo.ReadyStates[i] = changedReadyStates[i];
-                break;
-            }
-        }
-
-        var changedPlayerActorNumbers = (int[])propertiesThatChanged[ServerInfo.PlayerActorNumbersKey];
-
-        for (int i = 0; i < ServerInfo.RequiredPlayerCount; i++)
-        {
-            if (ServerInfo.PlayerActorNumbers[i] != changedPlayerActorNumbers[i])
-            {
-                ServerInfo.PlayerActorNumbers[i] = changedPlayerActorNumbers[i];
-                break;
-            }
-        }
     }
 
     public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
@@ -285,5 +279,6 @@ public class PlayerInRoomController : MonoBehaviourPunCallbacks
         ui.ActivateStartButton();
         ui.UpdateMasterClient(newMasterClient.ActorNumber);
     }
+    #endregion
 
 }

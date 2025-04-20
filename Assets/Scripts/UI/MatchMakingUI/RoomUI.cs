@@ -1,9 +1,5 @@
 ﻿using Photon.Pun;
-using Photon.Pun.Demo.PunBasics;
 using Sirenix.OdinInspector;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -78,7 +74,7 @@ public class RoomUI : MonoBehaviour
 
             playersUI[index].SetActive(true);
             playersRawImage[index].SetActive(true);
-            playersReadyStatesUI[index].text = ServerInfo.ReadyStates[index] ? "준비 완료" : "준비 중";
+            playersReadyStatesUI[index].text = ServerInfo.ReadyStates[index] ? "준비 완료" : "준비하기";
 
             smRenderers[index].material = storage.GetMesh(characterId);
             nicknamesUI[index].text = nickname;
@@ -87,10 +83,10 @@ public class RoomUI : MonoBehaviour
 
     public void UpdateReadyState(int index, bool ready)
     {
-        playersReadyStatesUI[index].text = ServerInfo.ReadyStates[index] ? "준비 완료" : "준비 중";
+        playersReadyStatesUI[index].text = ServerInfo.ReadyStates[index] ? "준비 완료" : "준비하기";
         if (ServerInfo.PlayerActorNumbers[index] == PhotonNetwork.LocalPlayer.ActorNumber)
         {
-            readyOrStartBtn.GetComponentInChildren<TMP_Text>().text = ServerInfo.ReadyStates[index] ? "준비 완료" : "준비 중";
+            readyOrStartBtn.GetComponentInChildren<TMP_Text>().text = ServerInfo.ReadyStates[index] ? "준비 완료" : "준비하기";
         }
     }
 

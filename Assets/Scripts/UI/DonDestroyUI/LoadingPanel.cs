@@ -8,21 +8,29 @@ public class LoadingPanel : MonoBehaviourPun
 {
     public static LoadingPanel Instance { get; private set; }   
 
-    [SerializeField] private GameObject loadingPanel;
     [SerializeField] private Slider progressBar;
     [SerializeField] private TextMeshProUGUI progressTMP;
 
     private bool loaded;
     private float currentTick;
 
+    PopupUI popup;
+
     private void Awake()
     {
+        #region Singleton
         if (Instance != null)
         {
             Destroy(gameObject);
             return;
         }
         Instance = this;
+        #endregion
+
+        Transform canvas = GameObject.Find("DontDestroyCanvas").transform;
+        gameObject.transform.SetParent(canvas);
+
+        popup = GetComponent<PopupUI>();
     }
 
     IEnumerator LoadingProgress()
@@ -59,7 +67,6 @@ public class LoadingPanel : MonoBehaviourPun
                         // 마스터 클라이언트
                         SendISLoadedLevel(this.loaded);
                         SetUIVisibility(false);
-                        Debug.Log("전송함");
                         yield break;
                     }
                     else
@@ -86,17 +93,19 @@ public class LoadingPanel : MonoBehaviourPun
     {
         Debug.Log("PunRPC SetUIVIsibility : " + visibility) ;
 
-        loadingPanel.SetActive(visibility);
-
         if (visibility)
-        { 
+        {
+            popup.ShowUI();
             StartCoroutine(nameof(LoadingProgress));
+        }
+        else
+        {
+            popup.HideUI();
         }
     }
 
     public void SendISLoadedLevel(bool loaded)
     {
-        Debug.Log("전송함 진짜");
         photonView.RPC("SetLoaded", RpcTarget.All, loaded);
     }
 
@@ -104,8 +113,11 @@ public class LoadingPanel : MonoBehaviourPun
     public void SetLoaded(bool loaded)
     {
         this.loaded = loaded;
-        Debug.Log("전송받음 " + loaded) ;
     }
 
+    public void BeforeLoadedLobbyScene()
+    {
+        Destroy(gameObject);
+    }
 
 }

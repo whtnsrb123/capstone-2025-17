@@ -53,8 +53,12 @@ public class PlayerInRoomUIController : MonoBehaviour
             // MasterClient일 때, OnPlayerEntered()가 호출되지 않으므로 나의 ActorNumber를 스스로 전송한다 
             network.DetectEnteredPlayer(PhotonNetwork.LocalPlayer.ActorNumber);
             network.ChangeReadyState();
+
+            // ========================================================
+            // 테스트 용이하게 하기 위해 버튼을 언제나 활성화시켜둔다. 제대로 동작하기는 함
+            // ========================================================
             // 시작하기 버튼을 비활성화 한다 
-            readyOrStartButtonTMP.text = "대기 ...";
+            readyOrStartButtonTMP.text = "대기 중 ...";
             roomView.readyOrStartBtn.enabled = false;
         }
         else
@@ -84,6 +88,7 @@ public class PlayerInRoomUIController : MonoBehaviour
             // 마스터 클라이언트
             network.ValidPlayerInRoom();
             LoadingPanel.Instance.SetLoadingPanelVisibility(true);
+            network.SetGameStart();
             GameStarter.GameStart();
         }
         else
@@ -95,6 +100,9 @@ public class PlayerInRoomUIController : MonoBehaviour
 
     public void ActivateStartButton(int trash1 = 0, bool trash2 = false)
     {
+        // ========================================================
+        // 테스트 용이하게 하기 위해 버튼을 언제나 활성화시켜둔다. 제대로 동작하기는 함
+        // ========================================================
         // 필요 인원 충족 시 start button 활성화 
         if (PhotonNetwork.IsMasterClient)
         {

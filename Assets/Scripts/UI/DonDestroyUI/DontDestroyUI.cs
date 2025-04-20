@@ -3,13 +3,14 @@ using Photon.Pun;
 
 public class DontDestroyUI : MonoBehaviour
 {
-    public GameObject optionPanel;
-    public GameObject loadingPanel;
-
     public static DontDestroyUI Instance {  get; private set; }
+   
+    GameObject loadingUI;
+    LoadingPanel loadingPanel;
 
     private void Awake()
     {
+        #region Singleton
         if (Instance != null)
         {
             Destroy(gameObject);
@@ -17,16 +18,7 @@ public class DontDestroyUI : MonoBehaviour
         Instance = this;
 
         DontDestroyOnLoad(gameObject);
-    }
+        #endregion
 
-
-    public static void SetUIVisibility(GameObject go)
-    {
-        go.SetActive(!go.activeSelf);
-    }
-
-    public static void SetUIVisibility(GameObject go, bool visible)
-    {
-        go.SetActive(visible);
     }
 }

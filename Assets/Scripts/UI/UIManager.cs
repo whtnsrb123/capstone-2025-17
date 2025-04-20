@@ -6,6 +6,8 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager Instance { get; private set; }
 
+    public bool isEscPanelActive {  get; set; }
+
     public static Dictionary<UIType, UIBase> startingUIDictionary = new Dictionary<UIType, UIBase>();
 
     public Stack<PopupUI> activatedPopups = new Stack<PopupUI>();
@@ -29,7 +31,7 @@ public class UIManager : MonoBehaviour
         #endregion
 
         dontDestroyCanvas = GameObject.Find("DontDestroyCanvas").transform;
-
+        Debug.Assert(dontDestroyCanvas != null, "DontDestroyCanvas null");
         RegisterUIObjects();
     }
     private void RegisterUIObjects()
@@ -56,7 +58,7 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyUp(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             EscPressed();
         }
@@ -72,8 +74,7 @@ public class UIManager : MonoBehaviour
         {
             if (activatedPopups.Count > 0)
             {
-                Debug.Log($"activated popup : {activatedPopups.Count}");
-                activatedPopups.Peek().HideUI();
+                activatedPopups.Peek()?.HideUI();
             }
             else
             {
@@ -84,12 +85,20 @@ public class UIManager : MonoBehaviour
         {
             if (activatedPopups.Count > 0)
             {
-                Debug.Log($"activated popup : {activatedPopups.Count}");
-                activatedPopups.Peek().HideUI();
+                activatedPopups.Peek()?.HideUI();
+                if (activatedPopups.Count == 0)
+                {
+                    isEscPanelActive = false;
+                    Cursor.lockState = CursorLockMode.Locked;
+                    Cursor.visible = false;
+                }
             }
             else
             {
+                isEscPanelActive = true;
                 startingUIDictionary[UIType.IngameOption].ShowUI();
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
             }
         }
 

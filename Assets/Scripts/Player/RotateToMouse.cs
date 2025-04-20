@@ -18,6 +18,8 @@ public class rotateToMouse : MonoBehaviour
     
     public void UpdateRotate(float mouseX, float mouseY)
     {
+        if (UIManager.Instance.isEscPanelActive) return;
+
         // Y축 회전
         eulerAngleY += mouseX * rotCamYAxisSpeed;
 
