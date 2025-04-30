@@ -95,9 +95,9 @@ public class PlayerInRoomUIController : MonoBehaviour
         {
             if (!GameStateManager.isServerTest)
             {
-                LoadingPanel.Instance.SetLoadingPanelVisibility(true);
                 network.SetGameStart();
                 GameStarter.GameStart();
+                return;
             }
             // 마스터 클라이언트
             network.ValidPlayerInRoom();
