@@ -3,15 +3,18 @@ using UnityEngine.AI;
 
 public class PersonAgent : MonoBehaviour
 {
+    [Header("Wandering")]
     public float wanderRadius = 10f;
     public Vector2 wanderIntervalRange = new Vector2(3f, 7f);
 
+    [Header("Detection")]
     public float viewDistance = 10f;
     public float viewAngle = 120f;
     public Transform eyePoint;
     public LayerMask playerLayer;
     public LayerMask obstructionMask;
 
+    [Header("Combat")]
     public float chaseTimeout = 3f;
     public float attackDistance = 2f;
 
@@ -25,6 +28,7 @@ public class PersonAgent : MonoBehaviour
 
     private enum State { Wander, Chase, Attack, Return }
     private State currentState = State.Wander;
+    private State previousState = State.Wander;
 
     private Vector3 lastDestination;
 
@@ -40,6 +44,12 @@ public class PersonAgent : MonoBehaviour
     void Update()
     {
         animator.SetFloat("Speed", agent.velocity.magnitude);
+
+        if (currentState != previousState)
+        {
+            Debug.Log($"{gameObject.name} | State changed: {previousState} → {currentState}");
+            previousState = currentState;
+        }
 
         switch (currentState)
         {
@@ -62,10 +72,16 @@ public class PersonAgent : MonoBehaviour
     {
         timer += Time.deltaTime;
         if (timer >= currentWanderTimer)
+        {
+            Debug.Log($"{gameObject.name} | Wander: Setting new destination.");
             SetNewDestination();
+        }
 
         if (CanSeePlayer())
+        {
+            Debug.Log($"{gameObject.name} | Wander: Player detected! Switching to Chase.");
             currentState = State.Chase;
+        }
     }
 
     private void HandleChase()
@@ -73,6 +89,7 @@ public class PersonAgent : MonoBehaviour
         if (player == null) return;
 
         agent.SetDestination(player.transform.position);
+        Debug.Log($"{gameObject.name} | Chase: Chasing the player.");
 
         if (CanSeePlayer())
         {
@@ -80,11 +97,13 @@ public class PersonAgent : MonoBehaviour
 
             if (Vector3.Distance(transform.position, player.transform.position) <= attackDistance)
             {
+                Debug.Log($"{gameObject.name} | Chase: Player in range. Switching to Attack.");
                 currentState = State.Attack;
             }
         }
         else if (Time.time - lastSeenTime > chaseTimeout)
         {
+            Debug.Log($"{gameObject.name} | Chase: Lost sight of player. Returning.");
             currentState = State.Return;
             agent.SetDestination(lastDestination);
         }
@@ -97,23 +116,27 @@ public class PersonAgent : MonoBehaviour
         agent.ResetPath();
         transform.LookAt(player.transform);
 
-        // 실제 공격 판정은 따로 구현 필요
-        Debug.Log("Attacking Player");
+        Debug.Log($"{gameObject.name} | Attack: Attacking the player.");
 
         if (Vector3.Distance(transform.position, player.transform.position) > attackDistance + 0.5f)
         {
+            Debug.Log($"{gameObject.name} | Attack: Player moved away. Switching to Chase.");
             currentState = State.Chase;
         }
     }
 
     private void HandleReturn()
     {
-        if (!agent.pathPending && agent.remainingDistance <= 0.2f)
+        Debug.Log($"{gameObject.name} | Return: Returning to last destination.");
+
+        if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance + 0.1f)
         {
+            Debug.Log($"{gameObject.name} | Return: Reached last destination. Switching to Wander.");
             currentState = State.Wander;
             SetNewDestination();
         }
     }
+
 
     private void SetNewDestination()
     {
@@ -139,8 +162,12 @@ public class PersonAgent : MonoBehaviour
         if (player == null) return false;
 
         Vector3 dirToPlayer = (player.transform.position - eyePoint.position).normalized;
-        float angle = Vector3.Angle(eyePoint.forward, dirToPlayer);
         float dist = Vector3.Distance(eyePoint.position, player.transform.position);
+
+        // 수평 방향만 고려한 시야각 계산
+        Vector3 flatForward = new Vector3(eyePoint.forward.x, 0, eyePoint.forward.z).normalized;
+        Vector3 flatToPlayer = new Vector3(dirToPlayer.x, 0, dirToPlayer.z).normalized;
+        float angle = Vector3.Angle(flatForward, flatToPlayer);
 
         if (angle < viewAngle / 2f && dist < viewDistance)
         {
@@ -152,7 +179,6 @@ public class PersonAgent : MonoBehaviour
         return false;
     }
 
-    // === 디버그 시야 시각화 ===
     private void OnDrawGizmosSelected()
     {
         if (eyePoint == null) return;
