@@ -7,12 +7,15 @@ public class PersonAgent : MonoBehaviour
     public Vector2 wanderIntervalRange = new Vector2(3f, 7f);
 
     private NavMeshAgent agent;
+    private Animator animator;
     private float timer;
     private float currentWanderTimer;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        animator = GetComponent<Animator>();
+
         SetNewDestination();
         timer = 0;
     }
@@ -20,11 +23,15 @@ public class PersonAgent : MonoBehaviour
     void Update()
     {
         timer += Time.deltaTime;
+
+        float speed = agent.velocity.magnitude;
+        animator.SetFloat("Speed", speed);
+
         if (timer >= currentWanderTimer)
-            SetNewDestination(  );
+            SetNewDestination();
     }
 
-    private void SetNewDestination( )
+    private void SetNewDestination()
     {
         Vector3 newPos = RandomNavSphere(transform.position, wanderRadius, -1);
         agent.SetDestination(newPos);
