@@ -13,30 +13,32 @@ public class PersonAgent : MonoBehaviour
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        SetRandomTimer();
+        SetNewDestination();
         timer = 0;
     }
 
     void Update()
     {
         timer += Time.deltaTime;
-
         if (timer >= currentWanderTimer)
-        {
-            Vector3 newPos = RandomNavSphere(transform.position, wanderRadius, -1);
-            agent.SetDestination(newPos);
-
-            SetRandomTimer();
-            timer = 0;
-        }
+            SetNewDestination(  );
     }
 
-    void SetRandomTimer()
+    private void SetNewDestination( )
+    {
+        Vector3 newPos = RandomNavSphere(transform.position, wanderRadius, -1);
+        agent.SetDestination(newPos);
+
+        SetRandomTimer();
+        timer = 0;
+    }
+
+    private void SetRandomTimer()
     {
         currentWanderTimer = Random.Range(wanderIntervalRange.x, wanderIntervalRange.y);
     }
 
-    public static Vector3 RandomNavSphere(Vector3 origin, float dist, int layermask)
+    private static Vector3 RandomNavSphere(Vector3 origin, float dist, int layermask)
     {
         Vector3 randDirection = Random.insideUnitSphere * dist;
         randDirection.y = 0f;
