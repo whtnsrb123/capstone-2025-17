@@ -20,7 +20,7 @@ public class PersonAgent : MonoBehaviour
 
     private NavMeshAgent agent;
     private Animator animator;
-    private GameObject player;
+    private GameObject targetPlayer;
 
     private float timer;
     private float currentWanderTimer;
@@ -36,8 +36,6 @@ public class PersonAgent : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
-        player = GameObject.FindGameObjectWithTag("Player");
-
         SetNewDestination();
     }
 
@@ -68,6 +66,37 @@ public class PersonAgent : MonoBehaviour
         }
     }
 
+    void LateUpdate()
+    {
+        if (currentState == State.Wander || currentState == State.Chase || currentState == State.Attack)
+        {
+            UpdateChaseStateIfNeeded();
+        }
+    }
+
+    private void UpdateChaseStateIfNeeded()
+    {
+        GameObject visiblePlayer = FindFirstVisiblePlayer();
+        GameObject obstructedPlayer = FindObstructedPlayer();
+
+        if (visiblePlayer != null)
+        {
+            var manager = visiblePlayer.GetComponent<ChaseStateManager>();
+            if (manager != null)
+            {
+                manager.SetChaseState(ChaseStateManager.ChaseState.Detected);
+            }
+        }
+        else if (obstructedPlayer != null)
+        {
+            var manager = obstructedPlayer.GetComponent<ChaseStateManager>();
+            if (manager != null)
+            {
+                manager.SetChaseState(ChaseStateManager.ChaseState.Obstructed);
+            }
+        }
+    }
+
     private void HandleWander()
     {
         timer += Time.deltaTime;
@@ -77,25 +106,32 @@ public class PersonAgent : MonoBehaviour
             SetNewDestination();
         }
 
-        if (CanSeePlayer())
+        GameObject seenPlayer = FindFirstVisiblePlayer();
+        if (seenPlayer != null)
         {
             Debug.Log($"{gameObject.name} | Wander: Player detected! Switching to Chase.");
+            targetPlayer = seenPlayer;
             currentState = State.Chase;
         }
     }
 
     private void HandleChase()
     {
-        if (player == null) return;
+        if (targetPlayer == null)
+        {
+            currentState = State.Return;
+            agent.SetDestination(lastDestination);
+            return;
+        }
 
-        agent.SetDestination(player.transform.position);
+        agent.SetDestination(targetPlayer.transform.position);
         Debug.Log($"{gameObject.name} | Chase: Chasing the player.");
 
-        if (CanSeePlayer())
+        if (CanSeeTarget())
         {
             lastSeenTime = Time.time;
 
-            if (Vector3.Distance(transform.position, player.transform.position) <= attackDistance)
+            if (Vector3.Distance(transform.position, targetPlayer.transform.position) <= attackDistance)
             {
                 Debug.Log($"{gameObject.name} | Chase: Player in range. Switching to Attack.");
                 currentState = State.Attack;
@@ -111,14 +147,19 @@ public class PersonAgent : MonoBehaviour
 
     private void HandleAttack()
     {
-        if (player == null) return;
+        if (targetPlayer == null)
+        {
+            currentState = State.Return;
+            agent.SetDestination(lastDestination);
+            return;
+        }
 
         agent.ResetPath();
-        transform.LookAt(player.transform);
+        transform.LookAt(targetPlayer.transform);
 
         Debug.Log($"{gameObject.name} | Attack: Attacking the player.");
 
-        if (Vector3.Distance(transform.position, player.transform.position) > attackDistance + 0.5f)
+        if (Vector3.Distance(transform.position, targetPlayer.transform.position) > attackDistance + 0.5f)
         {
             Debug.Log($"{gameObject.name} | Attack: Player moved away. Switching to Chase.");
             currentState = State.Chase;
@@ -134,9 +175,17 @@ public class PersonAgent : MonoBehaviour
             Debug.Log($"{gameObject.name} | Return: Reached last destination. Switching to Wander.");
             currentState = State.Wander;
             SetNewDestination();
+
+            if (targetPlayer != null)
+            {
+                var manager = targetPlayer.GetComponent<ChaseStateManager>();
+                if (manager != null)
+                    manager.SetChaseState(ChaseStateManager.ChaseState.Undetected);
+
+                targetPlayer = null;
+            }
         }
     }
-
 
     private void SetNewDestination()
     {
@@ -157,14 +206,67 @@ public class PersonAgent : MonoBehaviour
         return navHit.position;
     }
 
-    private bool CanSeePlayer()
+    private GameObject FindFirstVisiblePlayer()
     {
-        if (player == null) return false;
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
 
-        Vector3 dirToPlayer = (player.transform.position - eyePoint.position).normalized;
-        float dist = Vector3.Distance(eyePoint.position, player.transform.position);
+        foreach (GameObject p in players)
+        {
+            if (p == null) continue;
 
-        // 수평 방향만 고려한 시야각 계산
+            Vector3 dirToPlayer = (p.transform.position - eyePoint.position).normalized;
+            float dist = Vector3.Distance(eyePoint.position, p.transform.position);
+
+            Vector3 flatForward = new Vector3(eyePoint.forward.x, 0, eyePoint.forward.z).normalized;
+            Vector3 flatToPlayer = new Vector3(dirToPlayer.x, 0, dirToPlayer.z).normalized;
+            float angle = Vector3.Angle(flatForward, flatToPlayer);
+
+            if (angle < viewAngle / 2f && dist < viewDistance)
+            {
+                if (!Physics.Raycast(eyePoint.position, dirToPlayer, dist, obstructionMask))
+                {
+                    return p;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private GameObject FindObstructedPlayer()
+    {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+
+        foreach (GameObject p in players)
+        {
+            if (p == null) continue;
+
+            Vector3 dirToPlayer = (p.transform.position - eyePoint.position).normalized;
+            float dist = Vector3.Distance(eyePoint.position, p.transform.position);
+
+            Vector3 flatForward = new Vector3(eyePoint.forward.x, 0, eyePoint.forward.z).normalized;
+            Vector3 flatToPlayer = new Vector3(dirToPlayer.x, 0, dirToPlayer.z).normalized;
+            float angle = Vector3.Angle(flatForward, flatToPlayer);
+
+            if (angle < viewAngle / 2f && dist < viewDistance)
+            {
+                if (Physics.Raycast(eyePoint.position, dirToPlayer, dist, obstructionMask))
+                {
+                    return p;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private bool CanSeeTarget()
+    {
+        if (targetPlayer == null) return false;
+
+        Vector3 dirToPlayer = (targetPlayer.transform.position - eyePoint.position).normalized;
+        float dist = Vector3.Distance(eyePoint.position, targetPlayer.transform.position);
+
         Vector3 flatForward = new Vector3(eyePoint.forward.x, 0, eyePoint.forward.z).normalized;
         Vector3 flatToPlayer = new Vector3(dirToPlayer.x, 0, dirToPlayer.z).normalized;
         float angle = Vector3.Angle(flatForward, flatToPlayer);
@@ -176,6 +278,7 @@ public class PersonAgent : MonoBehaviour
                 return true;
             }
         }
+
         return false;
     }
 
