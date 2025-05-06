@@ -3,6 +3,12 @@ using TMPro;
 
 public class PickUpController : MonoBehaviour
 {
+    private float defaultMass; // 물체의 원래 질량
+    private float defaultDrag; // 물체의 원래 저항력
+    private float defaultAngularDrag; // 물체의 원래 각속도 저항력
+
+
+
     public Transform raycastPosition;         // 레이캐스트 시작 위치 (카메라)
     public Transform pickPosition;            // 물체를 들 위치 (손 위치)
     public GameObject heldObject;             // 현재 들고 있는 물체
@@ -28,9 +34,16 @@ public class PickUpController : MonoBehaviour
     private Quaternion originalRotation; // 처음 잡았던 회전값 저장
     private bool isTouching = false;     // 다른 물체에 닿아 있는지 여부
     private Quaternion heldRotationOffset = Quaternion.identity; // R키로 회전한 상태 누적 저장
+    private InteractManager interactManager;
+    private GameObject recentlyThrownObject;
+    private float throwCooldownTime = 1.0f; // 1초간 재감지 금지
+    private float throwTimer = 0f;
 
     void Start()
     {
+        interactManager = GetComponent<InteractManager>();
+        pushController = GetComponent<PlayerPushController>();
+
         // 카메라 기준으로 레이 시작 위치 지정
         Camera mainCamera = Camera.main;
         raycastPosition = mainCamera.transform;
@@ -38,41 +51,44 @@ public class PickUpController : MonoBehaviour
         // UI 텍스트 비활성화
         if (pickUpUI != null) pickUpUI.enabled = false;
 
-        // 플레이어 밀기 컴포넌트 연결
-        pushController = GetComponent<PlayerPushController>();
-
-        // 궤적 라인 초기 설정
+        InitializeTrajectoryLine();
+    }
+    private void InitializeTrajectoryLine()
+    {
         trajectoryLine.enabled = true;
         trajectoryLine.positionCount = 0;
         trajectoryLine.startWidth = 0.05f;
         trajectoryLine.endWidth = 0.05f;
         trajectoryLine.numCornerVertices = 5;
         trajectoryLine.numCapVertices = 0;
-
-        // 궤적 라인 텍스처 및 색상 설정
-        trajectoryLine.material = new Material(Shader.Find("Sprites/Default"));
-        trajectoryLine.startColor = new Color(1f, 1f, 0f, 1f);
-        trajectoryLine.endColor = new Color(1f, 1f, 0f, 1f);
         trajectoryLine.textureMode = LineTextureMode.Tile;
 
-        // 점선 텍스처 생성
+        trajectoryLine.material = new Material(Shader.Find("Sprites/Default"))
+        {
+            mainTexture = CreateDashedTexture()
+        };
+        trajectoryLine.startColor = trajectoryLine.endColor = Color.yellow;
+        trajectoryLine.material.mainTextureScale = new Vector2(1f / (dashLength + dashGap), 1f);
+    }
+
+    private Texture2D CreateDashedTexture()
+    {
         Texture2D dashTexture = new Texture2D(4, 1);
         dashTexture.SetPixel(0, 0, Color.white);
         dashTexture.SetPixel(1, 0, Color.white);
         dashTexture.SetPixel(2, 0, Color.clear);
         dashTexture.SetPixel(3, 0, Color.clear);
         dashTexture.Apply();
-
-        trajectoryLine.material.mainTexture = dashTexture;
-        trajectoryLine.material.mainTextureScale = new Vector2(1f / (dashLength + dashGap), 1f);
+        return dashTexture;
     }
 
     void Update()
     {
-        // 감지 레이 시각화
+        if (throwTimer > 0f)
+            throwTimer -= Time.deltaTime;
+
         Debug.DrawRay(raycastPosition.position, raycastPosition.forward * detectionRange, Color.red);
 
-        // 들고 있는 경우 UI 활성화
         if (heldObject != null)
         {
             if (pickUpUI != null)
@@ -81,13 +97,9 @@ public class PickUpController : MonoBehaviour
                 pickUpUI.text = "Press F to Drop";
             }
         }
-        else
+        else if (trajectoryLine != null)
         {
-            // 궤적 제거
-            if (trajectoryLine != null)
-            {
-                trajectoryLine.positionCount = 0;
-            }
+            trajectoryLine.positionCount = 0;
         }
     }
 
@@ -139,61 +151,61 @@ public class PickUpController : MonoBehaviour
             DropObject(); // 놓기
         }
     }
-
     private void TryPickUp()
     {
         if (detectedObject == null) return;
+        if (detectedObject == recentlyThrownObject && throwTimer > 0f)
+        {
+            Debug.Log("감지 금지 : 최근 던진 오브젝트");
+            return;
+        }
 
         heldObject = detectedObject;
         heldObjectRb = heldObject.GetComponent<Rigidbody>();
-
         if (heldObjectRb != null)
         {
-            heldObjectRb.isKinematic = false;    // 물리 유지
-            heldObjectRb.useGravity = false;     // 중력 제거
+            // 원래 물리 속성 저장
+            defaultMass = heldObjectRb.mass;
+            defaultDrag = heldObjectRb.drag;
+            defaultAngularDrag = heldObjectRb.angularDrag;
 
-            Collider heldObjectCollider = heldObject.GetComponent<Collider>();
+            // 들고 있을 때 가벼운 속성 적용
+            heldObjectRb.mass = 0.1f; // 매우 가벼운 질량
+            heldObjectRb.drag = 5f;   // 높은 저항력
+            heldObjectRb.angularDrag = 10f; // 높은 회전 저항력
 
-            if (heldObjectCollider != null && heldObject.CompareTag("Pickable"))
-            {
-                heldObjectCollider.isTrigger = false; // 충돌 유지
-            }
-
-            // Ray 충돌 제외를 위해 레이어 변경
+            heldObjectRb.isKinematic = false;
+            heldObjectRb.useGravity = false;
             heldObject.layer = LayerMask.NameToLayer("HeldObject");
-
-            // 현재 회전값 저장
             originalRotation = heldObject.transform.rotation;
-
-            Debug.Log("물체 잡기 성공: " + heldObject.name);
-        }
-        else
-        {
-            heldObject = null;
         }
     }
+
 
     public void DropObject()
     {
         if (heldObject != null)
         {
+            // 원래 물리 속성 복구
+            heldObjectRb.mass = defaultMass;
+            heldObjectRb.drag = defaultDrag;
+            heldObjectRb.angularDrag = defaultAngularDrag;
+
             heldObjectRb.useGravity = true;
-            heldObjectRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-
-            // 레이어 복구
+            heldObjectRb.isKinematic = false;
             heldObject.layer = LayerMask.NameToLayer("Default");
-
-            heldObject = null;
-            heldObjectRb = null;
-
-            Debug.Log("물체 놓기");
         }
+        ResetHeldObject();
     }
 
     public void ThrowObject()
     {
         if (heldObject != null && heldObjectRb != null)
         {
+            heldObjectRb.mass = defaultMass;
+            heldObjectRb.drag = defaultDrag;
+            heldObjectRb.angularDrag = defaultAngularDrag;
+
             heldObjectRb.useGravity = true;
             heldObjectRb.isKinematic = false;
             heldObjectRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
@@ -202,15 +214,23 @@ public class PickUpController : MonoBehaviour
             heldObjectRb.AddForce(throwDirection * throwForce, ForceMode.VelocityChange);
 
             heldObject.transform.position += Vector3.up * 0.1f;
+            Debug.Log("물체 던지기");
+            recentlyThrownObject = heldObject;
+            throwTimer = throwCooldownTime;
+        }
 
-            // 레이어 복구
+        ResetHeldObject();
+    }
+    private void ResetHeldObject()
+    {
+        if (heldObject != null)
             heldObject.layer = LayerMask.NameToLayer("Default");
 
-            heldObject = null;
-            heldObjectRb = null;
+        heldObject = null;
+        heldObjectRb = null;
 
-            Debug.Log("물체 던지기");
-        }
+        if (TryGetComponent(out InteractManager interact))
+            interact.ResetDetection();
     }
 
     private void DisplayTrajectory()
@@ -258,7 +278,6 @@ public class PickUpController : MonoBehaviour
             {
                 totalLength += Vector3.Distance(previousPoint, pointPosition);
             }
-
             previousPoint = pointPosition;
         }
 
@@ -268,11 +287,8 @@ public class PickUpController : MonoBehaviour
 
     public void RotateHeldObject()
     {
-        if (heldObject != null)
-        {
-            heldRotationOffset *= Quaternion.Euler(0, 0, -90);
-            Debug.Log("물체 회전");
-        }
+        heldRotationOffset *= Quaternion.Euler(0, 0, -90);
+        Debug.Log("물체 회전");
     }
 
     public bool IsHoldingObject()

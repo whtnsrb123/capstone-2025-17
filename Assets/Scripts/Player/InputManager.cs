@@ -6,8 +6,8 @@ public class InputManager : MonoBehaviour
     private PickUpController pickUpController;
     private RotateToMouse rotateToMouse;
     private InteractManager interactManager;
-    public Animator animator; // 애니메이터 컴포넌트 연결
-    public string throwTriggerName = "IsThrow"; // 던지기 트리거 이름
+    public Animator animator;
+    public string throwTriggerName = "IsThrow";
 
     private void Awake()
     {
@@ -21,7 +21,7 @@ public class InputManager : MonoBehaviour
         pushController = GetComponent<PlayerPushController>();
         pickUpController = GetComponent<PickUpController>();
         interactManager = GetComponent<InteractManager>();
-        animator = GetComponent<Animator>(); // 애니메이터 컴포넌트 할당
+        animator = GetComponent<Animator>();
     }
 
     void Update()

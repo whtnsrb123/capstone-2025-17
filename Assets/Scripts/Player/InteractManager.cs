@@ -22,6 +22,7 @@ public class InteractManager : MonoBehaviour
     // 애니메이터 관련 변수
     public Animator animator; // 애니메이터 컴포넌트 연결
     public string liftTriggerName = "IsLift"; // 애니메이터 트리거 이름
+    public string IsPutName = "IsPut";
 
     void Start()
     {
@@ -45,7 +46,6 @@ public class InteractManager : MonoBehaviour
         DetectObject();
         heldObject = pickUpController.heldObject; // PickUpController에서 들고 있는 물체 정보를 가져옴
     }
-
     private void DetectObject()
     {
         detectedObject = null;
@@ -56,34 +56,66 @@ public class InteractManager : MonoBehaviour
 
         if (Physics.Raycast(raycastPosition.position, raycastPosition.forward, out hit, detectionRange))
         {
-            detectedObject = hit.collider.gameObject;
+            GameObject hitObject = hit.collider.gameObject;
 
-            if (hit.collider.CompareTag("Pickable"))
+            if (hitObject.CompareTag("Pickable"))
             {
-                Debug.Log("Pickable 감지: " + hit.collider.gameObject.name);
-
-                if (descriptionText != null && heldObject == null)
+                if (heldObject == null)
                 {
-                    descriptionText.enabled = true;
-                    descriptionText.text = "Press F to Pick Up";
-                    isPickable = true;
+                    detectedObject = hitObject;
                     pickUpController.detectedObject = detectedObject;
+                    isPickable = true;
+
+                    if (descriptionText != null)
+                    {
+                        descriptionText.enabled = true;
+                        descriptionText.text = "Press F to Pick Up";
+                    }
                 }
             }
-            else if (hit.collider.CompareTag("Interactable"))
+            else if (hitObject.CompareTag("Interactable"))
             {
-                Debug.Log("Interactable 감지: " + hit.collider.gameObject.name);
+                detectedObject = hitObject;
+                isPickable = false;
+
                 if (descriptionText != null)
                 {
                     descriptionText.enabled = true;
                     descriptionText.text = "Press F to Interact";
-                    isPickable = false;
                 }
             }
         }
+        else
+        {
+            detectedObject = null;
+            pickUpController.detectedObject = null;
+            isPickable = false;
 
-        if (detectedObject == null && heldObject == null && descriptionText != null)
-            descriptionText.enabled = false;
+            if (descriptionText != null && heldObject == null)
+            {
+                descriptionText.enabled = false;
+                descriptionText.text = "";
+            }
+
+            Debug.Log("감지 X : 상태 초기화 완료");
+        }
+        if (detectedObject == null && heldObject == null)
+        {
+            if (descriptionText != null)
+            {
+                descriptionText.enabled = false;
+                descriptionText.text = "";
+            }
+        }
+    }
+
+    private void SetDescription(string text)
+    {
+        if (descriptionText != null && heldObject == null)
+        {
+            descriptionText.enabled = true;
+            descriptionText.text = text;
+        }
     }
 
     public void OnInput()
@@ -91,10 +123,7 @@ public class InteractManager : MonoBehaviour
         if (heldObject != null) // 들고 있는 물체가 있다면
         {
             pickUpController.HandlePickUpOrDrop(); // 물체를 내려놓습니다.
-            if (isPickable) // 들 수 있는 물체였다면
-            {
-                animator.SetTrigger("IsPut"); // IsPut 트리거 활성화
-            }
+            animator.SetTrigger(IsPutName); // IsPut 트리거 활성화 
             return;
         }
 
@@ -110,5 +139,18 @@ public class InteractManager : MonoBehaviour
         {
             interactController.Interact(detectedObject);
         }
+    }
+    public void ResetDetection()
+    {
+        detectedObject = null;
+        isPickable = false;
+
+        if (descriptionText != null)
+        {
+            descriptionText.enabled = false;
+            descriptionText.text = "";
+        }
+
+        Debug.Log("감지 상태 초기화됨");
     }
 }
