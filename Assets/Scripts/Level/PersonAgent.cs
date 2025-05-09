@@ -30,6 +30,7 @@ public class PersonAgent : MonoBehaviourPun
     private enum State { Wander, Chase, Attack, Return }
     private State currentState = State.Wander;
     private State previousState = State.Wander;
+    public bool isAttacking = false;
 
     private Vector3 lastDestination;
 
@@ -43,9 +44,8 @@ public class PersonAgent : MonoBehaviourPun
     void Update()
     {
         if (GameStateManager.isServerTest && !PhotonNetwork.IsMasterClient)
-        {
             return;
-        }
+
         animator.SetFloat("Speed", agent.velocity.magnitude);
 
         if (currentState != previousState)
@@ -53,7 +53,7 @@ public class PersonAgent : MonoBehaviourPun
             Debug.Log($"{gameObject.name} | State changed: {previousState} → {currentState}");
             previousState = currentState;
         }
-        
+
         switch (currentState)
         {
             case State.Wander:
@@ -82,13 +82,9 @@ public class PersonAgent : MonoBehaviourPun
     void InvokedStateMethod(string methodName, RpcTarget target = RpcTarget.All)
     {
         if (GameStateManager.isServerTest)
-        {
             photonView.RPC(methodName, target);
-        }
         else
-        {
             SendMessage(methodName);
-        }
     }
 
     private void UpdateChaseStateIfNeeded()
@@ -98,22 +94,14 @@ public class PersonAgent : MonoBehaviourPun
 
         if (visiblePlayer != null)
         {
-            var manager = visiblePlayer.GetComponent<ChaseStateManager>();
-            if (manager != null)
-            {
-                manager.SetChaseState(ChaseStateManager.ChaseState.Detected);
-            }
+            visiblePlayer.GetComponent<ChaseStateManager>()?.SetChaseState(ChaseStateManager.ChaseState.Detected);
         }
         else if (obstructedPlayer != null)
         {
-            var manager = obstructedPlayer.GetComponent<ChaseStateManager>();
-            if (manager != null)
-            {
-                manager.SetChaseState(ChaseStateManager.ChaseState.Obstructed);
-            }
+            obstructedPlayer.GetComponent<ChaseStateManager>()?.SetChaseState(ChaseStateManager.ChaseState.Obstructed);
         }
     }
-    
+
     [PunRPC]
     private void HandleWander()
     {
@@ -132,7 +120,7 @@ public class PersonAgent : MonoBehaviourPun
             currentState = State.Chase;
         }
     }
-    
+
     [PunRPC]
     private void HandleChase()
     {
@@ -163,7 +151,7 @@ public class PersonAgent : MonoBehaviourPun
             agent.SetDestination(lastDestination);
         }
     }
-    
+
     [PunRPC]
     private void HandleAttack()
     {
@@ -174,18 +162,43 @@ public class PersonAgent : MonoBehaviourPun
             return;
         }
 
+        if(isAttacking) return;
+
         agent.ResetPath();
         transform.LookAt(targetPlayer.transform);
+        animator.SetTrigger("Attack");
+        isAttacking = true;
 
-        Debug.Log($"{gameObject.name} | Attack: Attacking the player.");
+        Debug.Log($"{gameObject.name} | Attack: Triggered attack animation.");
+    }
 
-        if (Vector3.Distance(transform.position, targetPlayer.transform.position) > attackDistance + 0.5f)
+    // 애니메이션 끝에 연결된 이벤트에서 호출됨
+    public void OnAttackAnimationEnd()
+    {
+        isAttacking = false;
+        
+        if (targetPlayer == null)
         {
-            Debug.Log($"{gameObject.name} | Attack: Player moved away. Switching to Chase.");
+            Debug.Log($"{gameObject.name} | Attack End: No target → Return");
+            currentState = State.Return;
+            agent.SetDestination(lastDestination);
+            return;
+        }
+
+        float distance = Vector3.Distance(transform.position, targetPlayer.transform.position);
+        Debug.Log($"{gameObject.name} | Attack End: Distance = {distance:F2}");
+
+        if (distance > attackDistance + 0.5f)
+        {
+            Debug.Log($"{gameObject.name} | Attack End: Player out of range → Chase");
             currentState = State.Chase;
         }
+        else
+        {
+            Debug.Log($"{gameObject.name} | Attack End: Still in range → stay in Attack or re-trigger");
+        }
     }
-    
+
     [PunRPC]
     private void HandleReturn()
     {
@@ -199,10 +212,7 @@ public class PersonAgent : MonoBehaviourPun
 
             if (targetPlayer != null)
             {
-                var manager = targetPlayer.GetComponent<ChaseStateManager>();
-                if (manager != null)
-                    manager.SetChaseState(ChaseStateManager.ChaseState.Undetected);
-
+                targetPlayer.GetComponent<ChaseStateManager>()?.SetChaseState(ChaseStateManager.ChaseState.Undetected);
                 targetPlayer = null;
             }
         }
@@ -212,7 +222,6 @@ public class PersonAgent : MonoBehaviourPun
     {
         lastDestination = RandomNavSphere(transform.position, wanderRadius, -1);
         agent.SetDestination(lastDestination);
-
         currentWanderTimer = Random.Range(wanderIntervalRange.x, wanderIntervalRange.y);
         timer = 0;
     }
@@ -229,55 +238,33 @@ public class PersonAgent : MonoBehaviourPun
 
     private GameObject FindFirstVisiblePlayer()
     {
-        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-
-        foreach (GameObject p in players)
+        foreach (GameObject p in GameObject.FindGameObjectsWithTag("Player"))
         {
             if (p == null) continue;
-
-            Vector3 dirToPlayer = (p.transform.position - eyePoint.position).normalized;
+            Vector3 dir = (p.transform.position - eyePoint.position).normalized;
             float dist = Vector3.Distance(eyePoint.position, p.transform.position);
+            float angle = Vector3.Angle(new Vector3(eyePoint.forward.x, 0, eyePoint.forward.z), new Vector3(dir.x, 0, dir.z));
 
-            Vector3 flatForward = new Vector3(eyePoint.forward.x, 0, eyePoint.forward.z).normalized;
-            Vector3 flatToPlayer = new Vector3(dirToPlayer.x, 0, dirToPlayer.z).normalized;
-            float angle = Vector3.Angle(flatForward, flatToPlayer);
-
-            if (angle < viewAngle / 2f && dist < viewDistance)
-            {
-                if (!Physics.Raycast(eyePoint.position, dirToPlayer, dist, obstructionMask))
-                {
-                    return p;
-                }
-            }
+            if (angle < viewAngle / 2f && dist < viewDistance &&
+                !Physics.Raycast(eyePoint.position, dir, dist, obstructionMask))
+                return p;
         }
-
         return null;
     }
 
     private GameObject FindObstructedPlayer()
     {
-        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-
-        foreach (GameObject p in players)
+        foreach (GameObject p in GameObject.FindGameObjectsWithTag("Player"))
         {
             if (p == null) continue;
-
-            Vector3 dirToPlayer = (p.transform.position - eyePoint.position).normalized;
+            Vector3 dir = (p.transform.position - eyePoint.position).normalized;
             float dist = Vector3.Distance(eyePoint.position, p.transform.position);
+            float angle = Vector3.Angle(new Vector3(eyePoint.forward.x, 0, eyePoint.forward.z), new Vector3(dir.x, 0, dir.z));
 
-            Vector3 flatForward = new Vector3(eyePoint.forward.x, 0, eyePoint.forward.z).normalized;
-            Vector3 flatToPlayer = new Vector3(dirToPlayer.x, 0, dirToPlayer.z).normalized;
-            float angle = Vector3.Angle(flatForward, flatToPlayer);
-
-            if (angle < viewAngle / 2f && dist < viewDistance)
-            {
-                if (Physics.Raycast(eyePoint.position, dirToPlayer, dist, obstructionMask))
-                {
-                    return p;
-                }
-            }
+            if (angle < viewAngle / 2f && dist < viewDistance &&
+                Physics.Raycast(eyePoint.position, dir, dist, obstructionMask))
+                return p;
         }
-
         return null;
     }
 
@@ -285,22 +272,12 @@ public class PersonAgent : MonoBehaviourPun
     {
         if (targetPlayer == null) return false;
 
-        Vector3 dirToPlayer = (targetPlayer.transform.position - eyePoint.position).normalized;
+        Vector3 dir = (targetPlayer.transform.position - eyePoint.position).normalized;
         float dist = Vector3.Distance(eyePoint.position, targetPlayer.transform.position);
+        float angle = Vector3.Angle(new Vector3(eyePoint.forward.x, 0, eyePoint.forward.z), new Vector3(dir.x, 0, dir.z));
 
-        Vector3 flatForward = new Vector3(eyePoint.forward.x, 0, eyePoint.forward.z).normalized;
-        Vector3 flatToPlayer = new Vector3(dirToPlayer.x, 0, dirToPlayer.z).normalized;
-        float angle = Vector3.Angle(flatForward, flatToPlayer);
-
-        if (angle < viewAngle / 2f && dist < viewDistance)
-        {
-            if (!Physics.Raycast(eyePoint.position, dirToPlayer, dist, obstructionMask))
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return angle < viewAngle / 2f && dist < viewDistance &&
+               !Physics.Raycast(eyePoint.position, dir, dist, obstructionMask);
     }
 
     private void OnDrawGizmosSelected()
