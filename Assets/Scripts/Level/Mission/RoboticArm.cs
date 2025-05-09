@@ -39,9 +39,9 @@ public class RoboticArm : MonoBehaviourPun
     {
         while (true)
         {
-            RunArm();
             float delay = Random.Range(15f, 30f);
             yield return new WaitForSeconds(delay);
+            RunArm();
         }
     }
 
