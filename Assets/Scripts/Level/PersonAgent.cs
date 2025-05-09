@@ -1,7 +1,8 @@
+using Photon.Pun;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class PersonAgent : MonoBehaviour
+public class PersonAgent : MonoBehaviourPun
 {
     [Header("Wandering")]
     public float wanderRadius = 10f;
@@ -41,6 +42,10 @@ public class PersonAgent : MonoBehaviour
 
     void Update()
     {
+        if (GameStateManager.isServerTest && !PhotonNetwork.IsMasterClient)
+        {
+            return;
+        }
         animator.SetFloat("Speed", agent.velocity.magnitude);
 
         if (currentState != previousState)
@@ -48,20 +53,20 @@ public class PersonAgent : MonoBehaviour
             Debug.Log($"{gameObject.name} | State changed: {previousState} → {currentState}");
             previousState = currentState;
         }
-
+        
         switch (currentState)
         {
             case State.Wander:
-                HandleWander();
+                photonView.RPC(nameof(HandleWander), RpcTarget.All);
                 break;
             case State.Chase:
-                HandleChase();
+                photonView.RPC(nameof(HandleChase), RpcTarget.All);
                 break;
             case State.Attack:
-                HandleAttack();
+                photonView.RPC(nameof(HandleAttack), RpcTarget.All);
                 break;
             case State.Return:
-                HandleReturn();
+                photonView.RPC(nameof(HandleReturn), RpcTarget.All);
                 break;
         }
     }
@@ -96,7 +101,8 @@ public class PersonAgent : MonoBehaviour
             }
         }
     }
-
+    
+    [PunRPC]
     private void HandleWander()
     {
         timer += Time.deltaTime;
@@ -114,7 +120,8 @@ public class PersonAgent : MonoBehaviour
             currentState = State.Chase;
         }
     }
-
+    
+    [PunRPC]
     private void HandleChase()
     {
         if (targetPlayer == null)
@@ -144,7 +151,8 @@ public class PersonAgent : MonoBehaviour
             agent.SetDestination(lastDestination);
         }
     }
-
+    
+    [PunRPC]
     private void HandleAttack()
     {
         if (targetPlayer == null)
@@ -165,7 +173,8 @@ public class PersonAgent : MonoBehaviour
             currentState = State.Chase;
         }
     }
-
+    
+    [PunRPC]
     private void HandleReturn()
     {
         Debug.Log($"{gameObject.name} | Return: Returning to last destination.");
