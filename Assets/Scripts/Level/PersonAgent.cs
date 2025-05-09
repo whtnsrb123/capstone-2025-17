@@ -57,16 +57,16 @@ public class PersonAgent : MonoBehaviourPun
         switch (currentState)
         {
             case State.Wander:
-                photonView.RPC(nameof(HandleWander), RpcTarget.All);
+                InvokedStateMethod(nameof(HandleWander));
                 break;
             case State.Chase:
-                photonView.RPC(nameof(HandleChase), RpcTarget.All);
+                InvokedStateMethod(nameof(HandleChase));
                 break;
             case State.Attack:
-                photonView.RPC(nameof(HandleAttack), RpcTarget.All);
+                InvokedStateMethod(nameof(HandleAttack));
                 break;
             case State.Return:
-                photonView.RPC(nameof(HandleReturn), RpcTarget.All);
+                InvokedStateMethod(nameof(HandleReturn));
                 break;
         }
     }
@@ -76,6 +76,18 @@ public class PersonAgent : MonoBehaviourPun
         if (currentState == State.Wander || currentState == State.Chase || currentState == State.Attack)
         {
             UpdateChaseStateIfNeeded();
+        }
+    }
+
+    void InvokedStateMethod(string methodName)
+    {
+        if (GameStateManager.isServerTest)
+        {
+            photonView.RPC(methodName, RpcTarget.All);
+        }
+        else
+        {
+            SendMessage(methodName);
         }
     }
 
