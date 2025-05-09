@@ -32,12 +32,16 @@ public class PersonAgent : MonoBehaviourPun
     private State previousState = State.Wander;
     public bool isAttacking = false;
 
+    public Transform grabTarget;
+    private PersonHand hand;
+
     private Vector3 lastDestination;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
+        hand = GetComponentInChildren<PersonHand>( );
         SetNewDestination();
     }
 
@@ -172,10 +176,14 @@ public class PersonAgent : MonoBehaviourPun
         Debug.Log($"{gameObject.name} | Attack: Triggered attack animation.");
     }
 
-    // 애니메이션 끝에 연결된 이벤트에서 호출됨
     public void OnAttackAnimationEnd()
     {
         isAttacking = false;
+
+        if(hand.target != null)
+        {
+            hand.DropPlayer(  );
+        }
         
         if (targetPlayer == null)
         {

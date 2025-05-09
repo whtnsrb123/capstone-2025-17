@@ -6,8 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="7ca77f44-c133-4a41-b675-4d0220a63863" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.capstone-2025-17/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.capstone-2025-17/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Arts/Levels/polyperfect/Low Poly Animated People/- Textures/Environment/crowd.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Arts/Levels/polyperfect/Low Poly Animated People/- Textures/Environment/crowd.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Arts/Levels/polyperfect/Low Poly Animated People/- Textures/Environment/flash.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Arts/Levels/polyperfect/Low Poly Animated People/- Textures/Environment/flash.mat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Arts/Levels/polyperfect/PersonNPC.controller" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Arts/Levels/polyperfect/PersonNPC.controller" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/MiniMap Render Texture 2.renderTexture" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/MiniMap Render Texture 2.renderTexture" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/Ingame/Mission1.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Ingame/Mission1.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/Ingame/Mission3.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Ingame/Mission3.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Level/PersonAgent.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Level/PersonAgent.cs" afterDir="false" />
@@ -21,6 +22,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Level/Mission/PersonHand.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Player/ChaseStateManager.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
@@ -143,7 +145,7 @@
       <workItem from="1746110839112" duration="4253000" />
       <workItem from="1746263803376" duration="3118000" />
       <workItem from="1746789470222" duration="3626000" />
-      <workItem from="1746803151504" duration="6600000" />
+      <workItem from="1746803151504" duration="8859000" />
     </task>
     <servers />
   </component>
