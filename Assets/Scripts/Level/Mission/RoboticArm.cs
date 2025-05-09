@@ -15,17 +15,13 @@ public class RoboticArm : MonoBehaviourPun
     {
         animator = GetComponent<Animator>();
         head = GetHead()[0];
-
+        
         if (GameStateManager.isServerTest && !PhotonNetwork.IsMasterClient) return;
 
         if (GameStateManager.isServerTest)
-        {
             photonView.RPC(nameof(RunArmRPC), RpcTarget.All);
-        }
         else
-        {
-            Invoke("RunArm", 5f);
-        }
+            StartCoroutine(RunArmLoop());
     }
 
     private RoboticArmHead[] GetHead()
@@ -36,18 +32,28 @@ public class RoboticArm : MonoBehaviourPun
     [PunRPC]
     private void RunArmRPC()
     {
-        Invoke("RunArm", 5f);
+        StartCoroutine(RunArmLoop());
     }
-    
+
+    private IEnumerator RunArmLoop()
+    {
+        while (true)
+        {
+            RunArm();
+            float delay = Random.Range(15f, 30f);
+            yield return new WaitForSeconds(delay);
+        }
+    }
+
     public void RunArm()
     {
         animator.SetTrigger("Run");
     }
-    
-    [PunRPC] //플레이어 드랍하는 타이밍이 언제일까요??
+
+    [PunRPC]
     public void TryDropPlayer()
     {
-        if(head.target == null) return;
+        if (head.target == null) return;
         head.DropPlayer();
     }
 }
