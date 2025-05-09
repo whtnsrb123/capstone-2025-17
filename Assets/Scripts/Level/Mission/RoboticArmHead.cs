@@ -1,18 +1,32 @@
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
-public class RoboticArmHead : MonoBehaviour
+public class RoboticArmHead : MonoBehaviourPun
 {
     public Transform target;
     public Transform pickPoint;
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.CompareTag("Player"))
-            PickPlayer(other.transform);
-    }
+        if (GameStateManager.isServerTest && !PhotonNetwork.IsMasterClient) return;
 
+        if (other.gameObject.CompareTag("Player"))
+        {
+            if (GameStateManager.isServerTest)
+            {
+                photonView.RPC(nameof(PickPlayer), RpcTarget.All, other.transform);
+            }
+            else
+            {
+                PickPlayer(other.transform);
+            }
+        }
+        
+    }
+    
+    [PunRPC]
     private void PickPlayer(Transform targetPlayer)
     {
         target = targetPlayer;

@@ -79,11 +79,11 @@ public class PersonAgent : MonoBehaviourPun
         }
     }
 
-    void InvokedStateMethod(string methodName)
+    void InvokedStateMethod(string methodName, RpcTarget target = RpcTarget.All)
     {
         if (GameStateManager.isServerTest)
         {
-            photonView.RPC(methodName, RpcTarget.All);
+            photonView.RPC(methodName, target);
         }
         else
         {

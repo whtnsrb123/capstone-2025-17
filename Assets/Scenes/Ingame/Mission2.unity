@@ -509,6 +509,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Wall_Outer_600 (13)
       objectReference: {fileID: 0}
+    - target: {fileID: 4012321271263964564, guid: 76668462bcc3fc144b1040577c59cd63,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 4388036955483338542, guid: 76668462bcc3fc144b1040577c59cd63,
         type: 3}
       propertyPath: m_LocalScale.y
@@ -887,6 +892,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Wall_Outer_600 (12)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4012321271263964564, guid: 76668462bcc3fc144b1040577c59cd63,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 4388036955483338542, guid: 76668462bcc3fc144b1040577c59cd63,
         type: 3}
@@ -1516,6 +1526,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Wall_Outer_600
       objectReference: {fileID: 0}
+    - target: {fileID: 4012321271263964564, guid: 76668462bcc3fc144b1040577c59cd63,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 4388036955483338542, guid: 76668462bcc3fc144b1040577c59cd63,
         type: 3}
       propertyPath: m_LocalScale.y
@@ -1851,6 +1866,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Wall_Outer_600 (14)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4012321271263964564, guid: 76668462bcc3fc144b1040577c59cd63,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 4388036955483338542, guid: 76668462bcc3fc144b1040577c59cd63,
         type: 3}
@@ -9041,6 +9061,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Wall_Outer_600 (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 4012321271263964564, guid: 76668462bcc3fc144b1040577c59cd63,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 4388036955483338542, guid: 76668462bcc3fc144b1040577c59cd63,
         type: 3}
       propertyPath: m_LocalScale.y
@@ -12818,6 +12843,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Wall_Outer_600 (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 4012321271263964564, guid: 76668462bcc3fc144b1040577c59cd63,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 4388036955483338542, guid: 76668462bcc3fc144b1040577c59cd63,
         type: 3}
       propertyPath: m_LocalScale.y
@@ -14216,6 +14246,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Wall_Outer_600 (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4012321271263964564, guid: 76668462bcc3fc144b1040577c59cd63,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 4388036955483338542, guid: 76668462bcc3fc144b1040577c59cd63,
         type: 3}
