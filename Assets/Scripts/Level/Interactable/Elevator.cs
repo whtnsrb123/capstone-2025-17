@@ -24,7 +24,7 @@ public class Elevator : MonoBehaviourPun, IInteractable
         StartCoroutine(MoveElevator());
         
         //일단 급한대로 이렇게.. 엘베 내려와 있으면 RPC로 엘베 올라감
-        if (GameStateManager.isServerTest && isDown && PhotonNetwork.IsMasterClient)
+        if (GameStateManager.isServerTest && isDown)
         {
             photonView.RPC(nameof(UpElevatorRPC), RpcTarget.All);
         }
