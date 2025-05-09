@@ -26,6 +26,11 @@ public class InputManager : MonoBehaviour
 
     void Update()
     {
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("lift")
+        || animator.GetCurrentAnimatorStateInfo(0).IsName("lift Reverse"))
+        {
+            return;
+        }
         UpdateRotate();   // 캐릭터 회전
         // F 키: 물체 잡기/놓기
         if (Input.GetKeyDown(KeyCode.F))

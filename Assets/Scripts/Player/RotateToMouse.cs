@@ -12,9 +12,11 @@ public class RotateToMouse : MonoBehaviour
 
     private float eulerAngleX;  // 현재 X축 회전 각도
     private float eulerAngleY;  // 현재 Y축 회전 각도
+    public Animator animator; 
 
     public void UpdateRotate(float mouseX, float mouseY)
     {
+        
         // Y축 회전
         eulerAngleY += mouseX * rotCamYAxisSpeed;
 

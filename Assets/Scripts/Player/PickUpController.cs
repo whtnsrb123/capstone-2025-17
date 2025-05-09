@@ -1,13 +1,12 @@
 using UnityEngine;
 using TMPro;
+using System.Collections;
 
 public class PickUpController : MonoBehaviour
 {
     private float defaultMass; // 물체의 원래 질량
     private float defaultDrag; // 물체의 원래 저항력
     private float defaultAngularDrag; // 물체의 원래 각속도 저항력
-
-
 
     public Transform raycastPosition;         // 레이캐스트 시작 위치 (카메라)
     public Transform pickPosition;            // 물체를 들 위치 (손 위치)
@@ -53,6 +52,7 @@ public class PickUpController : MonoBehaviour
 
         InitializeTrajectoryLine();
     }
+    //궤적
     private void InitializeTrajectoryLine()
     {
         trajectoryLine.enabled = true;
@@ -151,7 +151,7 @@ public class PickUpController : MonoBehaviour
             DropObject(); // 놓기
         }
     }
-    private void TryPickUp()
+    /*private void TryPickUp()
     {
         if (detectedObject == null) return;
         if (detectedObject == recentlyThrownObject && throwTimer > 0f)
@@ -180,9 +180,50 @@ public class PickUpController : MonoBehaviour
             originalRotation = heldObject.transform.rotation;
         }
     }
+*/
+    private bool isPickingUp = false; // 중복 줍기 방지용
+
+    public void TryPickUp()
+    {
+        if (isPickingUp) return; // 이미 줍는 중이면 무시
+        if (detectedObject == null) return; // 감지된 오브젝트 없으면 무시
+    
+        StartCoroutine(PickUpWithDelay(0.8f));
+    }
+
+    private IEnumerator PickUpWithDelay(float delay)
+    {
+        isPickingUp = true;
+        yield return new WaitForSeconds(delay);
+
+        if (detectedObject == null || heldObject != null)
+        {
+            isPickingUp = false;
+            yield break;
+        }
+
+        heldObject = detectedObject;
+        heldObjectRb = heldObject.GetComponent<Rigidbody>();
+        if (heldObjectRb != null)
+        {
+            heldObjectRb.isKinematic = false;
+            heldObjectRb.useGravity = false;
+
+            heldObject.layer = LayerMask.NameToLayer("HeldObject");
+            originalRotation = heldObject.transform.rotation;
+            Debug.Log("물체 잡기 성공: " + heldObject.name);
+        }
+        else
+        {
+            heldObject = null;
+        }
+        isPickingUp = false;
+    }
 
 
-    public void DropObject()
+
+
+    /*public void DropObject()
     {
         if (heldObject != null)
         {
@@ -197,11 +238,56 @@ public class PickUpController : MonoBehaviour
         }
         ResetHeldObject();
     }
+*/
+    private bool isDropping = false; // 중복 방지용
+
+    public void DropObject()
+    {
+        if (isDropping) return;      // 이미 내려놓는 중이면 무시
+        if (heldObject == null) return; // 들고 있는 물체 없으면 무시
+
+        StartCoroutine(DropWithDelay(0.8f));
+    }
+
+    private IEnumerator DropWithDelay(float delay)
+    {
+        isDropping = true;
+        yield return new WaitForSeconds(delay);
+
+        // 딜레이 중에 heldObject가 사라졌으면 중단
+        if (heldObject == null)
+        {
+            isDropping = false;
+            yield break;
+        }
+
+        // 기존 DropObject 처리
+        heldObjectRb.useGravity = true;
+        heldObjectRb.isKinematic = false;
+        heldObjectRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        heldObject.layer = LayerMask.NameToLayer("Default");
+        Debug.Log("물체 놓기: " + heldObject.name);
+
+        heldObject = null;
+        heldObjectRb = null;
+
+        isDropping = false;
+    }
 
     public void ThrowObject()
     {
         if (heldObject != null && heldObjectRb != null)
         {
+            StartCoroutine(ThrowWithDelay(0.7f));
+        }
+    }
+    private IEnumerator ThrowWithDelay(float delay)
+    {
+
+        yield return new WaitForSeconds(delay);
+        if (heldObject != null && heldObjectRb != null)
+        {
+
             heldObjectRb.mass = defaultMass;
             heldObjectRb.drag = defaultDrag;
             heldObjectRb.angularDrag = defaultAngularDrag;
@@ -218,6 +304,7 @@ public class PickUpController : MonoBehaviour
             recentlyThrownObject = heldObject;
             throwTimer = throwCooldownTime;
         }
+
 
         ResetHeldObject();
     }

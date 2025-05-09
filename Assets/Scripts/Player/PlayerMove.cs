@@ -10,10 +10,10 @@ public class CharacterController : MonoBehaviour
     private float acceleration = 20f;                                       // 이동 가속도
 
     private bool isGrounded;                                // 캐릭터가 땅에 닿아 있는지 여부
-    private Rigidbody rb;                                       // 캐릭터의 Rigidbody 컴포넌트
+    private Rigidbody rb;  
 
     // 물에 젖은 상태 관리
-    private bool isWet = false;            // 물에 젖었는지 여부
+    private bool isWet = false;            // 물에 젖었는지
     private float originalMoveSpeed;       // 원래 걷기 속도
     private float originalSprintSpeed;     // 원래 달리기 속도
     private float originalJumpForce;       // 원래 점프 힘
@@ -65,6 +65,12 @@ public class CharacterController : MonoBehaviour
 
     void Update()
     {
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("lift")
+        || animator.GetCurrentAnimatorStateInfo(0).IsName("lift Reverse"))
+        {
+            return;
+        }
+
         MoveCharacter();  // 이동
         HandleJump();     // 점프
         CheckGrounded();  // 땅에 닿아 있는지 감지
@@ -112,7 +118,6 @@ public class CharacterController : MonoBehaviour
         }
         else
         {
-            // 목표 속도까지 부드럽게 변경
             Vector3 newVelocity = Vector3.Lerp(currentVelocity, targetVelocity, acceleration * Time.deltaTime);
             rb.velocity = new Vector3(newVelocity.x, rb.velocity.y, newVelocity.z);
 
