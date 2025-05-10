@@ -257,6 +257,17 @@ public class PickUpController : MonoBehaviourPun
         }
 
     }
+    
+    [PunRPC]
+    void RPC_ClearParent(int objectViewID)
+    {
+        PhotonView objView = PhotonView.Find(objectViewID);
+
+        if (objView == null) return;
+
+        Transform objTransform = objView.transform;
+        objTransform.SetParent(null); // 부모 해제
+    }
 
 
 
@@ -319,7 +330,7 @@ public class PickUpController : MonoBehaviourPun
         heldObjectRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
         heldObject.layer = LayerMask.NameToLayer("Default");
         Debug.Log("물체 놓기: " + heldObject.name);
-        objView.transform.parent = null;
+        photonView.RPC(nameof(RPC_ClearParent), RpcTarget.All, objectViewID);
         //heldObject.transform.parent = null;
         heldObject = null;
         heldObjectRb = null;
