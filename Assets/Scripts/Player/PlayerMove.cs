@@ -66,7 +66,10 @@ public class CharacterController : MonoBehaviour
     void Update()
     {
         if (animator.GetCurrentAnimatorStateInfo(0).IsName("lift")
-        || animator.GetCurrentAnimatorStateInfo(0).IsName("lift Reverse"))
+        || animator.GetCurrentAnimatorStateInfo(0).IsName("lift Reverse")
+        || animator.GetCurrentAnimatorStateInfo(0).IsName("Falling")
+        || animator.GetCurrentAnimatorStateInfo(0).IsName("Fall Impact")
+        || animator.GetCurrentAnimatorStateInfo(0).IsName("Getting Up"))
         {
             return;
         }

@@ -3,8 +3,8 @@ using TMPro;
 
 public class InteractManager : MonoBehaviour
 {
-    public Transform cameraMount; // 카메라 기준 위치 (CameraMount)
-    private Transform raycastPosition; // 내부에서 사용하는 레이 발사 위치
+    public Transform cameraMount;
+    private Transform raycastPosition;
 
     public float detectionRange = 10f;
     public TMP_Text descriptionText;
@@ -19,9 +19,9 @@ public class InteractManager : MonoBehaviour
     private PlayerPushController pushController;
     private InteractController interactController;
 
-    // 애니메이터 관련 변수
-    public Animator animator; // 애니메이터 컴포넌트 연결
-    public string liftTriggerName = "IsLift"; // 애니메이터 트리거 이름
+
+    public Animator animator; 
+    public string liftTriggerName = "IsLift";
     public string IsPutName = "IsPut";
 
     void Start()
@@ -29,7 +29,6 @@ public class InteractManager : MonoBehaviour
         pickUpController = GetComponent<PickUpController>();
         interactController = GetComponent<InteractController>();
 
-        // cameraMount 자동 연결
         if (cameraMount == null && Camera.main != null)
             cameraMount = Camera.main.transform;
 
@@ -120,10 +119,10 @@ public class InteractManager : MonoBehaviour
 
     public void OnInput()
     {
-        if (heldObject != null) // 들고 있는 물체가 있다면
+        if (heldObject != null)
         {
-            pickUpController.HandlePickUpOrDrop(); // 물체를 내려놓습니다.
-            animator.SetTrigger(IsPutName); // IsPut 트리거 활성화 
+            pickUpController.HandlePickUpOrDrop(); 
+            animator.SetTrigger(IsPutName);
             return;
         }
 
@@ -133,7 +132,7 @@ public class InteractManager : MonoBehaviour
         if (isPickable)
         {
             pickUpController.HandlePickUpOrDrop();
-            animator.SetTrigger(liftTriggerName); // PickUp 시 애니메이터 트리거 활성화
+            animator.SetTrigger(liftTriggerName); 
         }
         else if (isPickable == false)
         {

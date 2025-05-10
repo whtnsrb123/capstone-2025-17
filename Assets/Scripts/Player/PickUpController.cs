@@ -6,54 +6,47 @@ public class PickUpController : MonoBehaviour
 {
     private float defaultMass; // 물체의 원래 질량
     private float defaultDrag; // 물체의 원래 저항력
-    private float defaultAngularDrag; // 물체의 원래 각속도 저항력
+    private float defaultAngularDrag;
 
-    public Transform raycastPosition;         // 레이캐스트 시작 위치 (카메라)
-    public Transform pickPosition;            // 물체를 들 위치 (손 위치)
-    public GameObject heldObject;             // 현재 들고 있는 물체
-    private Rigidbody heldObjectRb;           // 들고 있는 물체의 Rigidbody
-    public GameObject detectedObject;         // 감지된 물체
+    public Transform raycastPosition;
+    public Transform pickPosition;
+    public GameObject heldObject;
+    private Rigidbody heldObjectRb;
+    public GameObject detectedObject;
 
     private float detectionRange = 2f;        // 감지 거리
     private float pickUpOffset = 0.5f;        // 손과 물체 사이 거리
-    [SerializeField] private TMP_Text pickUpUI; // UI 텍스트: "Press F to Drop"
-    private PlayerPushController pushController;
-    [SerializeField] private float throwForce = 10f; // 던지는 힘
+    [SerializeField] private TMP_Text pickUpUI;
+    [SerializeField] private float throwForce = 10f;
 
-    [SerializeField] private LineRenderer trajectoryLine; // 궤적 라인
-    private int trajectoryPoints = 50;        // 궤적 점 수
-    private float timeBetweenPoints = 0.03f;  // 점 간 시간
+    [SerializeField] private LineRenderer trajectoryLine;
+    private int trajectoryPoints = 50;       
+    private float timeBetweenPoints = 0.03f; 
     [SerializeField] private float dashLength = 0.1f; // 점 길이
-    [SerializeField] private float dashGap = 0.05f;   // 점 간 간격
+    [SerializeField] private float dashGap = 0.05f; 
     private float crosshairSize = 50f;        // 에임 크기
 
-    [SerializeField] private float holdFollowSpeed = 60f;  // 손 위치로 빠르게 이동
-    [SerializeField] private float holdRotateSpeed = 10f;  // 손 회전 따라오는 속도
+    [SerializeField] private float holdFollowSpeed = 60f; 
+    [SerializeField] private float holdRotateSpeed = 10f; 
 
     private Quaternion originalRotation; // 처음 잡았던 회전값 저장
-    private bool isTouching = false;     // 다른 물체에 닿아 있는지 여부
+    private bool isTouching = false;
     private Quaternion heldRotationOffset = Quaternion.identity; // R키로 회전한 상태 누적 저장
-    private InteractManager interactManager;
+    
     private GameObject recentlyThrownObject;
-    private float throwCooldownTime = 1.0f; // 1초간 재감지 금지
+    private float throwCooldownTime = 1.0f;
     private float throwTimer = 0f;
 
     void Start()
     {
-        interactManager = GetComponent<InteractManager>();
-        pushController = GetComponent<PlayerPushController>();
-
-        // 카메라 기준으로 레이 시작 위치 지정
         Camera mainCamera = Camera.main;
         raycastPosition = mainCamera.transform;
 
-        // UI 텍스트 비활성화
         if (pickUpUI != null) pickUpUI.enabled = false;
 
         InitializeTrajectoryLine();
     }
-    //궤적
-    private void InitializeTrajectoryLine()
+    private void InitializeTrajectoryLine() // 궤적
     {
         trajectoryLine.enabled = true;
         trajectoryLine.positionCount = 0;
