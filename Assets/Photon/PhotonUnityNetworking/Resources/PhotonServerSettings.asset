@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: PhotonServerSettings
   m_EditorClassIdentifier: 
   AppSettings:
-    AppIdRealtime: 
+    AppIdRealtime: 93618e2b-05e4-4b14-b6c8-b83c0782a202
     AppIdFusion: 
     AppIdChat: 
-    AppIdVoice: 
+    AppIdVoice: 93618e2b-05e4-4b14-b6c8-b83c0782a202
     AppVersion: 
     UseNameServer: 1
-    FixedRegion: 
+    FixedRegion: kr
     Server: 
     Port: 0
     ProxyServer: 
@@ -39,6 +39,38 @@ MonoBehaviour:
   - ClickRpc
   - DestroyRpc
   - HeresWhy
+  - ActivateGimmickRPC
+  - DestroySpaceship
+  - EndGame
+  - Fire
+  - GameClear
+  - GameOver
+  - HandleAttack
+  - HandleChase
+  - HandleReturn
+  - HandleWander
+  - MissionComplete
+  - PickPlayer
+  - RequestUpdatePlayerEscaped
+  - RequestUpdatePlayerState
+  - RespawnSpaceship
+  - RPC_DropObject
+  - RPC_OnInput
+  - RPC_OnTimeUp
+  - RPC_PushPlayer
+  - RPC_RotateHeldObject
+  - RPC_SetParent
+  - RPC_StartTimer
+  - RPC_ThrowObject
+  - RPC_TryPickUp
+  - RpcUpdatePlayerEscaped
+  - RpcUpdatePlayerState
+  - RunArmRPC
+  - SetLoaded
+  - SetUIVisibility
+  - StartGame
+  - SyncGameState
+  - TryDropPlayer
   DisableAutoOpenWizard: 1
-  ShowSettings: 0
+  ShowSettings: 1
   DevRegionSetOnce: 0

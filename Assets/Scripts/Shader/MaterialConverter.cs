@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 using UnityEditor;
 using System.Linq;
 
@@ -15,21 +15,21 @@ public class MaterialConverter : EditorWindow
 
     private void OnGUI()
     {
-        GUILayout.Label("º¯°æÇÒ ¿ÀºêÁ§Æ®", EditorStyles.boldLabel);
+        GUILayout.Label("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®", EditorStyles.boldLabel);
         newMaterial = (Material)EditorGUILayout.ObjectField("New Material", newMaterial, typeof(Material), false);
 
-        GUILayout.Label("º¯°æÇÒ Layer", EditorStyles.boldLabel);
+        GUILayout.Label("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Layer", EditorStyles.boldLabel);
         newLayer = EditorGUILayout.LayerField("New Layer", newLayer);
 
-        // ¼±ÅÃÇÑ ¿ÀºêÁ§Æ®¸¸ º¯°æ
-        GUILayout.Label("¼±ÅÃµÈ ¿ÀºêÁ§Æ®ÀÇ ¸ðµç ¸ÓÅ×¸®¾ó º¯°æ (BaseMap À¯Áö)", EditorStyles.boldLabel);
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        GUILayout.Label("ï¿½ï¿½ï¿½Ãµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½×¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (BaseMap ï¿½ï¿½ï¿½ï¿½)", EditorStyles.boldLabel);
         if (GUILayout.Button("Change Materials") && newMaterial != null)
         {
             ChangeSelectedMaterials();
         }
 
-        // ¸ðµç MaterialÀÌ Àû¿ëµÈ ¿ÀºêÁ§Æ® º¯°æ 
-        GUILayout.Label("¹èÄ¡µÈ ¸ðµç ¿ÀºêÁ§Æ®ÀÇ ¸ðµç ¸ÓÅ×¸®¾ó º¯°æ (BaseMap À¯Áö)", EditorStyles.boldLabel);
+        // ï¿½ï¿½ï¿½ Materialï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ 
+        GUILayout.Label("ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½×¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (BaseMap ï¿½ï¿½ï¿½ï¿½)", EditorStyles.boldLabel);
         if (GUILayout.Button("Change All Materials") && newMaterial != null)
         {
             ChangeAllMaterials();
@@ -41,18 +41,18 @@ public class MaterialConverter : EditorWindow
         Renderer[] renderers;
         renderers = Selection.gameObjects
            .Select(go => go.GetComponent<Renderer>())
-           .Where(r => r != null) // Renderer°¡ ¾ø´Â GameObject´Â Á¦¿Ü
+           .Where(r => r != null) // Rendererï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ GameObjectï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
            .ToArray();
         ChangeMaterials(renderers);
 
-        Debug.Log("¼±ÅÃµÈ ¿ÀºêÁ§Æ®ÀÇ ¸ðµç ¸ÓÅ×¸®¾óÀ» º¯°æÇÏ¿´½À´Ï´Ù.");
+        Debug.Log("ï¿½ï¿½ï¿½Ãµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½×¸ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
     }
 
     private void ChangeAllMaterials()
     {
         ChangeMaterials(FindObjectsOfType<Renderer>());
 
-        Debug.Log("¸ðµç ¿ÀºêÁ§Æ®ÀÇ ¸ðµç ¸ÓÅ×¸®¾óÀ» º¯°æÇÏ¿´½À´Ï´Ù.");
+        Debug.Log("ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½×¸ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
     }
 
     private void ChangeMaterials(Renderer[] renderers)
@@ -61,22 +61,22 @@ public class MaterialConverter : EditorWindow
         {
             if (renderer != null)
             {
-                Material[] oldMaterials = renderer.sharedMaterials; // ¸ðµç ¸ÓÅ×¸®¾ó °¡Á®¿À±â
-                Material[] newMaterials = new Material[oldMaterials.Length]; // º¯°æÇÒ ¸ÓÅ×¸®¾ó ¹è¿­ »ý¼º
+                Material[] oldMaterials = renderer.sharedMaterials; // ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½×¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+                Material[] newMaterials = new Material[oldMaterials.Length]; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½×¸ï¿½ï¿½ï¿½ ï¿½è¿­ ï¿½ï¿½ï¿½ï¿½
 
                 for (int i = 0; i < oldMaterials.Length; i++)
                 {
                     Material oldMaterial = oldMaterials[i];
                     if (oldMaterial != null)
                     {
-                        // ±âÁ¸ BaseMap ÅØ½ºÃ³ °¡Á®¿À±â
+                        // ï¿½ï¿½ï¿½ï¿½ BaseMap ï¿½Ø½ï¿½Ã³ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                         Texture baseMapTexture = oldMaterial.GetTexture("_BaseMap");
                         Color color = oldMaterial.GetColor("_BaseColor");
 
                         Undo.RecordObject(renderer, "Change Material");
                         Material newMatInstance = new Material(newMaterial);
 
-                        // ±âÁ¸ BaseMap ÅØ½ºÃ³°¡ ÀÖÀ¸¸é À¯Áö
+                        // ï¿½ï¿½ï¿½ï¿½ BaseMap ï¿½Ø½ï¿½Ã³ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                         if (baseMapTexture != null)
                         {
                             newMatInstance.SetTexture("_BaseMap", baseMapTexture);
@@ -87,10 +87,10 @@ public class MaterialConverter : EditorWindow
                     }
                 }
 
-                renderer.sharedMaterials = newMaterials; // ¸ðµç ¸ÓÅ×¸®¾ó ±³Ã¼
+                renderer.sharedMaterials = newMaterials; // ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½×¸ï¿½ï¿½ï¿½ ï¿½ï¿½Ã¼
                 EditorUtility.SetDirty(renderer);
             }
             renderer.gameObject.layer = newLayer;
         }
     }
-}
+}*/
