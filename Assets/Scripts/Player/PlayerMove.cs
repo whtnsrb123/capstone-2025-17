@@ -14,6 +14,8 @@ public class CharacterController : MonoBehaviourPun
 
     private bool isGrounded;                                // 캐릭터가 땅에 닿아 있는지 여부
     private Rigidbody rb;  
+    private RotateToMouse rotateToMouse;
+    private Transform cameraTransform;
 
     // 물에 젖은 상태 관리
     private bool isWet = false;            // 물에 젖었는지
@@ -53,7 +55,7 @@ public class CharacterController : MonoBehaviourPun
         Cursor.visible = false;
 
         // 마우스 회전 관련 컴포넌트 가져오기
-        rotateToMouse = GetComponent<rotateToMouse>();
+        rotateToMouse = GetComponent<RotateToMouse>();
     }
 
 
@@ -151,6 +153,8 @@ public class CharacterController : MonoBehaviourPun
         {
             Vector3 newVelocity = Vector3.Lerp(currentVelocity, targetVelocity, acceleration * Time.deltaTime);
             rb.velocity = new Vector3(newVelocity.x, rb.velocity.y, newVelocity.z);
+        }
+    }
 
     // 마우스 입력을 받아 캐릭터 회전 처리
     void UpdateRotate()

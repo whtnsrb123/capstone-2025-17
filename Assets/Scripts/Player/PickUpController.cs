@@ -239,7 +239,7 @@ public class PickUpController : MonoBehaviourPun
 
         Transform pickPos = playerView.transform.Find("pickPosition");
 
-
+    }
 
 
 
@@ -334,7 +334,8 @@ public class PickUpController : MonoBehaviourPun
             heldObject = null;
             heldObjectRb = null;
             Debug.Log("로컬 플레이어 물체 놓기 완료");
-    
+        }
+    }
 
     public void ThrowObject()
     {

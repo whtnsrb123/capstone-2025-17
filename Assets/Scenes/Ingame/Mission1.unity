@@ -2479,7 +2479,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!81 &302360271
 AudioListener:
   m_ObjectHideFlags: 0
@@ -19657,7 +19657,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd1273a3dd0b60e4a961ee534f4e3039, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 6683843909272647973, guid: 42047da27c2e60f4099de582970495dd,
+  playerPrefab: {fileID: 984485247083863301, guid: 822ea2a44769944c3a5e7d0aa44e0d0a,
     type: 3}
   spawnPoints:
   - {fileID: 1411992417}

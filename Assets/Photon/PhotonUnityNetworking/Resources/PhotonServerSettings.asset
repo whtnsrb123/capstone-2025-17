@@ -64,6 +64,10 @@ MonoBehaviour:
   - RPC_ThrowObject
   - UnRegisterPlayerGoal
   - UpElevatorRPC
+  - RPC_OnInput
+  - RPC_PushPlayer
+  - RPC_RotateHeldObject
+  - RPC_TryPickUp
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
