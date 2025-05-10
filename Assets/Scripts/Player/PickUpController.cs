@@ -1,8 +1,9 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using Photon.Pun;
 
-public class PickUpController : MonoBehaviour
+public class PickUpController : MonoBehaviourPun
 {
     private float defaultMass; // 물체의 원래 질량
     private float defaultDrag; // 물체의 원래 저항력
@@ -77,6 +78,7 @@ public class PickUpController : MonoBehaviour
 
     void Update()
     {
+        if (GameStateManager.isServerTest && !photonView.IsMine) return;
         if (throwTimer > 0f)
             throwTimer -= Time.deltaTime;
 
@@ -98,6 +100,7 @@ public class PickUpController : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (GameStateManager.isServerTest && !photonView.IsMine) return;
         // 궤적 그리기
         DisplayTrajectory();
 
@@ -178,6 +181,18 @@ public class PickUpController : MonoBehaviour
 
     public void TryPickUp()
     {
+        if (GameStateManager.isServerTest)
+        {
+            photonView.RPC(nameof(RPC_TryPickUp), RpcTarget.All);
+        }
+        else
+        {
+            RPC_TryPickUp();
+        }
+    }
+    [PunRPC]
+    public void RPC_TryPickUp()
+    {
         if (isPickingUp) return; // 이미 줍는 중이면 무시
         if (detectedObject == null) return; // 감지된 오브젝트 없으면 무시
     
@@ -236,6 +251,18 @@ public class PickUpController : MonoBehaviour
 
     public void DropObject()
     {
+        if (GameStateManager.isServerTest)
+        {
+            photonView.RPC(nameof(RPC_DropObject), RpcTarget.All);
+        }
+        else
+        {
+            RPC_DropObject();
+        }
+    }
+    [PunRPC]
+    public void RPC_DropObject()
+    {
         if (isDropping) return;      // 이미 내려놓는 중이면 무시
         if (heldObject == null) return; // 들고 있는 물체 없으면 무시
 
@@ -268,6 +295,19 @@ public class PickUpController : MonoBehaviour
     }
 
     public void ThrowObject()
+    {
+        if (GameStateManager.isServerTest)
+        {
+            photonView.RPC(nameof(RPC_ThrowObject), RpcTarget.All);
+        }
+        else
+        {
+            RPC_ThrowObject();
+        }
+    }
+    
+    [PunRPC]
+    public void RPC_ThrowObject()
     {
         if (heldObject != null && heldObjectRb != null)
         {
@@ -366,6 +406,18 @@ public class PickUpController : MonoBehaviour
     }
 
     public void RotateHeldObject()
+    {
+        if (GameStateManager.isServerTest)
+        {
+            photonView.RPC(nameof(RPC_RotateHeldObject), RpcTarget.All);
+        }
+        else
+        {
+            RPC_RotateHeldObject();
+        }
+    }
+    [PunRPC]
+    public void RPC_RotateHeldObject()
     {
         heldRotationOffset *= Quaternion.Euler(0, 0, -90);
         Debug.Log("물체 회전");

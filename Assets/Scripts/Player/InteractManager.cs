@@ -1,7 +1,8 @@
+using Photon.Pun;
 using UnityEngine;
 using TMPro;
 
-public class InteractManager : MonoBehaviour
+public class InteractManager : MonoBehaviourPun
 {
     public Transform cameraMount;
     private Transform raycastPosition;
@@ -42,6 +43,7 @@ public class InteractManager : MonoBehaviour
 
     void Update()
     {
+        if (GameStateManager.isServerTest && !photonView.IsMine) return;
         DetectObject();
         heldObject = pickUpController.heldObject; // PickUpController에서 들고 있는 물체 정보를 가져옴
     }
@@ -116,8 +118,19 @@ public class InteractManager : MonoBehaviour
             descriptionText.text = text;
         }
     }
-
     public void OnInput()
+    {
+        if(GameStateManager.isServerTest)
+        {
+            photonView.RPC(nameof(RPC_OnInput), RpcTarget.All);
+        }
+        else
+        {
+            RPC_OnInput();
+        }
+    }
+    [PunRPC]
+    public void RPC_OnInput()
     {
         if (heldObject != null)
         {

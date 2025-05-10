@@ -1,8 +1,9 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using Photon.Pun;
 
-public class PlayerPushController : MonoBehaviour
+public class PlayerPushController : MonoBehaviourPun
 {
     private float pushForce = 3f; 
     private Rigidbody targetPlayerRb; 
@@ -64,6 +65,18 @@ public class PlayerPushController : MonoBehaviour
     }
 
     public void PushPlayer()
+    {
+        if (GameStateManager.isServerTest)
+        {
+            photonView.RPC(nameof(RPC_PushPlayer), RpcTarget.All);
+        }
+        else
+        {
+            RPC_PushPlayer();
+        }
+    }
+    [PunRPC]
+    public void RPC_PushPlayer()
     {
         isPushing = true; // 밀치는 중
 

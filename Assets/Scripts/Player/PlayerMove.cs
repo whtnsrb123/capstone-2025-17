@@ -1,7 +1,8 @@
 using UnityEngine;
 using System.Collections;
+using Photon.Pun;
 
-public class CharacterController : MonoBehaviour
+public class CharacterController : MonoBehaviourPun
 {
     [SerializeField] private float moveSpeed = 2f;              // 걷기 속도
     [SerializeField] private float sprintSpeed = 3f;             // 달리기 속도
@@ -65,6 +66,7 @@ public class CharacterController : MonoBehaviour
 
     void Update()
     {
+        if (GameStateManager.isServerTest && !photonView.IsMine) return;
         if (animator.GetCurrentAnimatorStateInfo(0).IsName("lift")
         || animator.GetCurrentAnimatorStateInfo(0).IsName("lift Reverse")
         || animator.GetCurrentAnimatorStateInfo(0).IsName("Falling")
