@@ -1787,7 +1787,6 @@ GameObject:
   - component: {fileID: 3184361188950647164}
   - component: {fileID: 2289562907432031086}
   - component: {fileID: 5227910973733861240}
-  - component: {fileID: 6118111455282328293}
   m_Layer: 5
   m_Name: PickUpText
   m_TagString: Untagged
@@ -1911,29 +1910,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &6118111455282328293
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3139396858403170618}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d732acaa1bf77426aa3cfa9baf61ed5a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  raycastPosition: {fileID: 0}
-  pickPosition: {fileID: 0}
-  heldObject: {fileID: 0}
-  detectedObject: {fileID: 0}
-  pickUpUI: {fileID: 0}
-  throwForce: 2
-  trajectoryLine: {fileID: 0}
-  dashLength: 0.1
-  dashGap: 0.05
-  holdFollowSpeed: 20
-  holdRotateSpeed: 10
 --- !u!1 &3309431092154226834
 GameObject:
   m_ObjectHideFlags: 0
@@ -2271,7 +2247,6 @@ GameObject:
   - component: {fileID: 636252831682226609}
   - component: {fileID: 24879048439712697}
   - component: {fileID: 8575465511554801602}
-  - component: {fileID: 7842891104537399623}
   m_Layer: 5
   m_Name: PushText
   m_TagString: Untagged
@@ -2395,29 +2370,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &7842891104537399623
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3953231247588195659}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d732acaa1bf77426aa3cfa9baf61ed5a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  raycastPosition: {fileID: 0}
-  pickPosition: {fileID: 0}
-  heldObject: {fileID: 0}
-  detectedObject: {fileID: 0}
-  pickUpUI: {fileID: 0}
-  throwForce: 2
-  trajectoryLine: {fileID: 0}
-  dashLength: 0.1
-  dashGap: 0.05
-  holdFollowSpeed: 20
-  holdRotateSpeed: 10
 --- !u!1 &3975978042845909634
 GameObject:
   m_ObjectHideFlags: 0
