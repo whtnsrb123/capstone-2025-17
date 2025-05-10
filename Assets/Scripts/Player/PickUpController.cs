@@ -289,14 +289,15 @@ public class PickUpController : MonoBehaviourPun
             RPC_DropObject();
         }
     }
-    [PunRPC]
+
+    /*[PunRPC]
     public void RPC_DropObject()
     {
         if (isDropping) return;      // 이미 내려놓는 중이면 무시
         if (heldObject == null) return; // 들고 있는 물체 없으면 무시
         int objectViewID = heldObject.GetPhotonView().ViewID;
         StartCoroutine(DropWithDelay(0.8f, objectViewID));
-    }
+    }*/
 
     private IEnumerator DropWithDelay(float delay, int objectViewID)
     {
@@ -322,6 +323,7 @@ public class PickUpController : MonoBehaviourPun
 
         heldObject = null;
         heldObjectRb = null;
+        heldObject.transform.parent = null;
 
         isDropping = false;
     }
@@ -348,13 +350,10 @@ public class PickUpController : MonoBehaviourPun
             col.isTrigger = false;
         }
 
-        // 현재 플레이어가 이 오브젝트를 들고 있었으면 heldObject 해제
-        if (heldObject == objView.gameObject)
-        {
-            heldObject = null;
-            heldObjectRb = null;
-            Debug.Log("로컬 플레이어 물체 놓기 완료");
-        }
+        if (isDropping) return;      // 이미 내려놓는 중이면 무시
+        if (heldObject == null) return; // 들고 있는 물체 없으면 무시
+        int objectViewID = heldObject.GetPhotonView().ViewID;
+        StartCoroutine(DropWithDelay(0.8f, objectViewID));
     }
 
     public void ThrowObject()
