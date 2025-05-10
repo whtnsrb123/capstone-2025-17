@@ -1,3 +1,4 @@
+using Photon.Pun;
 using UnityEngine;
 using TMPro;
 using System.Collections;
@@ -78,10 +79,10 @@ public class PickUpController : MonoBehaviourPun
 
     void Update()
     {
+
         if (GameStateManager.isServerTest && !photonView.IsMine) return;
         if (throwTimer > 0f)
             throwTimer -= Time.deltaTime;
-
         Debug.DrawRay(raycastPosition.position, raycastPosition.forward * detectionRange, Color.red);
 
         if (heldObject != null)
@@ -227,6 +228,17 @@ public class PickUpController : MonoBehaviourPun
         }
         isPickingUp = false;
     }
+    
+    [PunRPC]
+    void RPC_SetParent(int objectViewID, int playerViewID)
+    {
+        PhotonView objView = PhotonView.Find(objectViewID);
+        PhotonView playerView = PhotonView.Find(playerViewID);
+
+        if (objView == null || playerView == null) return;
+
+        Transform pickPos = playerView.transform.Find("pickPosition");
+
 
 
 
@@ -293,6 +305,36 @@ public class PickUpController : MonoBehaviourPun
 
         isDropping = false;
     }
+    
+    [PunRPC]
+    void RPC_DropObject(int objectViewID)
+    {
+        PhotonView objView = PhotonView.Find(objectViewID);
+        if (objView == null) return;
+
+        objView.transform.parent = null;
+
+        Rigidbody rb = objView.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.isKinematic = false;
+            rb.useGravity = true;
+            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        }
+
+        Collider col = objView.GetComponent<Collider>();
+        if (col != null)
+        {
+            col.isTrigger = false;
+        }
+
+        // 현재 플레이어가 이 오브젝트를 들고 있었으면 heldObject 해제
+        if (heldObject == objView.gameObject)
+        {
+            heldObject = null;
+            heldObjectRb = null;
+            Debug.Log("로컬 플레이어 물체 놓기 완료");
+    
 
     public void ThrowObject()
     {
@@ -320,7 +362,6 @@ public class PickUpController : MonoBehaviourPun
         yield return new WaitForSeconds(delay);
         if (heldObject != null && heldObjectRb != null)
         {
-
             heldObjectRb.mass = defaultMass;
             heldObjectRb.drag = defaultDrag;
             heldObjectRb.angularDrag = defaultAngularDrag;
@@ -351,6 +392,34 @@ public class PickUpController : MonoBehaviourPun
 
         if (TryGetComponent(out InteractManager interact))
             interact.ResetDetection();
+    }
+
+    [PunRPC]
+    void RPC_ThrowObject(int objectViewID, Vector3 throwDirection)
+    {
+       PhotonView objView = PhotonView.Find(objectViewID);
+       if (objView == null) return;
+       
+       Transform objTransform = objView.transform;
+       Rigidbody rb = objTransform.GetComponent<Rigidbody>();
+       Collider col = objTransform.GetComponent<Collider>();
+       Collider heldObjectCollider = objView.gameObject.GetComponent<Collider>();
+
+       if (col != null)
+       {
+           col.isTrigger = false;
+       }
+       
+       if (rb != null)
+       {
+           rb.isKinematic = false;
+           rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+           rb.AddForce(throwDirection * throwForce, ForceMode.VelocityChange);
+       }
+       objTransform.parent = null;
+       objTransform.position += Vector3.up * 0.1f;
+
+       Debug.Log("RPC 던지기 완료");
     }
 
     private void DisplayTrajectory()

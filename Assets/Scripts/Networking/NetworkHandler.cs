@@ -5,11 +5,10 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class NetworkHandler : MonoBehaviour
+public class NetworkHandler : MonoBehaviourPunCallbacks
 {
-    public static NetworkHandler Instance;
-
     // ===== 에러 패널 UI 오브젝트 변수 =====
+    // 잘 사용되지 않으므로 동적으로 할당 및 생성
     GameObject errorPanelPrefab; // 에러 패널 프리팹
     GameObject currentErrorPanel = null; // 씬에 존재하는 패널
     TextMeshProUGUI errorTypeTMP; // 에러 메시지 유형
@@ -21,44 +20,50 @@ public class NetworkHandler : MonoBehaviour
     #region 사용자정의 에러 코드
     public const int RequestNotSent = 0; // 접속이 끊겨, 요청이 전송되지 않은 경우
     public const int MakeNameFailed = 1; // 방 이름을 생성하지 못한 경우
-    # endregion
+    #endregion
 
-    private void Awake()
+    public static NetworkHandler Instance { get; private set; }
+
+    private void Start()
     {
+        if (Instance != null)
         {
-            // 테스트용~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
+            Destroy(gameObject);
         }
+        Instance = this;
+
+        DontDestroyOnLoad(gameObject);
+
         errorPanelPrefab = Resources.Load<GameObject>("Prefabs/UI/ErrorPanel");
     }
 
+
     // 접속이 끊겼을 때 예외 처리 
-   public  void SetDisconnectedExceptionPanel(int code)
+    public  void SetDisconnectedExceptionPanel(int code)
     {
         Action OnDisconnect = null;
         switch (code)
         {
             case (int) DisconnectCause.DisconnectByOperationLimit:
-                errorText = "Too many Operation Call... No More Please";
+                errorText = "요청이 너무 많습니다.\n잠시 뒤 다시 시도해주세요.";
                 break;
             case (int) DisconnectCause.ServerTimeout:
             case (int) DisconnectCause.ClientTimeout:
-                errorText = "Too long response time hurry up next time~";
+                errorText = "응답 시간을 초과했습니다.";
                 break;
             case (int) DisconnectCause.CustomAuthenticationFailed:
-                errorText = "You InJeung failed";
+                errorText = "인증에 실패했습니다.";
                 break;
             case (int) DisconnectCause.MaxCcuReached:
-                errorText = "Server Too Many People.. sorry";
+                errorText = "서버 인원이 너무 많습니다.";
                 break;
             default:
-                errorText = "Server is BoorAnJeong, Try Later~";
+                errorText = "서버가 불안정합니다.\n 다시 시도해주세요.";
                 break;
         }
 
 
-        if (NetworkManager.Instance.GetClienttState() == ConnectState.Room)
+        if (ClientInfo.sClientState == ConnectState.Room)
         {
             // 대기방 혹은 인게임에서 Disconnected -> Rejoin 시도
             OnDisconnect = ReconnectAndRejoin;
@@ -68,7 +73,7 @@ public class NetworkHandler : MonoBehaviour
             // 그 외 모든 곳에서 Disconnected -> StartScene으로 돌아가서 재접속
             OnDisconnect = BackToStartScene;
         }
-        ShowExceptionPanel("====Disconnected====", errorText, OnDisconnect);
+        ShowExceptionPanel("네트워크 접속 끊김", errorText, OnDisconnect);
     }
 
     // 랜덤 매치 시, 예외 처리
@@ -80,17 +85,17 @@ public class NetworkHandler : MonoBehaviour
         {
             // 재접속이 필수인 경우
             case MakeNameFailed:
-                errorText = "I dont know reason bur failed random match";
+                errorText = "알 수 없는 원인으로 매칭이 실패했습니다.";
                 break;
             case RequestNotSent:
-                errorText = "Disconnect, You failed";
+                errorText = "요청이 전송되지 않았습니다.";
                 break;
             default:
-                errorText = "You Can't random match Now :(";
+                errorText = "랜덤 매치에 실패했습니다.\n 잠시 뒤 다시 시도해주세요.";
                 break;
         }
 
-        ShowExceptionPanel("No Random Now", errorText, OnRandomMathFailed);
+        ShowExceptionPanel("랜덤 매치 실패", errorText, OnRandomMathFailed);
     }
 
 
@@ -103,28 +108,28 @@ public class NetworkHandler : MonoBehaviour
             // 재접속이 필수인 경우
             case ErrorCode.AuthenticationTicketExpired:
             case ErrorCode.InternalServerError:
-                errorText = "You Need to be ReConnected";
+                errorText = "연결이 끊겼습니다.\n재접속을 시도해주세요.";
                 OnCreateFailed = BackToStartScene;
                 break;
             case RequestNotSent:
-                errorText = "Disconnect, You failed";
+                errorText = "요청이 전송되지 않았습니다.";
                 break;
             case MakeNameFailed:
-                errorText = "I dont know reason bur failed random match";
+                errorText = "알 수 없는 원인으로 방 생성에 실패했습니다.";
                 break;
             default:
-                errorText = "You Can't Create Room Now :(";
+                errorText = "현재는 방 생성이 불가합니다.";
                 break;
         }
 
-        ShowExceptionPanel("====You Can't Create====", errorText, OnCreateFailed);
+        ShowExceptionPanel("방 생성 실패", errorText, OnCreateFailed);
     }
 
     // 방 조인 시, 예외 처리 
     public void SetJoinExceptionPanel(int code)
     {
         //  예외를 중복으로 처리하지 않도록 return  
-        if (NetworkManager.Instance.GetCurrenttState() == ConnectState.Disconnected) return;
+        if (ClientInfo.sClientState != ConnectState.Lobby) return;
 
         Action OnJoinFailed = null;
 
@@ -132,23 +137,23 @@ public class NetworkHandler : MonoBehaviour
         {
             // 조인과 관련된 에러 코드
             case ErrorCode.GameClosed:
-                errorText = "Game Closed : The Room Was Closed :(";
+                errorText = "이미 게임이 시작된 방입니다.";
                 break;
             case ErrorCode.GameDoesNotExist:
-                errorText = "Game Does Not Exist : The Room Name Does Not Exists Now :(";
+                errorText = "존재하지 않는 방입니다.";
                 break;
             case ErrorCode.GameFull:
-                errorText = "Game Full : The Room is Full :(";
+                errorText = "인원이 가득 찼습니다.";
                 break;
             case RequestNotSent:
-                errorText = "Disconnect, You failed";
+                errorText = "요청이 전송되지 않았습니다.";
                 break;
             default:
-                errorText = "Join Room Failed :(";
+                errorText = "알 수 없는 원인으로 참가가 불가합니다.";
                 break;
         }
 
-        ShowExceptionPanel("====You Can't Join====", errorText, OnJoinFailed);
+        ShowExceptionPanel("방 참가 실패", errorText, OnJoinFailed);
     }
 
     // 인게임에서 네트워크 예외 처리
@@ -165,6 +170,7 @@ public class NetworkHandler : MonoBehaviour
 
         // 패널을 프리팹으로 생성한다
         currentErrorPanel = Instantiate(errorPanelPrefab, canvas.transform, false);
+        Debug.Assert(canvas != null, "핸들러 프리팹을 찾지 못함");
 
         // 패널의 자식들 중 사용할 UI 요소 찾아 변수에 할당한다
         TextMeshProUGUI[] allTMPsChildren = currentErrorPanel.GetComponentsInChildren<TextMeshProUGUI>();
@@ -213,8 +219,58 @@ public class NetworkHandler : MonoBehaviour
         else
         {
             Debug.Log("돌아갈 룸 있음");
-            NetworkManager.Instance.SetCurrenttState(ConnectState.Room);
-            NetworkManager.Instance.SetClientState(ConnectState.Room);
+            ClientInfo.sCurrentState = ConnectState.Room;
+            ClientInfo.sClientState = ConnectState.Room;
         }
     }
+
+
+    #region 서버 예외 처리 콜백 함수들
+
+    public override void OnJoinRandomFailed(short returnCode, string message)
+    {
+        base.OnJoinRandomFailed(returnCode, message);
+
+        // 랜덤 매치 예외 처리
+        SetJoinExceptionPanel(returnCode);
+    }
+    public override void OnCreateRoomFailed(short returnCode, string message)
+    {
+        base.OnCreateRoomFailed(returnCode, message);
+
+        // 방 생성 예외 처리
+        SetCreateExceptionPanel(returnCode);
+    }
+
+    public override void OnJoinRoomFailed(short returnCode, string message)
+    {
+        base.OnJoinRoomFailed(returnCode, message);
+
+        // 조인 예외 처리
+        if (ClientInfo.sClientState == ConnectState.Room)
+        {
+            // ReconnectAndRejoin()이 실패한 경우에 호출된 OnJOinRoomFailed()를 처리한다
+
+            // sClientState가 Room이면 다시 Room 재참여를 시도하므로, Lobby로 수정한다 
+            ClientInfo.sClientState = ConnectState.Lobby; 
+            SetDisconnectedExceptionPanel(0);
+        }
+        else
+        {
+            // 일반적인 Join의 실패를 처리한다
+            SetJoinExceptionPanel(returnCode);
+        }
+    }
+
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        Debug.Log("On Disconnected");
+        ClientInfo.sCurrentState = ConnectState.Disconnected;
+
+        // Disconnected 예외 처리
+        SetDisconnectedExceptionPanel((int)cause);
+    }
+    #endregion
+
+
 }

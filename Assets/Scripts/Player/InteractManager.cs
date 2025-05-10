@@ -1,6 +1,7 @@
 using Photon.Pun;
 using UnityEngine;
 using TMPro;
+using UnityEngine.EventSystems;
 
 public class InteractManager : MonoBehaviourPun
 {
@@ -29,6 +30,7 @@ public class InteractManager : MonoBehaviourPun
     {
         pickUpController = GetComponent<PickUpController>();
         interactController = GetComponent<InteractController>();
+
 
         if (cameraMount == null && Camera.main != null)
             cameraMount = Camera.main.transform;

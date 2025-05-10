@@ -5,23 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7ca77f44-c133-4a41-b675-4d0220a63863" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.capstone-2025-17/.idea/projectSettingsUpdater.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.capstone-2025-17/.idea/projectSettingsUpdater.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.capstone-2025-17/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.capstone-2025-17/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Arts/RendererTextures/Team1RenderTexture 1.renderTexture" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Arts/RendererTextures/Team1RenderTexture 1.renderTexture" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Manager/GameTimerManager.prefab" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Manager/GameTimerManager.prefab.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Player/Player.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Player/Player.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Player/Player.prefab.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Player/Player.prefab.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Arts/RendererTextures/Team1RenderTexture 2.renderTexture" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Arts/RendererTextures/Team1RenderTexture 2.renderTexture" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Arts/RendererTextures/Team1RenderTexture 3.renderTexture" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Arts/RendererTextures/Team1RenderTexture 3.renderTexture" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Arts/RendererTextures/Team1RenderTexture 4.renderTexture" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Arts/RendererTextures/Team1RenderTexture 4.renderTexture" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Environment/PlayerSpawner.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Environment/PlayerSpawner.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Player_0326.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Player_0326.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/Ingame/Mission1.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Ingame/Mission1.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Lobby/LobbyScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Lobby/LobbyScene.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Manage/Managers.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Manage/Managers.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Networking/GameStateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Networking/GameStateManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Networking/GameTimerManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Networking/GameTimerManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Networking/MissionManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Networking/MissionManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Player/PlayerMove.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Player/PlayerMove.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Settings/URP-Balanced.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/URP-Balanced.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Settings/URP-HighFidelity.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/URP-HighFidelity.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Settings/URP-Performant.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/URP-Performant.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/build_info" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/build_info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,7 +22,9 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Networking/PlayerEventReceiver.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5a41d6b7189842eca409fd0b1c3e3dcf17bf78/4f/bab62522/Dictionary`2.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/c36f504d88b44122b50b87d1f7294759176c00/9f/ff921d18/MonoBehaviour.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
@@ -47,7 +39,7 @@
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feat/#18-네트워크플레이&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;bug/#22-입력이-다른-캐릭터에게-적용되는-현상&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -74,7 +66,7 @@
       <method v="2" />
     </configuration>
     <configuration name="Standalone Player" type="RunUnityExe" factoryName="Unity Executable">
-      <option name="EXE_PATH" value="$PROJECT_DIR$/../TestBuild.app/Contents/MacOS/toyland_trials" />
+      <option name="EXE_PATH" value="$PROJECT_DIR$/build/TestBuild.app/Contents/MacOS/toyland_trials" />
       <option name="PROGRAM_PARAMETERS" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../TestBuild.app/Contents/MacOS" />
       <option name="PASS_PARENT_ENVS" value="1" />
@@ -110,6 +102,9 @@
       <option name="listenPortForConnections" value="false" />
       <option name="pid" />
       <option name="projectPathOnTarget" />
+      <option name="runtimes">
+        <list />
+      </option>
       <option name="selectedOptions">
         <list />
       </option>
@@ -120,6 +115,9 @@
       <option name="listenPortForConnections" value="false" />
       <option name="pid" />
       <option name="projectPathOnTarget" />
+      <option name="runtimes">
+        <list />
+      </option>
       <option name="selectedOptions">
         <list />
       </option>
@@ -141,6 +139,10 @@
       <workItem from="1742279730399" duration="2465000" />
       <workItem from="1742811434792" duration="1478000" />
       <workItem from="1742883854157" duration="312000" />
+      <workItem from="1743661350523" duration="1256000" />
+      <workItem from="1743662612896" duration="1953000" />
+      <workItem from="1743664796983" duration="4229000" />
+      <workItem from="1743773106545" duration="735000" />
     </task>
     <servers />
   </component>
