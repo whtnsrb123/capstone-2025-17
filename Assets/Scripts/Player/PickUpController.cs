@@ -302,8 +302,7 @@ public class PickUpController : MonoBehaviourPun
     private IEnumerator DropWithDelay(float delay, int objectViewID)
     {
         PhotonView objView = PhotonView.Find(objectViewID);
-
-        objView.transform.parent = null;
+        
         isDropping = true;
         yield return new WaitForSeconds(delay);
 
@@ -320,7 +319,8 @@ public class PickUpController : MonoBehaviourPun
         heldObjectRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
         heldObject.layer = LayerMask.NameToLayer("Default");
         Debug.Log("물체 놓기: " + heldObject.name);
-        heldObject.transform.parent = null;
+        objView.transform.parent = null;
+        //heldObject.transform.parent = null;
         heldObject = null;
         heldObjectRb = null;
 
