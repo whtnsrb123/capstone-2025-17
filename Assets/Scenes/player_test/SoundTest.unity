@@ -2364,9 +2364,24 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 236745563097956575, guid: 553b7a3fa29fae840af90e9198a57ac7,
         type: 3}
+      propertyPath: clips.array.Array.size
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 236745563097956575, guid: 553b7a3fa29fae840af90e9198a57ac7,
+        type: 3}
+      propertyPath: clips.array.Array.data[19].Key
+      value: buttonClick
+      objectReference: {fileID: 0}
+    - target: {fileID: 236745563097956575, guid: 553b7a3fa29fae840af90e9198a57ac7,
+        type: 3}
       propertyPath: clips.array.Array.data[4].Value
       value: 
       objectReference: {fileID: 8300000, guid: b94e901bf459898438d7d374f494037c, type: 3}
+    - target: {fileID: 236745563097956575, guid: 553b7a3fa29fae840af90e9198a57ac7,
+        type: 3}
+      propertyPath: clips.array.Array.data[19].Value
+      value: 
+      objectReference: {fileID: 8300000, guid: b7b78d852fcc5db4994a9cbbdd7a0f6e, type: 3}
     - target: {fileID: 553088719201310819, guid: 553b7a3fa29fae840af90e9198a57ac7,
         type: 3}
       propertyPath: m_Name
