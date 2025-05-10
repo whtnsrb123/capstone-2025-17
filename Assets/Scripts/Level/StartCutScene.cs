@@ -26,7 +26,7 @@ public class StartCutScene : MonoBehaviour
 
     private void Start()
     {
-        PlayCutscene();
+        // PlayCutscene();
     }
 
     public void PlayCutscene()

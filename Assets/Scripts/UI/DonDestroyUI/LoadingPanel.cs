@@ -66,15 +66,10 @@ public class LoadingPanel : MonoBehaviourPun
                     {
                         // 마스터 클라이언트
                         SendISLoadedLevel(this.loaded);
-                        SetUIVisibility(false);
-                        yield break;
                     }
-                    else
-                    {
-                        // 이외 클라이언트 
-                        SetUIVisibility(false);
-                        yield break;
-                    }
+                    SetUIVisibility(false);
+                    GameObject.FindObjectOfType<StartCutScene>().PlayCutscene();
+                    yield break;
                 }
             }
 
