@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PhotonServerSettings
   m_EditorClassIdentifier: 
   AppSettings:
-    AppIdRealtime: 93618e2b-05e4-4b14-b6c8-b83c0782a202
+    AppIdRealtime: 
     AppIdFusion: 
     AppIdChat: 
     AppIdVoice: 
@@ -34,47 +34,11 @@ MonoBehaviour:
   RunInBackground: 1
   StartInOfflineMode: 0
   RpcList:
+  - CantHearYou
+  - ChangeColour
   - ClickRpc
   - DestroyRpc
-  - DestroySpaceship
-  - Fire
-  - RespawnSpaceship
-  - EndGame
-  - StartGame
-  - SyncGameState
-  - MissionComplete
-  - GameClear
-  - GameOver
-  - RPC_OnTimeUp
-  - RPC_StartTimer
-  - RequestUpdatePlayerEscaped
-  - RequestUpdatePlayerState
-  - RpcUpdatePlayerEscaped
-  - RpcUpdatePlayerState
-  - RPC_NextMission
-  - RPC_SetUIVisibility
-  - SetUIVisibility
-  - ClientSceneLoaded
-  - SetLoaded
-  - ActivateGimmickRPC
-  - InteractRPC
-  - RegisterPlayerGoal
-  - RPC_DropObject
-  - RPC_SetParent
-  - RPC_ThrowObject
-  - UnRegisterPlayerGoal
-  - UpElevatorRPC
-  - RPC_OnInput
-  - RPC_PushPlayer
-  - RPC_RotateHeldObject
-  - RPC_TryPickUp
-  - HandleAttack
-  - HandleChase
-  - HandleReturn
-  - HandleWander
-  - PickPlayer
-  - RunArmRPC
-  - TryDropPlayer
+  - HeresWhy
   DisableAutoOpenWizard: 1
-  ShowSettings: 1
-  DevRegionSetOnce: 1
+  ShowSettings: 0
+  DevRegionSetOnce: 0
