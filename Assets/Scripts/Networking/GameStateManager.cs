@@ -54,7 +54,7 @@ public class GameStateManager : MonoBehaviourPun, IManager
         if(Managers.MissionManager.AreAllMissionsComplete())
         {
             isGameStarted = false;
-            
+            Debug.Log("CheckGameEnd 실행 됨!!!!!!!!!!");
             //게임 클리어 연출 씬 실행
             photonView.RPC("GameClear", RpcTarget.All);
             return; // 게임 클리어 상태면 게임 오버 체크하지 않음
