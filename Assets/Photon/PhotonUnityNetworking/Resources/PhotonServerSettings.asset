@@ -68,6 +68,13 @@ MonoBehaviour:
   - RPC_PushPlayer
   - RPC_RotateHeldObject
   - RPC_TryPickUp
+  - HandleAttack
+  - HandleChase
+  - HandleReturn
+  - HandleWander
+  - PickPlayer
+  - RunArmRPC
+  - TryDropPlayer
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

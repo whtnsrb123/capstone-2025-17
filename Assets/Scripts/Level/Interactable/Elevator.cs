@@ -1,9 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
-using Photon.Pun;
 using UnityEngine;
 
-public class Elevator : MonoBehaviourPun, IInteractable
+public class Elevator : MonoBehaviour, IInteractable
 {
     public bool isMoving = false;
     public bool isDown = true;
@@ -21,18 +20,6 @@ public class Elevator : MonoBehaviourPun, IInteractable
         if (isMoving) return;
 
         isMoving = true;
-        StartCoroutine(MoveElevator());
-        
-        //일단 급한대로 이렇게.. 엘베 내려와 있으면 RPC로 엘베 올라감
-        if (GameStateManager.isServerTest && isDown)
-        {
-            photonView.RPC(nameof(UpElevatorRPC), RpcTarget.All);
-        }
-    }
-
-    [PunRPC]
-    void UpElevatorRPC()
-    {
         StartCoroutine(MoveElevator());
     }
     
