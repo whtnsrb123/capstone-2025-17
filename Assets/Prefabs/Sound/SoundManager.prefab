@@ -97,5 +97,7 @@ MonoBehaviour:
       Value: {fileID: 8300000, guid: f9e316482d7deff4091820ce9c24b152, type: 3}
     - Key: 'radio '
       Value: {fileID: 8300000, guid: 15c3aee1196167f4f882799d08b87fac, type: 3}
+    - Key: buttonClick
+      Value: {fileID: 8300000, guid: b7b78d852fcc5db4994a9cbbdd7a0f6e, type: 3}
   audioSourcePrefab: {fileID: 6396528262120614968, guid: 25904906e1d4e204aa013d2786422111,
     type: 3}
