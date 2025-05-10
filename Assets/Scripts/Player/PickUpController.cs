@@ -221,6 +221,11 @@ public class PickUpController : MonoBehaviourPun
 
             heldObject.layer = LayerMask.NameToLayer("HeldObject");
             originalRotation = heldObject.transform.rotation;
+            PhotonView objectView = detectedObject.GetComponent<PhotonView>();
+            if (objectView != null && !objectView.IsMine)
+            {
+                objectView.RequestOwnership();
+            }
             Debug.Log("물체 잡기 성공: " + heldObject.name);
         }
         else
@@ -278,12 +283,15 @@ public class PickUpController : MonoBehaviourPun
     {
         if (isDropping) return;      // 이미 내려놓는 중이면 무시
         if (heldObject == null) return; // 들고 있는 물체 없으면 무시
-
-        StartCoroutine(DropWithDelay(0.8f));
+        int objectViewID = heldObject.GetPhotonView().ViewID;
+        StartCoroutine(DropWithDelay(0.8f, objectViewID));
     }
 
-    private IEnumerator DropWithDelay(float delay)
+    private IEnumerator DropWithDelay(float delay, int objectViewID)
     {
+        PhotonView objView = PhotonView.Find(objectViewID);
+
+        objView.transform.parent = null;
         isDropping = true;
         yield return new WaitForSeconds(delay);
 
