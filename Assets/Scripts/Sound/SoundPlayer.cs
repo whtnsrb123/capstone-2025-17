@@ -7,11 +7,6 @@ public class SoundPlayer : MonoBehaviour
     [SerializeField] private SoundManager soundManager;
     [SerializeField] private string bgmName;
 
-    private void Start()
-    {
-        //PlayBGM(bgmName);
-    }
-
     public void PlayBGM(string bgmName)
     {
         soundManager.Play(bgmName, ESoundType.BGM);
