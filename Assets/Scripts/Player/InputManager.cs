@@ -9,6 +9,7 @@ public class InputManager : MonoBehaviourPun
     private InteractManager interactManager;
     public Animator animator;
     public string throwTriggerName = "IsThrow";
+    private GameObject MiniMap;
 
     private void Awake()
     {
@@ -24,6 +25,11 @@ public class InputManager : MonoBehaviourPun
         pickUpController = GetComponent<PickUpController>();
         interactManager = GetComponent<InteractManager>();
         animator = GetComponent<Animator>();
+        MiniMap = GameObject.Find("MiniMap"); //Find 함수는 활성 오브젝트만 찾을 수 있다.
+        if (MiniMap != null)
+        {
+            MiniMap.SetActive(false);
+        }
     }
 
     void Update()
@@ -54,6 +60,19 @@ public class InputManager : MonoBehaviourPun
         }
 
         if (Input.GetKeyDown(KeyCode.R)) pickUpController.RotateHeldObject();
+
+        // Tab 키 : 미니맵 On Off
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            if (MiniMap.activeSelf)
+            {
+                MiniMap.SetActive(false);
+            }
+            else
+            {
+                MiniMap.SetActive(true);
+            }
+        }
     }
 
     void UpdateRotate()
