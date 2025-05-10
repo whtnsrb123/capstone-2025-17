@@ -290,14 +290,14 @@ public class PickUpController : MonoBehaviourPun
         }
     }
 
-    /*[PunRPC]
+    [PunRPC]
     public void RPC_DropObject()
     {
         if (isDropping) return;      // 이미 내려놓는 중이면 무시
         if (heldObject == null) return; // 들고 있는 물체 없으면 무시
         int objectViewID = heldObject.GetPhotonView().ViewID;
         StartCoroutine(DropWithDelay(0.8f, objectViewID));
-    }*/
+    }
 
     private IEnumerator DropWithDelay(float delay, int objectViewID)
     {
@@ -320,40 +320,11 @@ public class PickUpController : MonoBehaviourPun
         heldObjectRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
         heldObject.layer = LayerMask.NameToLayer("Default");
         Debug.Log("물체 놓기: " + heldObject.name);
-
+        heldObject.transform.parent = null;
         heldObject = null;
         heldObjectRb = null;
-        heldObject.transform.parent = null;
 
         isDropping = false;
-    }
-    
-    [PunRPC]
-    void RPC_DropObject(int objectViewID)
-    {
-        PhotonView objView = PhotonView.Find(objectViewID);
-        if (objView == null) return;
-
-        objView.transform.parent = null;
-
-        Rigidbody rb = objView.GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            rb.isKinematic = false;
-            rb.useGravity = true;
-            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-        }
-
-        Collider col = objView.GetComponent<Collider>();
-        if (col != null)
-        {
-            col.isTrigger = false;
-        }
-
-        if (isDropping) return;      // 이미 내려놓는 중이면 무시
-        if (heldObject == null) return; // 들고 있는 물체 없으면 무시
-        int objectViewID = heldObject.GetPhotonView().ViewID;
-        StartCoroutine(DropWithDelay(0.8f, objectViewID));
     }
 
     public void ThrowObject()
