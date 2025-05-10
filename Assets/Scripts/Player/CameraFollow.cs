@@ -1,7 +1,4 @@
 using Photon.Pun;
-using Photon.Realtime;
-using Unity.VisualScripting;
-using Unity.VisualScripting.ReorderableList;
 using UnityEngine;
 
 public class CameraFollow : MonoBehaviourPun
@@ -27,6 +24,7 @@ public class CameraFollow : MonoBehaviourPun
 
     void LateUpdate()
     {
+        if (GameStateManager.isServerTest && !photonView.IsMine) return;
         Vector3 dir = player.transform.position - mainCam.transform.position;
         
 
