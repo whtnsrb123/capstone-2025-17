@@ -3507,6 +3507,10 @@ PrefabInstance:
       value: SM_Prop_Pallet_01 (2)
       objectReference: {fileID: 0}
     - target: {fileID: 1904520952959222, guid: 15aefff89fb17ca4d9574be8a0ed390a, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1904520952959222, guid: 15aefff89fb17ca4d9574be8a0ed390a, type: 3}
       propertyPath: m_TagString
       value: Pickable
       objectReference: {fileID: 0}

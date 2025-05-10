@@ -227,6 +227,10 @@ public class PickUpController : MonoBehaviourPun
                 objectView.RequestOwnership();
             }
             Debug.Log("물체 잡기 성공: " + heldObject.name);
+            int objectViewID = objectView.ViewID;
+            int playerViewID = photonView.ViewID;
+
+            photonView.RPC(nameof(RPC_SetParent), RpcTarget.All, objectViewID, playerViewID);
         }
         else
         {
