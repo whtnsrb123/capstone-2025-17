@@ -1,7 +1,9 @@
+using Photon.Pun;
 using UnityEngine;
 using TMPro;
+using UnityEngine.EventSystems;
 
-public class InteractManager : MonoBehaviour
+public class InteractManager : MonoBehaviourPun
 {
     public Transform cameraMount; // 카메라 기준 위치 (CameraMount)
     private Transform raycastPosition; // 내부에서 사용하는 레이 발사 위치
@@ -27,7 +29,6 @@ public class InteractManager : MonoBehaviour
     {
         pickUpController = GetComponent<PickUpController>();
         interactController = GetComponent<InteractController>();
-
         // cameraMount 자동 연결
         if (cameraMount == null && Camera.main != null)
             cameraMount = Camera.main.transform;
@@ -42,6 +43,7 @@ public class InteractManager : MonoBehaviour
 
     void Update()
     {
+        if (!photonView.IsMine) return;
         DetectObject();
         heldObject = pickUpController.heldObject; // PickUpController에서 들고 있는 물체 정보를 가져옴
     }

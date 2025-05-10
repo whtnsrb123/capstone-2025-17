@@ -1,32 +1,33 @@
 using UnityEngine;
+using Photon.Pun;
 
-public class InputManager : MonoBehaviour
+public class InputManager : MonoBehaviourPun
 {
-    private PlayerPushController pushController;
+    private Player_Push_Controller pushController;
     private PickUpController pickUpController;
-    private RotateToMouse rotateToMouse;
     private InteractManager interactManager;
-    public Animator animator; // 애니메이터 컴포넌트 연결
-    public string throwTriggerName = "IsThrow"; // 던지기 트리거 이름
-
-    private void Awake()
-    {
-        Cursor.lockState = CursorLockMode.Locked; // 마우스 커서 고정 
-        Cursor.visible = false; // 마우스 커서를 숨김
-        rotateToMouse = GetComponent<RotateToMouse>(); // 마우스 컨트롤 
-    }
+    private GameObject MiniMap;
 
     void Start()
     {
-        pushController = GetComponent<PlayerPushController>();
+        pushController = GetComponent<Player_Push_Controller>();
         pickUpController = GetComponent<PickUpController>();
         interactManager = GetComponent<InteractManager>();
-        animator = GetComponent<Animator>(); // 애니메이터 컴포넌트 할당
+        MiniMap = GameObject.Find("MiniMap"); //Find 함수는 활성 오브젝트만 찾을 수 있다.
+        if (MiniMap != null)
+        {
+            MiniMap.SetActive(false);
+        }
+
+        if (pushController == null) Debug.LogError("Player_Push_Controller가 없습니다.");
+        if (pickUpController == null) Debug.LogError("PickUpController가 없습니다.");
     }
 
     void Update()
     {
-        UpdateRotate();   // 캐릭터 회전
+        if (GameStateManager.isServerTest)
+            if (!photonView.IsMine) return;
+
         // F 키: 물체 잡기/놓기
         if (Input.GetKeyDown(KeyCode.F))
         {
@@ -41,12 +42,15 @@ public class InputManager : MonoBehaviour
             {
                 Debug.Log("물체를 들고 있음 -> 던지기 시도");
                 pickUpController.ThrowObject();
-                animator.SetTrigger(throwTriggerName); // 던지기 트리거 활성화
             }
             else if (pushController.CanPush())
             {
                 Debug.Log("밀치기 가능 -> 푸쉬 시도");
                 pushController.PushPlayer();
+            }
+            else
+            {
+                Debug.Log("밀치기 불가능: canPush = " + pushController.CanPush());
             }
         }
 
@@ -56,12 +60,19 @@ public class InputManager : MonoBehaviour
             Debug.Log("R 키 입력 감지됨");
             pickUpController.RotateHeldObject();
         }
-    }
-
-    void UpdateRotate() // 화면 회전 (마우스)
-    {
-        float mouseX = Input.GetAxis("Mouse X"); // 마우스 좌우
-        float mouseY = Input.GetAxis("Mouse Y"); // 마우스 상하
-        rotateToMouse.UpdateRotate(mouseX, mouseY); // 회전 적용
+        
+        // Tab 키 : 미니맵 On Off
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            Debug.Log("Tab 키 입력 감지됨");
+            if (MiniMap.activeSelf)
+            {
+                MiniMap.SetActive(false);
+            }
+            else
+            {
+                MiniMap.SetActive(true);
+            }
+        }
     }
 }

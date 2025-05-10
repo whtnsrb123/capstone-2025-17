@@ -58,35 +58,50 @@ public class GameTimerManager : MonoBehaviourPun, IManager
     [PunRPC]
     private void RPC_StartTimer(float duration)
     {
-        // 이전 캔버스가 있다면 삭제
-        GameObject oldCanvas = GameObject.Find("GameTimerCanvas");
-        if (oldCanvas != null)
+        // 이미 타이머 텍스트가 세팅되어 있으면 다시 만들지 않음
+        if (timerText == null)
         {
-            Destroy(oldCanvas);
-        }
-        
-        //------------------------------Resources 폴더에서 GameTimerCanvas 불러와서 timerText 연결------------------------------------------------------
-        // 캔버스 프리팹 로드 & 인스턴스화
-        Canvas gameTimerCanvasPrefab = Resources.Load<Canvas>("GameTimerCanvas");
-        if (gameTimerCanvasPrefab == null)
-        {
-            Debug.LogError("GameTimerCanvas 프리팹이 Resources 폴더에 없습니다!");
-            return;
+            // 기존 캔버스 찾기
+            GameObject existingCanvas = GameObject.Find("GameTimerCanvas");
+
+            if (existingCanvas != null)
+            {
+                Transform timerTransform = existingCanvas.transform.Find("gameTimer");
+                if (timerTransform != null)
+                {
+                    timerText = timerTransform.GetComponent<TMP_Text>();
+                }
+                else
+                {
+                    Debug.LogError("기존 Canvas에 gameTimer 오브젝트가 없습니다!");
+                }
+            }
+            else
+            {
+                // 프리팹 로드
+                Canvas gameTimerCanvasPrefab = Resources.Load<Canvas>("GameTimerCanvas");
+                if (gameTimerCanvasPrefab == null)
+                {
+                    Debug.LogError("GameTimerCanvas 프리팹이 Resources 폴더에 없습니다!");
+                    return;
+                }
+
+                Canvas canvasInstance = Instantiate(gameTimerCanvasPrefab);
+                canvasInstance.name = "GameTimerCanvas"; // 이름 강제 설정
+
+                Transform timerTransform = canvasInstance.transform.Find("gameTimer");
+                if (timerTransform != null)
+                {
+                    timerText = timerTransform.GetComponent<TMP_Text>();
+                }
+                else
+                {
+                    Debug.LogError("GameTimerCanvas 안에 gameTimer 오브젝트가 없습니다!");
+                }
+            }
         }
 
-        Canvas canvasInstance = Instantiate(gameTimerCanvasPrefab);
-
-        // 자식 오브젝트에서 "gameTimer" 이름의 TMP_Text 찾기
-        Transform timerTransform = canvasInstance.transform.Find("gameTimer");
-        if (timerTransform != null)
-        {
-            timerText = timerTransform.GetComponent<TMP_Text>();
-        }
-        else
-        {
-            Debug.LogError("GameTimerCanvas 안에 gameTimer 오브젝트가 없습니다!");
-        }
-        //----------------------------------------------------------------------------------------------------------------------------------------
+        // 타이머 시작
         timer = duration;
         isTimerRunning = true;
     }

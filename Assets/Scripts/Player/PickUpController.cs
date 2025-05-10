@@ -1,7 +1,8 @@
+using Photon.Pun;
 using UnityEngine;
 using TMPro;
 
-public class PickUpController : MonoBehaviour
+public class PickUpController : MonoBehaviourPun
 {
     public Transform raycastPosition;         // 레이캐스트 시작 위치 (카메라)
     public Transform pickPosition;            // 물체를 들 위치 (손 위치)
@@ -31,7 +32,9 @@ public class PickUpController : MonoBehaviour
 
     void Start()
     {
-        // 카메라 기준으로 레이 시작 위치 지정
+        if (!photonView.IsMine) return;
+        // 밀기 컨트롤러 초기화
+        pushController = GetComponent<Player_Push_Controller>();
         Camera mainCamera = Camera.main;
         raycastPosition = mainCamera.transform;
 
@@ -69,6 +72,8 @@ public class PickUpController : MonoBehaviour
 
     void Update()
     {
+        if (!photonView.IsMine) return;
+        // 물체를 들고 있을 경우 위치 업데이트
         // 감지 레이 시각화
         Debug.DrawRay(raycastPosition.position, raycastPosition.forward * detectionRange, Color.red);
 
@@ -93,7 +98,7 @@ public class PickUpController : MonoBehaviour
 
     void FixedUpdate()
     {
-        // 궤적 그리기
+        if (!photonView.IsMine) return;
         DisplayTrajectory();
 
         // 들고 있는 물체 손 위치로 이동
@@ -143,6 +148,12 @@ public class PickUpController : MonoBehaviour
     private void TryPickUp()
     {
         if (detectedObject == null) return;
+        
+        PhotonView objectView = detectedObject.GetComponent<PhotonView>();
+        if (objectView != null && !objectView.IsMine)
+        {
+            objectView.RequestOwnership();
+        }
 
         heldObject = detectedObject;
         heldObjectRb = heldObject.GetComponent<Rigidbody>();
@@ -162,6 +173,27 @@ public class PickUpController : MonoBehaviour
             // Ray 충돌 제외를 위해 레이어 변경
             heldObject.layer = LayerMask.NameToLayer("HeldObject");
 
+            // pickPosition이 할당되었는지 확인
+            if (pickPosition != null)
+            {
+                if (objectView != null)
+                {
+                    Vector3 newPickPosition = pickPosition.position + pickPosition.forward * (objectRadius + pickUpOffset);
+                    heldObject.transform.position = newPickPosition; // 조정된 위치에 배치
+                    heldObject.transform.rotation = pickPosition.rotation;
+                    heldObject.transform.parent = pickPosition;
+                    Debug.Log("물체 잡기 성공: " + heldObject.name);
+                    
+                    int objectViewID = objectView.ViewID;
+                    int playerViewID = photonView.ViewID;
+
+                    photonView.RPC(nameof(RPC_SetParent), RpcTarget.All, objectViewID, playerViewID);
+                }
+            }
+            else
+            {
+                Debug.LogError("pickPosition이 설정되지 않았습니다.");
+            }
             // 현재 회전값 저장
             originalRotation = heldObject.transform.rotation;
 
@@ -172,28 +204,106 @@ public class PickUpController : MonoBehaviour
             heldObject = null;
         }
     }
+    
+    [PunRPC]
+    void RPC_SetParent(int objectViewID, int playerViewID)
+    {
+        PhotonView objView = PhotonView.Find(objectViewID);
+        PhotonView playerView = PhotonView.Find(playerViewID);
 
-    public void DropObject()
+        if (objView == null || playerView == null) return;
+
+        Transform pickPos = playerView.transform.Find("pickPosition");
+
+        if (pickPos != null)
+        {
+            objView.transform.SetParent(pickPos);
+            objView.transform.localPosition = Vector3.forward * pickUpOffset;
+            objView.transform.localRotation = Quaternion.identity;
+        }
+    }
+    
+    private void DropObject()
     {
         if (heldObject != null)
         {
+            int objectViewID = heldObject.GetPhotonView().ViewID;
+
+            // 먼저 모든 클라에 Drop 알림
+            photonView.RPC(nameof(RPC_DropObject), RpcTarget.All, objectViewID);
+
+            // 이후 로컬 상태 정리
+            heldObjectRb.isKinematic = false;
             heldObjectRb.useGravity = true;
             heldObjectRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
-            // 레이어 복구
-            heldObject.layer = LayerMask.NameToLayer("Default");
+            heldObject.transform.parent = null;
+
+            Collider heldObjectCollider = heldObject.GetComponent<Collider>();
+            if (heldObjectCollider != null)
+            {
+                heldObjectCollider.isTrigger = false;
+            }
 
             heldObject = null;
             heldObjectRb = null;
+            Debug.Log("물체 놓기 성공");
 
-            Debug.Log("물체 놓기");
         }
     }
+    
+    [PunRPC]
+    void RPC_DropObject(int objectViewID)
+    {
+        PhotonView objView = PhotonView.Find(objectViewID);
+        if (objView == null) return;
+
+        objView.transform.parent = null;
+
+        Rigidbody rb = objView.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.isKinematic = false;
+            rb.useGravity = true;
+            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        }
+
+        Collider col = objView.GetComponent<Collider>();
+        if (col != null)
+        {
+            col.isTrigger = false;
+        }
+
+        // 현재 플레이어가 이 오브젝트를 들고 있었으면 heldObject 해제
+        if (heldObject == objView.gameObject)
+        {
+            heldObject = null;
+            heldObjectRb = null;
+            Debug.Log("로컬 플레이어 물체 놓기 완료");
+    
 
     public void ThrowObject()
     {
         if (heldObject != null && heldObjectRb != null)
         {
+            int viewID = heldObject.GetPhotonView().ViewID;
+            Vector3 throwDirection = (pickPosition.forward + Vector3.up * 0.5f).normalized;
+            
+            photonView.RPC(nameof(RPC_ThrowObject), RpcTarget.All, viewID, throwDirection);
+            
+            Collider heldObjectCollider = heldObject.GetComponent<Collider>();
+            if (heldObjectCollider != null)
+            {
+                heldObjectCollider.isTrigger = false;
+            }
+
+            heldObjectRb.isKinematic = false;
+            heldObjectRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+
+            // 던질 방향과 힘 설정
+            if (pickPosition != null)
+            {
+                heldObjectRb.AddForce(throwDirection * throwForce, ForceMode.VelocityChange);
             heldObjectRb.useGravity = true;
             heldObjectRb.isKinematic = false;
             heldObjectRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
@@ -211,6 +321,34 @@ public class PickUpController : MonoBehaviour
 
             Debug.Log("물체 던지기");
         }
+    }
+
+    [PunRPC]
+    void RPC_ThrowObject(int objectViewID, Vector3 throwDirection)
+    {
+       PhotonView objView = PhotonView.Find(objectViewID);
+       if (objView == null) return;
+       
+       Transform objTransform = objView.transform;
+       Rigidbody rb = objTransform.GetComponent<Rigidbody>();
+       Collider col = objTransform.GetComponent<Collider>();
+       Collider heldObjectCollider = objView.gameObject.GetComponent<Collider>();
+
+       if (col != null)
+       {
+           col.isTrigger = false;
+       }
+       
+       if (rb != null)
+       {
+           rb.isKinematic = false;
+           rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+           rb.AddForce(throwDirection * throwForce, ForceMode.VelocityChange);
+       }
+       objTransform.parent = null;
+       objTransform.position += Vector3.up * 0.1f;
+
+       Debug.Log("RPC 던지기 완료");
     }
 
     private void DisplayTrajectory()

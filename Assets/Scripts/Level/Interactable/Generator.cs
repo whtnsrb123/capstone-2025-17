@@ -1,9 +1,11 @@
 using UnityEngine;
 using System.Collections;
+using Photon.Pun;
 
-public class Generator : MonoBehaviour, IInteractable
+public class Generator : MonoBehaviourPun, IInteractable
 {
     public bool isOn = false;
+    public string gimmickId;
     private Light light;
     private Coroutine generating;
 
@@ -14,9 +16,14 @@ public class Generator : MonoBehaviour, IInteractable
 
     public void Interact()
     {
+        photonView.RPC(nameof(InteractRPC), RpcTarget.All);
+    }
+
+    [PunRPC]
+    private void InteractRPC()
+    {
         if(generating != null)
             return;
-
         generating = StartCoroutine(Generate());
     }
 
