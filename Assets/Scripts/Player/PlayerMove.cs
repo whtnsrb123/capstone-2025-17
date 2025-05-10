@@ -1,5 +1,8 @@
 using Photon.Pun;
 using UnityEngine;
+using System.Collections;
+using Photon.Pun;
+
 
 public class CharacterController : MonoBehaviourPun
 {
@@ -10,10 +13,10 @@ public class CharacterController : MonoBehaviourPun
     private float acceleration = 20f;                                       // 이동 가속도
 
     private bool isGrounded;                                // 캐릭터가 땅에 닿아 있는지 여부
-    private Rigidbody rb;                                       // 캐릭터의 Rigidbody 컴포넌트
+    private Rigidbody rb;  
 
     // 물에 젖은 상태 관리
-    private bool isWet = false;            // 물에 젖었는지 여부
+    private bool isWet = false;            // 물에 젖었는지
     private float originalMoveSpeed;       // 원래 걷기 속도
     private float originalSprintSpeed;     // 원래 달리기 속도
     private float originalJumpForce;       // 원래 점프 힘
@@ -87,14 +90,15 @@ public class CharacterController : MonoBehaviourPun
 
     void Update()
     {
-        if (GameStateManager.isServerTest)
+        if (GameStateManager.isServerTest && !photonView.IsMine) return;
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("lift")
+        || animator.GetCurrentAnimatorStateInfo(0).IsName("lift Reverse")
+        || animator.GetCurrentAnimatorStateInfo(0).IsName("Falling")
+        || animator.GetCurrentAnimatorStateInfo(0).IsName("Fall Impact")
+        || animator.GetCurrentAnimatorStateInfo(0).IsName("Getting Up"))
         {
-            if (!photonView.IsMine) return;
+            return;
         }
-        //서버테스트중이 아니거나 로컬캐릭터일때만 이동처리
-        MoveCharacter();  // 캐릭터 이동 처리
-        UpdateRotate();   // 마우스 회전에 따른 캐릭터 회전
-        HandleJump();     // 점프 처리
         MoveCharacter();  // 이동
         HandleJump();     // 점프
         CheckGrounded();  // 땅에 닿아 있는지 감지
@@ -145,7 +149,6 @@ public class CharacterController : MonoBehaviourPun
         }
         else
         {
-            // 가속도를 적용하여 목표 속도까지 부드럽게 변경
             Vector3 newVelocity = Vector3.Lerp(currentVelocity, targetVelocity, acceleration * Time.deltaTime);
             rb.velocity = new Vector3(newVelocity.x, rb.velocity.y, newVelocity.z);
 
@@ -166,7 +169,7 @@ public class CharacterController : MonoBehaviourPun
             isGrounded = false; // 점프 후 공중 상태로 변경
 
             bool isHolding = GetComponent<PickUpController>().IsHoldingObject();
-            if(isHolding)
+            if (isHolding)
             {
                 animator.SetTrigger(carryJumpTriggerName); // carry 점프 트리거 활성화
             }
@@ -197,23 +200,14 @@ public class CharacterController : MonoBehaviourPun
     // 파티클 충돌 처리
     private void OnParticleCollision(GameObject other)
     {
-        if (other.CompareTag("WaterParticle")) // 파티클 태그 확인
+        Debug.Log("OnParticleCollision 호출됨: " + other.name);
+
+        if (other.CompareTag("WaterParticle"))
         {
-            int numParticles = ps.GetParticles(particles);
+            Debug.Log("WaterParticle 태그 감지됨!");
 
-            for (int i = 0; i < numParticles; i++)
-            {
-                if (particles[i].remainingLifetime < 0.1f) // 충돌한 파티클 찾기 (수명 활용)
-                {
-                    particles[i].remainingLifetime = 0f; // 파티클 수명을 0으로 설정하여 즉시 제거
-                    ps.SetParticles(particles, numParticles); // 파티클 데이터 업데이트
-                    break;
-                }
-            }
-
-            Debug.Log("파티클 물방울과 충돌");
-
-            SlowDownSpeed(); // 속도 감소 효과
+            StartWetEffect(); // 젖은 상태 효과 시작
+            SlowDownSpeed();  // 속도 감소 효과 적용
         }
     }
 
@@ -223,15 +217,19 @@ public class CharacterController : MonoBehaviourPun
         if (isWet)
         {
             wetTime = wetDuration;
-            return; // 이미 젖은 상태라면 중복 실행 방지
+            Debug.Log("계속 물에 맞고 있음");
+            return;
         }
+
         isWet = true;
-        wetTime = wetDuration; // 5초 타이머 시작
+        wetTime = wetDuration;
 
         // 속도와 점프력을 절반으로 줄임
         moveSpeed = originalMoveSpeed * 0.5f;
         sprintSpeed = originalSprintSpeed * 0.5f;
         jumpForce = originalJumpForce * 0.5f;
+
+        Debug.Log("처음 물에 맞음");
     }
 
     // 물에 젖은 효과 종료
@@ -259,6 +257,9 @@ public class CharacterController : MonoBehaviourPun
         moveSpeed *= slowDownFactor;
         sprintSpeed *= slowDownFactor;
         jumpForce *= slowDownFactor;
+
+        if (animator != null)
+            animator.speed = 0.5f;
     }
 
     // 원래 속도로 복구
@@ -270,6 +271,8 @@ public class CharacterController : MonoBehaviourPun
         jumpForce = originalJumpForce;
 
         isSlowedDown = false;
+        if (animator != null)
+            animator.speed = 1f;
     }
 
     // 에디터에서 땅 감지 Ray 시각

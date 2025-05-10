@@ -5,8 +5,8 @@ using UnityEngine.EventSystems;
 
 public class InteractManager : MonoBehaviourPun
 {
-    public Transform cameraMount; // 카메라 기준 위치 (CameraMount)
-    private Transform raycastPosition; // 내부에서 사용하는 레이 발사 위치
+    public Transform cameraMount;
+    private Transform raycastPosition;
 
     public float detectionRange = 10f;
     public TMP_Text descriptionText;
@@ -21,15 +21,17 @@ public class InteractManager : MonoBehaviourPun
     private PlayerPushController pushController;
     private InteractController interactController;
 
-    // 애니메이터 관련 변수
-    public Animator animator; // 애니메이터 컴포넌트 연결
-    public string liftTriggerName = "IsLift"; // 애니메이터 트리거 이름
+
+    public Animator animator; 
+    public string liftTriggerName = "IsLift";
+    public string IsPutName = "IsPut";
 
     void Start()
     {
         pickUpController = GetComponent<PickUpController>();
         interactController = GetComponent<InteractController>();
-        // cameraMount 자동 연결
+
+
         if (cameraMount == null && Camera.main != null)
             cameraMount = Camera.main.transform;
 
@@ -43,11 +45,10 @@ public class InteractManager : MonoBehaviourPun
 
     void Update()
     {
-        if (!photonView.IsMine) return;
+        if (GameStateManager.isServerTest && !photonView.IsMine) return;
         DetectObject();
         heldObject = pickUpController.heldObject; // PickUpController에서 들고 있는 물체 정보를 가져옴
     }
-
     private void DetectObject()
     {
         detectedObject = null;
@@ -58,45 +59,85 @@ public class InteractManager : MonoBehaviourPun
 
         if (Physics.Raycast(raycastPosition.position, raycastPosition.forward, out hit, detectionRange))
         {
-            detectedObject = hit.collider.gameObject;
+            GameObject hitObject = hit.collider.gameObject;
 
-            if (hit.collider.CompareTag("Pickable"))
+            if (hitObject.CompareTag("Pickable"))
             {
-                Debug.Log("Pickable 감지: " + hit.collider.gameObject.name);
-
-                if (descriptionText != null && heldObject == null)
+                if (heldObject == null)
                 {
-                    descriptionText.enabled = true;
-                    descriptionText.text = "Press F to Pick Up";
-                    isPickable = true;
+                    detectedObject = hitObject;
                     pickUpController.detectedObject = detectedObject;
+                    isPickable = true;
+
+                    if (descriptionText != null)
+                    {
+                        descriptionText.enabled = true;
+                        descriptionText.text = "Press F to Pick Up";
+                    }
                 }
             }
-            else if (hit.collider.CompareTag("Interactable"))
+            else if (hitObject.CompareTag("Interactable"))
             {
-                Debug.Log("Interactable 감지: " + hit.collider.gameObject.name);
+                detectedObject = hitObject;
+                isPickable = false;
+
                 if (descriptionText != null)
                 {
                     descriptionText.enabled = true;
                     descriptionText.text = "Press F to Interact";
-                    isPickable = false;
                 }
             }
         }
+        else
+        {
+            detectedObject = null;
+            pickUpController.detectedObject = null;
+            isPickable = false;
 
-        if (detectedObject == null && heldObject == null && descriptionText != null)
-            descriptionText.enabled = false;
+            if (descriptionText != null && heldObject == null)
+            {
+                descriptionText.enabled = false;
+                descriptionText.text = "";
+            }
+
+            Debug.Log("감지 X : 상태 초기화 완료");
+        }
+        if (detectedObject == null && heldObject == null)
+        {
+            if (descriptionText != null)
+            {
+                descriptionText.enabled = false;
+                descriptionText.text = "";
+            }
+        }
     }
 
+    private void SetDescription(string text)
+    {
+        if (descriptionText != null && heldObject == null)
+        {
+            descriptionText.enabled = true;
+            descriptionText.text = text;
+        }
+    }
     public void OnInput()
     {
-        if (heldObject != null) // 들고 있는 물체가 있다면
+        if(GameStateManager.isServerTest)
         {
-            pickUpController.HandlePickUpOrDrop(); // 물체를 내려놓습니다.
-            if (isPickable) // 들 수 있는 물체였다면
-            {
-                animator.SetTrigger("IsPut"); // IsPut 트리거 활성화
-            }
+            photonView.RPC(nameof(RPC_OnInput), RpcTarget.All);
+        }
+        else
+        {
+            RPC_OnInput();
+        }
+    }
+    [PunRPC]
+    public void RPC_OnInput()
+    {
+        if (heldObject != null)
+        {
+            pickUpController.HandlePickUpOrDrop(); 
+            animator.SetTrigger(IsPutName);
             return;
         }
 
@@ -106,11 +147,24 @@ public class InteractManager : MonoBehaviourPun
         if (isPickable)
         {
             pickUpController.HandlePickUpOrDrop();
-            animator.SetTrigger(liftTriggerName); // PickUp 시 애니메이터 트리거 활성화
+            animator.SetTrigger(liftTriggerName); 
         }
         else if (isPickable == false)
         {
             interactController.Interact(detectedObject);
         }
+    }
+    public void ResetDetection()
+    {
+        detectedObject = null;
+        isPickable = false;
+
+        if (descriptionText != null)
+        {
+            descriptionText.enabled = false;
+            descriptionText.text = "";
+        }
+
+        Debug.Log("감지 상태 초기화됨");
     }
 }

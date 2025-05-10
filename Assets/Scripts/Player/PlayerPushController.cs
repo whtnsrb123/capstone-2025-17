@@ -1,29 +1,36 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using Photon.Pun;
 
-public class PlayerPushController : MonoBehaviour
+public class PlayerPushController : MonoBehaviourPun
 {
-    private float pushForce = 3f; // 밀치는 힘
-    private bool canPush = false; // 밀칠 수 있는 상태 여부
-    private Rigidbody targetPlayerRb; // 밀칠 대상 플레이어의 Rigidbody
-    [SerializeField] private Transform cameraMount; // 카메라가 붙을 위치
+    private float pushForce = 3f; 
+    private Rigidbody targetPlayerRb; 
+    
+    private bool canPush = false;
+    [SerializeField] private Transform cameraMount;
     [SerializeField] private float detectionRange = 0.5f; // 감지 거리
-    [SerializeField] private TMP_Text pushUI; // 밀칠 수 있을 때 표시할 UI
+    [SerializeField] private TMP_Text pushUI; 
 
     private bool isPushing = false; // 밀치는 중인지 여부
-    [SerializeField] private float pushDelay = 1f; // 밀치기 딜레이 (초)
+    [SerializeField] private float pushDelay = 1f; // 밀치기 딜레이
+    public Animator animator;
+    public const string PushTriggerName = "IsPush";
+    
 
     void Start()
     {
         if (pushUI != null) pushUI.enabled = false;
         if (cameraMount == null && Camera.main != null)
             cameraMount = Camera.main.transform;
+
+        animator = GetComponent<Animator>();
     }
 
     void Update()
     {
-        DetectPlayer(); // 플레이어 감지 함수 호출
+        DetectPlayer();
     }
 
     void DetectPlayer()
@@ -33,7 +40,6 @@ public class PlayerPushController : MonoBehaviour
 
         RaycastHit hit;
 
-        // 정면으로 하나의 레이캐스트를 쏘아 플레이어 감지
         if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hit, detectionRange))
         {
             // Player 태그 감지
@@ -51,7 +57,7 @@ public class PlayerPushController : MonoBehaviour
             }
         }
 
-        // 플레이어를 감지하지 못했을 경우 UI 숨김
+
         if (targetPlayerRb == null && pushUI != null)
         {
             pushUI.enabled = false;
@@ -60,9 +66,21 @@ public class PlayerPushController : MonoBehaviour
 
     public void PushPlayer()
     {
-        isPushing = true; // 밀치는 중으로 설정
+        if (GameStateManager.isServerTest)
+        {
+            photonView.RPC(nameof(RPC_PushPlayer), RpcTarget.All);
+        }
+        else
+        {
+            RPC_PushPlayer();
+        }
+    }
+    [PunRPC]
+    public void RPC_PushPlayer()
+    {
+        isPushing = true; // 밀치는 중
 
-        // targetPlayerRb가 null인지 확인
+
         if (targetPlayerRb == null)
         {
             isPushing = false;
@@ -73,7 +91,7 @@ public class PlayerPushController : MonoBehaviour
         Vector3 pushDirection = (targetPlayerRb.transform.position - transform.position).normalized;
         targetPlayerRb.AddForce(pushDirection * pushForce, ForceMode.Impulse); // 힘 적용하여 밀치기
         Debug.Log("밀치기 성공: " + targetPlayerRb.gameObject.name); // 디버그 메시지
-
+        animator.SetTrigger(PushTriggerName); 
         StartCoroutine(ResetPushing()); // 딜레이 코루틴 시작
     }
 

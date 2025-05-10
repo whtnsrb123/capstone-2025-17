@@ -1,78 +1,65 @@
-using UnityEngine;
 using Photon.Pun;
+using UnityEngine;
 
 public class InputManager : MonoBehaviourPun
 {
-    private Player_Push_Controller pushController;
+    private PlayerPushController pushController;
     private PickUpController pickUpController;
+    private RotateToMouse rotateToMouse;
     private InteractManager interactManager;
-    private GameObject MiniMap;
+    public Animator animator;
+    public string throwTriggerName = "IsThrow";
+
+    private void Awake()
+    {
+        if (GameStateManager.isServerTest && !photonView.IsMine) return;
+        Cursor.lockState = CursorLockMode.Locked; // 마우스 커서 고정 
+        Cursor.visible = false; // 마우스 커서를 숨김
+        rotateToMouse = GetComponent<RotateToMouse>(); // 마우스 컨트롤 
+    }
 
     void Start()
     {
-        pushController = GetComponent<Player_Push_Controller>();
+        pushController = GetComponent<PlayerPushController>();
         pickUpController = GetComponent<PickUpController>();
         interactManager = GetComponent<InteractManager>();
-        MiniMap = GameObject.Find("MiniMap"); //Find 함수는 활성 오브젝트만 찾을 수 있다.
-        if (MiniMap != null)
-        {
-            MiniMap.SetActive(false);
-        }
-
-        if (pushController == null) Debug.LogError("Player_Push_Controller가 없습니다.");
-        if (pickUpController == null) Debug.LogError("PickUpController가 없습니다.");
+        animator = GetComponent<Animator>();
     }
 
     void Update()
     {
-        if (GameStateManager.isServerTest)
-            if (!photonView.IsMine) return;
-
-        // F 키: 물체 잡기/놓기
-        if (Input.GetKeyDown(KeyCode.F))
+        if (GameStateManager.isServerTest && !photonView.IsMine) return;
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("lift")
+        || animator.GetCurrentAnimatorStateInfo(0).IsName("lift Reverse")
+        || animator.GetCurrentAnimatorStateInfo(0).IsName("Falling")
+        || animator.GetCurrentAnimatorStateInfo(0).IsName("Fall Impact")
+        || animator.GetCurrentAnimatorStateInfo(0).IsName("Getting Up"))
         {
-            interactManager.OnInput();
+            return;
         }
+        UpdateRotate();
+        if (Input.GetKeyDown(KeyCode.F)) interactManager.OnInput();
 
-        // 마우스 왼쪽 클릭: 밀치기 또는 물체 던지기
         if (Input.GetMouseButtonDown(0))
         {
-            Debug.Log("마우스 왼쪽 클릭 감지됨"); // 디버그 로그 추가
             if (pickUpController.IsHoldingObject())
             {
-                Debug.Log("물체를 들고 있음 -> 던지기 시도");
                 pickUpController.ThrowObject();
+                animator.SetTrigger(throwTriggerName);
             }
             else if (pushController.CanPush())
             {
-                Debug.Log("밀치기 가능 -> 푸쉬 시도");
                 pushController.PushPlayer();
-            }
-            else
-            {
-                Debug.Log("밀치기 불가능: canPush = " + pushController.CanPush());
             }
         }
 
-        // R 키: 물체 회전
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            Debug.Log("R 키 입력 감지됨");
-            pickUpController.RotateHeldObject();
-        }
-        
-        // Tab 키 : 미니맵 On Off
-        if (Input.GetKeyDown(KeyCode.Tab))
-        {
-            Debug.Log("Tab 키 입력 감지됨");
-            if (MiniMap.activeSelf)
-            {
-                MiniMap.SetActive(false);
-            }
-            else
-            {
-                MiniMap.SetActive(true);
-            }
-        }
+        if (Input.GetKeyDown(KeyCode.R)) pickUpController.RotateHeldObject();
+    }
+
+    void UpdateRotate()
+    {
+        float mouseX = Input.GetAxis("Mouse X");
+        float mouseY = Input.GetAxis("Mouse Y");
+        rotateToMouse.UpdateRotate(mouseX, mouseY);
     }
 }

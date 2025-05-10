@@ -1,83 +1,90 @@
 using Photon.Pun;
 using UnityEngine;
 using TMPro;
+using System.Collections;
+using Photon.Pun;
 
 public class PickUpController : MonoBehaviourPun
 {
-    public Transform raycastPosition;         // 레이캐스트 시작 위치 (카메라)
-    public Transform pickPosition;            // 물체를 들 위치 (손 위치)
-    public GameObject heldObject;             // 현재 들고 있는 물체
-    private Rigidbody heldObjectRb;           // 들고 있는 물체의 Rigidbody
-    public GameObject detectedObject;         // 감지된 물체
+    private float defaultMass; // 물체의 원래 질량
+    private float defaultDrag; // 물체의 원래 저항력
+    private float defaultAngularDrag;
+
+    public Transform raycastPosition;
+    public Transform pickPosition;
+    public GameObject heldObject;
+    private Rigidbody heldObjectRb;
+    public GameObject detectedObject;
 
     private float detectionRange = 2f;        // 감지 거리
     private float pickUpOffset = 0.5f;        // 손과 물체 사이 거리
-    [SerializeField] private TMP_Text pickUpUI; // UI 텍스트: "Press F to Drop"
-    private PlayerPushController pushController;
-    [SerializeField] private float throwForce = 10f; // 던지는 힘
+    [SerializeField] private TMP_Text pickUpUI;
+    [SerializeField] private float throwForce = 10f;
 
-    [SerializeField] private LineRenderer trajectoryLine; // 궤적 라인
-    private int trajectoryPoints = 50;        // 궤적 점 수
-    private float timeBetweenPoints = 0.03f;  // 점 간 시간
+    [SerializeField] private LineRenderer trajectoryLine;
+    private int trajectoryPoints = 50;       
+    private float timeBetweenPoints = 0.03f; 
     [SerializeField] private float dashLength = 0.1f; // 점 길이
-    [SerializeField] private float dashGap = 0.05f;   // 점 간 간격
+    [SerializeField] private float dashGap = 0.05f; 
     private float crosshairSize = 50f;        // 에임 크기
 
-    [SerializeField] private float holdFollowSpeed = 60f;  // 손 위치로 빠르게 이동
-    [SerializeField] private float holdRotateSpeed = 10f;  // 손 회전 따라오는 속도
+    [SerializeField] private float holdFollowSpeed = 60f; 
+    [SerializeField] private float holdRotateSpeed = 10f; 
 
     private Quaternion originalRotation; // 처음 잡았던 회전값 저장
-    private bool isTouching = false;     // 다른 물체에 닿아 있는지 여부
+    private bool isTouching = false;
     private Quaternion heldRotationOffset = Quaternion.identity; // R키로 회전한 상태 누적 저장
+    
+    private GameObject recentlyThrownObject;
+    private float throwCooldownTime = 1.0f;
+    private float throwTimer = 0f;
 
     void Start()
     {
-        if (!photonView.IsMine) return;
-        // 밀기 컨트롤러 초기화
-        pushController = GetComponent<Player_Push_Controller>();
         Camera mainCamera = Camera.main;
         raycastPosition = mainCamera.transform;
 
-        // UI 텍스트 비활성화
         if (pickUpUI != null) pickUpUI.enabled = false;
 
-        // 플레이어 밀기 컴포넌트 연결
-        pushController = GetComponent<PlayerPushController>();
-
-        // 궤적 라인 초기 설정
+        InitializeTrajectoryLine();
+    }
+    private void InitializeTrajectoryLine() // 궤적
+    {
         trajectoryLine.enabled = true;
         trajectoryLine.positionCount = 0;
         trajectoryLine.startWidth = 0.05f;
         trajectoryLine.endWidth = 0.05f;
         trajectoryLine.numCornerVertices = 5;
         trajectoryLine.numCapVertices = 0;
-
-        // 궤적 라인 텍스처 및 색상 설정
-        trajectoryLine.material = new Material(Shader.Find("Sprites/Default"));
-        trajectoryLine.startColor = new Color(1f, 1f, 0f, 1f);
-        trajectoryLine.endColor = new Color(1f, 1f, 0f, 1f);
         trajectoryLine.textureMode = LineTextureMode.Tile;
 
-        // 점선 텍스처 생성
+        trajectoryLine.material = new Material(Shader.Find("Sprites/Default"))
+        {
+            mainTexture = CreateDashedTexture()
+        };
+        trajectoryLine.startColor = trajectoryLine.endColor = Color.yellow;
+        trajectoryLine.material.mainTextureScale = new Vector2(1f / (dashLength + dashGap), 1f);
+    }
+
+    private Texture2D CreateDashedTexture()
+    {
         Texture2D dashTexture = new Texture2D(4, 1);
         dashTexture.SetPixel(0, 0, Color.white);
         dashTexture.SetPixel(1, 0, Color.white);
         dashTexture.SetPixel(2, 0, Color.clear);
         dashTexture.SetPixel(3, 0, Color.clear);
         dashTexture.Apply();
-
-        trajectoryLine.material.mainTexture = dashTexture;
-        trajectoryLine.material.mainTextureScale = new Vector2(1f / (dashLength + dashGap), 1f);
+        return dashTexture;
     }
 
     void Update()
     {
-        if (!photonView.IsMine) return;
-        // 물체를 들고 있을 경우 위치 업데이트
-        // 감지 레이 시각화
+
+        if (GameStateManager.isServerTest && !photonView.IsMine) return;
+        if (throwTimer > 0f)
+            throwTimer -= Time.deltaTime;
         Debug.DrawRay(raycastPosition.position, raycastPosition.forward * detectionRange, Color.red);
 
-        // 들고 있는 경우 UI 활성화
         if (heldObject != null)
         {
             if (pickUpUI != null)
@@ -86,19 +93,16 @@ public class PickUpController : MonoBehaviourPun
                 pickUpUI.text = "Press F to Drop";
             }
         }
-        else
+        else if (trajectoryLine != null)
         {
-            // 궤적 제거
-            if (trajectoryLine != null)
-            {
-                trajectoryLine.positionCount = 0;
-            }
+            trajectoryLine.positionCount = 0;
         }
     }
 
     void FixedUpdate()
     {
-        if (!photonView.IsMine) return;
+        if (GameStateManager.isServerTest && !photonView.IsMine) return;
+        // 궤적 그리기
         DisplayTrajectory();
 
         // 들고 있는 물체 손 위치로 이동
@@ -144,65 +148,85 @@ public class PickUpController : MonoBehaviourPun
             DropObject(); // 놓기
         }
     }
-
-    private void TryPickUp()
+    /*private void TryPickUp()
     {
         if (detectedObject == null) return;
-        
-        PhotonView objectView = detectedObject.GetComponent<PhotonView>();
-        if (objectView != null && !objectView.IsMine)
+        if (detectedObject == recentlyThrownObject && throwTimer > 0f)
         {
-            objectView.RequestOwnership();
+            Debug.Log("감지 금지 : 최근 던진 오브젝트");
+            return;
         }
 
         heldObject = detectedObject;
         heldObjectRb = heldObject.GetComponent<Rigidbody>();
-
         if (heldObjectRb != null)
         {
-            heldObjectRb.isKinematic = false;    // 물리 유지
-            heldObjectRb.useGravity = false;     // 중력 제거
+            // 원래 물리 속성 저장
+            defaultMass = heldObjectRb.mass;
+            defaultDrag = heldObjectRb.drag;
+            defaultAngularDrag = heldObjectRb.angularDrag;
 
-            Collider heldObjectCollider = heldObject.GetComponent<Collider>();
+            // 들고 있을 때 가벼운 속성 적용
+            heldObjectRb.mass = 0.1f; // 매우 가벼운 질량
+            heldObjectRb.drag = 5f;   // 높은 저항력
+            heldObjectRb.angularDrag = 10f; // 높은 회전 저항력
 
-            if (heldObjectCollider != null && heldObject.CompareTag("Pickable"))
-            {
-                heldObjectCollider.isTrigger = false; // 충돌 유지
-            }
-
-            // Ray 충돌 제외를 위해 레이어 변경
+            heldObjectRb.isKinematic = false;
+            heldObjectRb.useGravity = false;
             heldObject.layer = LayerMask.NameToLayer("HeldObject");
-
-            // pickPosition이 할당되었는지 확인
-            if (pickPosition != null)
-            {
-                if (objectView != null)
-                {
-                    Vector3 newPickPosition = pickPosition.position + pickPosition.forward * (objectRadius + pickUpOffset);
-                    heldObject.transform.position = newPickPosition; // 조정된 위치에 배치
-                    heldObject.transform.rotation = pickPosition.rotation;
-                    heldObject.transform.parent = pickPosition;
-                    Debug.Log("물체 잡기 성공: " + heldObject.name);
-                    
-                    int objectViewID = objectView.ViewID;
-                    int playerViewID = photonView.ViewID;
-
-                    photonView.RPC(nameof(RPC_SetParent), RpcTarget.All, objectViewID, playerViewID);
-                }
-            }
-            else
-            {
-                Debug.LogError("pickPosition이 설정되지 않았습니다.");
-            }
-            // 현재 회전값 저장
             originalRotation = heldObject.transform.rotation;
+        }
+    }
+*/
+    private bool isPickingUp = false; // 중복 줍기 방지용
 
+    public void TryPickUp()
+    {
+        if (GameStateManager.isServerTest)
+        {
+            photonView.RPC(nameof(RPC_TryPickUp), RpcTarget.All);
+        }
+        else
+        {
+            RPC_TryPickUp();
+        }
+    }
+    [PunRPC]
+    public void RPC_TryPickUp()
+    {
+        if (isPickingUp) return; // 이미 줍는 중이면 무시
+        if (detectedObject == null) return; // 감지된 오브젝트 없으면 무시
+    
+        StartCoroutine(PickUpWithDelay(0.8f));
+    }
+
+    private IEnumerator PickUpWithDelay(float delay)
+    {
+        isPickingUp = true;
+        yield return new WaitForSeconds(delay);
+
+        if (detectedObject == null || heldObject != null)
+        {
+            isPickingUp = false;
+            yield break;
+        }
+
+        heldObject = detectedObject;
+        heldObjectRb = heldObject.GetComponent<Rigidbody>();
+        if (heldObjectRb != null)
+        {
+            heldObjectRb.isKinematic = false;
+            heldObjectRb.useGravity = false;
+
+            heldObject.layer = LayerMask.NameToLayer("HeldObject");
+            originalRotation = heldObject.transform.rotation;
             Debug.Log("물체 잡기 성공: " + heldObject.name);
         }
         else
         {
             heldObject = null;
         }
+        isPickingUp = false;
     }
     
     [PunRPC]
@@ -215,41 +239,71 @@ public class PickUpController : MonoBehaviourPun
 
         Transform pickPos = playerView.transform.Find("pickPosition");
 
-        if (pickPos != null)
-        {
-            objView.transform.SetParent(pickPos);
-            objView.transform.localPosition = Vector3.forward * pickUpOffset;
-            objView.transform.localRotation = Quaternion.identity;
-        }
-    }
-    
-    private void DropObject()
+
+
+
+
+    /*public void DropObject()
     {
         if (heldObject != null)
         {
-            int objectViewID = heldObject.GetPhotonView().ViewID;
+            // 원래 물리 속성 복구
+            heldObjectRb.mass = defaultMass;
+            heldObjectRb.drag = defaultDrag;
+            heldObjectRb.angularDrag = defaultAngularDrag;
 
-            // 먼저 모든 클라에 Drop 알림
-            photonView.RPC(nameof(RPC_DropObject), RpcTarget.All, objectViewID);
-
-            // 이후 로컬 상태 정리
-            heldObjectRb.isKinematic = false;
             heldObjectRb.useGravity = true;
-            heldObjectRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-
-            heldObject.transform.parent = null;
-
-            Collider heldObjectCollider = heldObject.GetComponent<Collider>();
-            if (heldObjectCollider != null)
-            {
-                heldObjectCollider.isTrigger = false;
-            }
-
-            heldObject = null;
-            heldObjectRb = null;
-            Debug.Log("물체 놓기 성공");
-
+            heldObjectRb.isKinematic = false;
+            heldObject.layer = LayerMask.NameToLayer("Default");
         }
+        ResetHeldObject();
+    }
+*/
+    private bool isDropping = false; // 중복 방지용
+
+    public void DropObject()
+    {
+        if (GameStateManager.isServerTest)
+        {
+            photonView.RPC(nameof(RPC_DropObject), RpcTarget.All);
+        }
+        else
+        {
+            RPC_DropObject();
+        }
+    }
+    [PunRPC]
+    public void RPC_DropObject()
+    {
+        if (isDropping) return;      // 이미 내려놓는 중이면 무시
+        if (heldObject == null) return; // 들고 있는 물체 없으면 무시
+
+        StartCoroutine(DropWithDelay(0.8f));
+    }
+
+    private IEnumerator DropWithDelay(float delay)
+    {
+        isDropping = true;
+        yield return new WaitForSeconds(delay);
+
+        // 딜레이 중에 heldObject가 사라졌으면 중단
+        if (heldObject == null)
+        {
+            isDropping = false;
+            yield break;
+        }
+
+        // 기존 DropObject 처리
+        heldObjectRb.useGravity = true;
+        heldObjectRb.isKinematic = false;
+        heldObjectRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        heldObject.layer = LayerMask.NameToLayer("Default");
+        Debug.Log("물체 놓기: " + heldObject.name);
+
+        heldObject = null;
+        heldObjectRb = null;
+
+        isDropping = false;
     }
     
     [PunRPC]
@@ -284,26 +338,34 @@ public class PickUpController : MonoBehaviourPun
 
     public void ThrowObject()
     {
+        if (GameStateManager.isServerTest)
+        {
+            photonView.RPC(nameof(RPC_ThrowObject), RpcTarget.All);
+        }
+        else
+        {
+            RPC_ThrowObject();
+        }
+    }
+    
+    [PunRPC]
+    public void RPC_ThrowObject()
+    {
         if (heldObject != null && heldObjectRb != null)
         {
-            int viewID = heldObject.GetPhotonView().ViewID;
-            Vector3 throwDirection = (pickPosition.forward + Vector3.up * 0.5f).normalized;
-            
-            photonView.RPC(nameof(RPC_ThrowObject), RpcTarget.All, viewID, throwDirection);
-            
-            Collider heldObjectCollider = heldObject.GetComponent<Collider>();
-            if (heldObjectCollider != null)
-            {
-                heldObjectCollider.isTrigger = false;
-            }
+            StartCoroutine(ThrowWithDelay(0.7f));
+        }
+    }
+    private IEnumerator ThrowWithDelay(float delay)
+    {
 
-            heldObjectRb.isKinematic = false;
-            heldObjectRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        yield return new WaitForSeconds(delay);
+        if (heldObject != null && heldObjectRb != null)
+        {
+            heldObjectRb.mass = defaultMass;
+            heldObjectRb.drag = defaultDrag;
+            heldObjectRb.angularDrag = defaultAngularDrag;
 
-            // 던질 방향과 힘 설정
-            if (pickPosition != null)
-            {
-                heldObjectRb.AddForce(throwDirection * throwForce, ForceMode.VelocityChange);
             heldObjectRb.useGravity = true;
             heldObjectRb.isKinematic = false;
             heldObjectRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
@@ -312,15 +374,24 @@ public class PickUpController : MonoBehaviourPun
             heldObjectRb.AddForce(throwDirection * throwForce, ForceMode.VelocityChange);
 
             heldObject.transform.position += Vector3.up * 0.1f;
+            Debug.Log("물체 던지기");
+            recentlyThrownObject = heldObject;
+            throwTimer = throwCooldownTime;
+        }
 
-            // 레이어 복구
+
+        ResetHeldObject();
+    }
+    private void ResetHeldObject()
+    {
+        if (heldObject != null)
             heldObject.layer = LayerMask.NameToLayer("Default");
 
-            heldObject = null;
-            heldObjectRb = null;
+        heldObject = null;
+        heldObjectRb = null;
 
-            Debug.Log("물체 던지기");
-        }
+        if (TryGetComponent(out InteractManager interact))
+            interact.ResetDetection();
     }
 
     [PunRPC]
@@ -396,7 +467,6 @@ public class PickUpController : MonoBehaviourPun
             {
                 totalLength += Vector3.Distance(previousPoint, pointPosition);
             }
-
             previousPoint = pointPosition;
         }
 
@@ -406,11 +476,20 @@ public class PickUpController : MonoBehaviourPun
 
     public void RotateHeldObject()
     {
-        if (heldObject != null)
+        if (GameStateManager.isServerTest)
         {
-            heldRotationOffset *= Quaternion.Euler(0, 0, -90);
-            Debug.Log("물체 회전");
+            photonView.RPC(nameof(RPC_RotateHeldObject), RpcTarget.All);
         }
+        else
+        {
+            RPC_RotateHeldObject();
+        }
+    }
+    [PunRPC]
+    public void RPC_RotateHeldObject()
+    {
+        heldRotationOffset *= Quaternion.Euler(0, 0, -90);
+        Debug.Log("물체 회전");
     }
 
     public bool IsHoldingObject()
