@@ -248,6 +248,13 @@ public class PickUpController : MonoBehaviourPun
         if (objView == null || playerView == null) return;
 
         Transform pickPos = playerView.transform.Find("pickPosition");
+        
+        if (pickPos != null)
+        {
+            objView.transform.SetParent(pickPos);
+            objView.transform.localPosition = Vector3.forward * pickUpOffset;
+            objView.transform.localRotation = Quaternion.identity;
+        }
 
     }
 
