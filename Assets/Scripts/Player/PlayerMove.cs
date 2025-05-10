@@ -153,16 +153,17 @@ public class CharacterController : MonoBehaviourPun
         {
             Vector3 newVelocity = Vector3.Lerp(currentVelocity, targetVelocity, acceleration * Time.deltaTime);
             rb.velocity = new Vector3(newVelocity.x, rb.velocity.y, newVelocity.z);
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                animator.SetInteger("MoveType", 2); // 달리기 상태
+            }
+            else
+            {
+                animator.SetInteger("MoveType", 1); // 걷기 상태
+            }
         }
     }
 
-    // 마우스 입력을 받아 캐릭터 회전 처리
-    void UpdateRotate()
-    {
-        float mouseX = Input.GetAxis("Mouse X"); // 마우스 좌우 이동 입력
-        float mouseY = Input.GetAxis("Mouse Y"); // 마우스 상하 이동 입력
-        rotateToMouse.UpdateRotate(mouseX, mouseY); // 회전 적용
-    }
 
     void HandleJump() //점프
     {
