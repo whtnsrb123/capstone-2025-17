@@ -50,6 +50,7 @@ public class PickUpController : MonoBehaviourPun
     }
     private void InitializeTrajectoryLine() // 궤적
     {
+        trajectoryLine = GetComponent<LineRenderer>();
         trajectoryLine.enabled = true;
         trajectoryLine.positionCount = 0;
         trajectoryLine.startWidth = 0.05f;

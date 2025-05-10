@@ -138,12 +138,15 @@ public class InteractManager : MonoBehaviourPun
         {
             pickUpController.HandlePickUpOrDrop(); 
             animator.SetTrigger(IsPutName);
-            if(detectedObject.GetComponent<BatteryBox>() != null)
+            if (FindObjectOfType<BatteryBox>() != null)
             {
-                detectedObject.GetComponent<BatteryBox>().Interact(gameObject);
-                return;
+                if (detectedObject.GetComponent<BatteryBox>() != null)
+                {
+                    detectedObject.GetComponent<BatteryBox>().Interact(gameObject);
+                    return;
+                }
             }
-
+            
             pickUpController.HandlePickUpOrDrop(); // 물체를 내려놓습니다.
             if (isPickable) // 들 수 있는 물체였다면
             {
