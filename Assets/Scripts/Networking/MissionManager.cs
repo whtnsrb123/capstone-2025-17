@@ -30,8 +30,9 @@ public class MissionManager : MonoBehaviourPun ,IManager
         Debug.Log("MissionManager 클리어");
     }
 
-    private void Start()
+    private IEnumerator Start()
     {
+        yield return new WaitForSeconds(0.1f); // 씬 안정화 대기
         Managers.GameTimerManager.StartTimer(300f);
     }
 

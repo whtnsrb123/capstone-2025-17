@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
+using UnityEngine.SceneManagement;
+
 [DefaultExecutionOrder(-100)] // 가능한 한 빨리 실행되게
 public class Managers : MonoBehaviour
 {
@@ -134,6 +136,34 @@ public class Managers : MonoBehaviour
         return go.GetComponent<T>();
     }
     
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name.StartsWith("Mission"))
+        {
+            // 기존 타이머 제거
+            if (_gameTimer != null)
+            {
+                PhotonNetwork.Destroy(_gameTimer.gameObject);
+                _gameTimer = null;
+                Debug.Log("GameTimerManager 파괴");
+            }
+
+            // 다시 생성
+            _gameTimer = CreateManager<GameTimerManager>(gameObject, "GameTimerManager");
+            _gameTimer.Init();
+            Debug.Log("GameTimerManager 재생성 완료");
+        }
+    }
     
 
 
