@@ -52,6 +52,11 @@ public class Managers : MonoBehaviour
 
     void CreateManagers(GameObject parent)
     {
+        if (GameStateManager.isServerTest && !PhotonNetwork.IsMasterClient)
+        {
+            return;
+        }
+
         _gameState = CreateManager<GameStateManager>(parent, "GameStateManager");
         _gameTimer = CreateManager<GameTimerManager>(parent, "GameTimerManager");
         _missionManager = CreateManager<MissionManager>(parent, "MissionManager");
@@ -65,6 +70,7 @@ public class Managers : MonoBehaviour
         foreach (var m in _managerList)
             m.Init();
     }
+
 
     T CreateManager<T>(GameObject parent, string name) where T : MonoBehaviour, IManager
     {
