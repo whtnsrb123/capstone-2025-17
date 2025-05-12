@@ -9,6 +9,7 @@ public class InputManager : MonoBehaviourPun
     private InteractManager interactManager;
     public Animator animator;
     public string throwTriggerName = "IsThrow";
+    public string PushTriggerName = "IsPush";
     private GameObject MiniMap;
 
     private void Awake()
@@ -56,6 +57,7 @@ public class InputManager : MonoBehaviourPun
             else if (pushController.CanPush())
             {
                 pushController.PushPlayer();
+                animator.SetTrigger(PushTriggerName); 
             }
         }
 

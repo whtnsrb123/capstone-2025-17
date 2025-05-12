@@ -15,8 +15,6 @@ public class PlayerPushController : MonoBehaviourPun
 
     private bool isPushing = false; // 밀치는 중인지 여부
     [SerializeField] private float pushDelay = 1f; // 밀치기 딜레이
-    public Animator animator;
-    public const string PushTriggerName = "IsPush";
     
 
     void Start()
@@ -24,8 +22,6 @@ public class PlayerPushController : MonoBehaviourPun
         if (pushUI != null) pushUI.enabled = false;
         if (cameraMount == null && Camera.main != null)
             cameraMount = Camera.main.transform;
-
-        animator = GetComponent<Animator>();
     }
 
     void Update()
@@ -91,7 +87,6 @@ public class PlayerPushController : MonoBehaviourPun
         Vector3 pushDirection = (targetPlayerRb.transform.position - transform.position).normalized;
         targetPlayerRb.AddForce(pushDirection * pushForce, ForceMode.Impulse); // 힘 적용하여 밀치기
         Debug.Log("밀치기 성공: " + targetPlayerRb.gameObject.name); // 디버그 메시지
-        animator.SetTrigger(PushTriggerName); 
         StartCoroutine(ResetPushing()); // 딜레이 코루틴 시작
     }
 

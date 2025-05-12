@@ -13,7 +13,7 @@ public class CharacterController : MonoBehaviourPun
     private float acceleration = 20f;                                       // 이동 가속도
 
     private bool isGrounded;                                // 캐릭터가 땅에 닿아 있는지 여부
-    private Rigidbody rb;  
+    private Rigidbody rb;
     private RotateToMouse rotateToMouse;
     private Transform cameraTransform;
 
@@ -43,6 +43,11 @@ public class CharacterController : MonoBehaviourPun
     public int MoveType = 0; // MoveType 변수 선언 및 초기화
     public string jumpTriggerName = "IsJump"; // 점프 트리거 이름
     public const string carryJumpTriggerName = "IsCarryJump"; // 점프 트리거 이름
+    public string fallTriggerName = "IsFall";
+    public string fallingImpactTriggerName = "IsFallingImpact";
+
+    private float jumpStartTime = -0.5f; // 점프 시작 시간 저장
+    private float jumpTimeout = 0.5f; // 1초 이내에 착지
 
     private void Awake()
     {
@@ -65,11 +70,10 @@ public class CharacterController : MonoBehaviourPun
         {
             if (!photonView.IsMine) return;
         }
-        
+
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true; // 캐릭터 회전이 물리적으로 영향을 받지 않도록 설정
         cameraTransform = Camera.main.transform; // 메인 카메라의 Transform 가져오기
-        rb.collisionDetectionMode = CollisionDetectionMode.Continuous; // 충돌 감지 모드 설정
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous; // 충돌 감지 모드 설정
 
         // 원래 속도와 점프력 저장
@@ -90,8 +94,41 @@ public class CharacterController : MonoBehaviourPun
         animator = GetComponent<Animator>();
     }
 
+    private bool wasGroundedLastFrame = true;
+    private bool isFallingAnimPlayed = false;
+    private bool isJumping = false;
+    private float airborneStartTime = 0f; // 공중에 떠있는 시작 시간 저장
+
     void Update()
     {
+        CheckGrounded();  // 땅에 닿아 있는지 감지
+
+        // 공중에 처음 뜨면 시간 저장
+        if (!isGrounded && wasGroundedLastFrame) airborneStartTime = Time.time;
+        // 공중에 떠있는 시간 계산
+        float timeInAir = Time.time - airborneStartTime;
+
+        // 낙하 애니메이션 트리거 0.5초 이상 공중에 떠있으면 낙하모션
+        if (!isGrounded && timeInAir > 0.5f && rb.velocity.y < 0
+        && !isJumping && !isFallingAnimPlayed)
+        {
+            animator.SetTrigger(fallTriggerName);
+            isFallingAnimPlayed = true;
+        }
+        // 트리거 초기화
+        if (isGrounded && !wasGroundedLastFrame)
+        {
+            animator.ResetTrigger(fallTriggerName);
+            animator.ResetTrigger(fallingImpactTriggerName);
+            if (timeInAir > 0.5f)
+            {
+                animator.SetTrigger(fallingImpactTriggerName);
+            }
+            isFallingAnimPlayed = false;
+            isJumping = false;
+        }
+        wasGroundedLastFrame = isGrounded;
+
         if (GameStateManager.isServerTest && !photonView.IsMine) return;
         if (animator.GetCurrentAnimatorStateInfo(0).IsName("lift")
         || animator.GetCurrentAnimatorStateInfo(0).IsName("lift Reverse")
@@ -103,7 +140,7 @@ public class CharacterController : MonoBehaviourPun
         }
         MoveCharacter();  // 이동
         HandleJump();     // 점프
-        CheckGrounded();  // 땅에 닿아 있는지 감지
+
 
         // 물에 닿은 상태일 때 계속 효과가 적용되도록 유지
         if (isWet)
@@ -128,7 +165,7 @@ public class CharacterController : MonoBehaviourPun
 
     // 캐릭터 이동 처리
     void MoveCharacter()
-    {   
+    {
         float horizontal = Input.GetAxis("Horizontal"); // A, D 또는 좌우 방향키 입력 값
         float vertical = Input.GetAxis("Vertical");     // W, S 또는 상하 방향키 입력 값
 
@@ -162,6 +199,11 @@ public class CharacterController : MonoBehaviourPun
                 animator.SetInteger("MoveType", 1); // 걷기 상태
             }
         }
+        if (!isGrounded)
+        {
+            animator.SetInteger("MoveType", 0); // 낙하 중엔 이동 애니메이션 무력화
+            return;
+        }
     }
 
 
@@ -172,6 +214,8 @@ public class CharacterController : MonoBehaviourPun
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse); // 위쪽 방향으로 힘을 가해 점프
             isGrounded = false; // 점프 후 공중 상태로 변경
+            isJumping = true;
+            jumpStartTime = Time.time; // 점프한 시간 기록
 
             bool isHolding = GetComponent<PickUpController>().IsHoldingObject();
             if (isHolding)
@@ -195,6 +239,7 @@ public class CharacterController : MonoBehaviourPun
         if (Physics.Raycast(ray, out hit, groundCheckDistance))
         {
             isGrounded = true;
+            isJumping = false;
         }
         else
         {
