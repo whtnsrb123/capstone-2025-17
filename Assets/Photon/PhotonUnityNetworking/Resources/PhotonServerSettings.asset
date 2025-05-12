@@ -76,6 +76,9 @@ MonoBehaviour:
   - RunArmRPC
   - TryDropPlayer
   - RPC_ClearParent
+  - RPC_StartThrowWithDelay
+  - RPC_ResetHeldObject
+  - RPC_ReceivePush
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

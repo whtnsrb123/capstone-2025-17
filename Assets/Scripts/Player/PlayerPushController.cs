@@ -5,17 +5,16 @@ using Photon.Pun;
 
 public class PlayerPushController : MonoBehaviourPun
 {
-    private float pushForce = 3f; 
-    private Rigidbody targetPlayerRb; 
-    
+    private float pushForce = 3f;
+    private Rigidbody targetPlayerRb;
+
     private bool canPush = false;
     [SerializeField] private Transform cameraMount;
     [SerializeField] private float detectionRange = 0.5f; // 감지 거리
-    [SerializeField] private TMP_Text pushUI; 
+    [SerializeField] private TMP_Text pushUI;
 
-    private bool isPushing = false; // 밀치는 중인지 여부
-    [SerializeField] private float pushDelay = 1f; // 밀치기 딜레이
-    
+    private bool isPushing = false;
+    [SerializeField] private float pushDelay = 1f; // 밀치기 쿨타임
 
     void Start()
     {
@@ -26,19 +25,18 @@ public class PlayerPushController : MonoBehaviourPun
 
     void Update()
     {
+        if (GameStateManager.isServerTest && !photonView.IsMine) return;
         DetectPlayer();
     }
 
     void DetectPlayer()
     {
-        targetPlayerRb = null; // 감지 초기화
+        targetPlayerRb = null;
         canPush = false;
 
         RaycastHit hit;
-
-        if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hit, detectionRange))
+        if (Physics.Raycast(cameraMount.position, cameraMount.forward, out hit, detectionRange))
         {
-            // Player 태그 감지
             if (hit.collider.CompareTag("Player") && hit.collider.gameObject != gameObject)
             {
                 targetPlayerRb = hit.collider.GetComponent<Rigidbody>();
@@ -46,15 +44,13 @@ public class PlayerPushController : MonoBehaviourPun
                 {
                     canPush = true;
                     pushUI.enabled = true;
-                    pushUI.text = "Left Click to Push"; // UI 메시지 설정
-
+                    pushUI.text = "Left Click to Push";
                     Debug.Log("플레이어 감지됨: " + hit.collider.gameObject.name);
                 }
             }
         }
 
-
-        if (targetPlayerRb == null && pushUI != null)
+        if (!canPush && pushUI != null)
         {
             pushUI.enabled = false;
         }
@@ -62,32 +58,31 @@ public class PlayerPushController : MonoBehaviourPun
 
     public void PushPlayer()
     {
-        if (GameStateManager.isServerTest)
-        {
-            photonView.RPC(nameof(RPC_PushPlayer), RpcTarget.All);
-        }
-        else
-        {
-            RPC_PushPlayer();
-        }
+        if (!canPush || isPushing || targetPlayerRb == null) return;
+
+        PhotonView targetView = targetPlayerRb.GetComponent<PhotonView>();
+        if (targetView == null) return;
+
+        Vector3 pushDir = (targetPlayerRb.transform.position - transform.position).normalized;
+
+        // 대상에게 자기 자신을 밀도록 요청 (소유자에게만 RPC)
+        targetView.RPC(nameof(RPC_ReceivePush), targetView.Owner, pushDir);
+
+        isPushing = true;
+        StartCoroutine(ResetPushing());
+
+        Debug.Log("밀치기 RPC 전송 완료: " + targetView.name);
     }
+
     [PunRPC]
-    public void RPC_PushPlayer()
+    public void RPC_ReceivePush(Vector3 pushDirection)
     {
-        isPushing = true; // 밀치는 중
-
-
-        if (targetPlayerRb == null)
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
         {
-            isPushing = false;
-            return;
+            rb.AddForce(pushDirection * pushForce, ForceMode.Impulse);
+            Debug.Log("밀림: " + gameObject.name);
         }
-
-        // 밀칠 방향 계산
-        Vector3 pushDirection = (targetPlayerRb.transform.position - transform.position).normalized;
-        targetPlayerRb.AddForce(pushDirection * pushForce, ForceMode.Impulse); // 힘 적용하여 밀치기
-        Debug.Log("밀치기 성공: " + targetPlayerRb.gameObject.name); // 디버그 메시지
-        StartCoroutine(ResetPushing()); // 딜레이 코루틴 시작
     }
 
     public bool CanPush()
@@ -97,7 +92,7 @@ public class PlayerPushController : MonoBehaviourPun
 
     IEnumerator ResetPushing()
     {
-        yield return new WaitForSeconds(pushDelay); // 딜레이 시간만큼 대기
-        isPushing = false; // 밀치기 가능 상태로 변경
+        yield return new WaitForSeconds(pushDelay);
+        isPushing = false;
     }
 }
