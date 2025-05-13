@@ -101,6 +101,12 @@ public class CharacterController : MonoBehaviourPun
 
     void Update()
     {
+        if (animator == null)
+        {
+            Debug.LogError("Animator가 할당되지 않았습니다.");
+            animator = GetComponent<Animator>();
+            return;
+        }
         CheckGrounded();  // 땅에 닿아 있는지 감지
 
         // 공중에 처음 뜨면 시간 저장
