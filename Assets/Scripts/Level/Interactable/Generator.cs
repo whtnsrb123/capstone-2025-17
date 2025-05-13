@@ -1,7 +1,8 @@
 using UnityEngine;
 using System.Collections;
+using Photon.Pun;
 
-public class Generator : MonoBehaviour, IInteractable
+public class Generator : MonoBehaviourPun, IInteractable
 {
     public bool isOn = false;
     private Light light;
@@ -17,8 +18,15 @@ public class Generator : MonoBehaviour, IInteractable
         if(generating != null)
             return;
 
+        photonView.RPC(nameof(OnGenerate), RpcTarget.All);
+    }
+
+    [PunRPC]
+    private void OnGenerate()
+    {
         generating = StartCoroutine(Generate());
     }
+    
 
     private IEnumerator Generate()
     {
