@@ -462,6 +462,7 @@ GameObject:
   - component: {fileID: 3865999153999927849}
   - component: {fileID: 887020640177147057}
   - component: {fileID: 7382862929885658808}
+  - component: {fileID: 2925625928783586150}
   m_Layer: 0
   m_Name: Player_0509
   m_TagString: Player
@@ -560,6 +561,8 @@ MonoBehaviour:
   animator: {fileID: 0}
   MoveType: 0
   jumpTriggerName: IsJump
+  fallTriggerName: IsFall
+  fallingImpactTriggerName: IsFallingImpact
 --- !u!114 &1385889436397186095
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -614,7 +617,6 @@ MonoBehaviour:
   detectionRange: 2
   pushUI: {fileID: 8575465511554801602}
   pushDelay: 1
-  animator: {fileID: 0}
 --- !u!114 &7217889996257957149
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -629,6 +631,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 0}
   throwTriggerName: IsThrow
+  PushTriggerName: IsPush
 --- !u!114 &4765485064288033584
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -814,6 +817,7 @@ MonoBehaviour:
   soundPlayer: {fileID: 1968624709043829588}
   walkingSound: walking
   throwSound: throw
+  jumpSound: jump
 --- !u!114 &1968624709043829588
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -827,7 +831,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   soundManager: {fileID: 6885794341226350006}
-  bgmName: 
 --- !u!114 &6885794341226350006
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -943,6 +946,18 @@ MonoBehaviour:
   m_SynchronizeLayers:
   - SynchronizeType: 1
     LayerIndex: 0
+--- !u!114 &2925625928783586150
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 984485247083863301}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd953cc322d61c2429f69ddd1c996dfc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1026141065467039876
 GameObject:
   m_ObjectHideFlags: 0
