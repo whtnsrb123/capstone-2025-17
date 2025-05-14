@@ -81,6 +81,7 @@ MonoBehaviour:
   - RPC_ReceivePush
   - OnElevator
   - OnGenerate
+  - RPC_OnCollisionEnter
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
