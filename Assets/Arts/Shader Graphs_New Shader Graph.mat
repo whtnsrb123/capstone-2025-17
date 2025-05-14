@@ -59,7 +59,7 @@ Material:
     - _waterAlpha: 0.92
     m_Colors:
     - _BaseColor: {r: 0.16019939, g: 0.2930915, b: 0.754717, a: 1}
-    - _VoronoiColor: {r: 0.13901745, g: 0.41509432, b: 0.38293, a: 1}
+    - _VoronoiColor: {r: 0.13725494, g: 0.33252153, b: 0.41568628, a: 1}
     - _VoronoiSpeed: {r: 0, g: -0.5, b: 0, a: 0}
     - _VoronoiTiling: {r: 1.2, g: 0.6, b: 0, a: 0}
   m_BuildTextureStacks: []

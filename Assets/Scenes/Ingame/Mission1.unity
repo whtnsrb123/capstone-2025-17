@@ -16874,6 +16874,74 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1561341750}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1518536992
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1026468722488620198, guid: 23cdfbe79f2cd864a87bc0deae004031,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 7.921
+      objectReference: {fileID: 0}
+    - target: {fileID: 1026468722488620198, guid: 23cdfbe79f2cd864a87bc0deae004031,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.331
+      objectReference: {fileID: 0}
+    - target: {fileID: 1026468722488620198, guid: 23cdfbe79f2cd864a87bc0deae004031,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 11.632
+      objectReference: {fileID: 0}
+    - target: {fileID: 1026468722488620198, guid: 23cdfbe79f2cd864a87bc0deae004031,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1026468722488620198, guid: 23cdfbe79f2cd864a87bc0deae004031,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1026468722488620198, guid: 23cdfbe79f2cd864a87bc0deae004031,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1026468722488620198, guid: 23cdfbe79f2cd864a87bc0deae004031,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1026468722488620198, guid: 23cdfbe79f2cd864a87bc0deae004031,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 1026468722488620198, guid: 23cdfbe79f2cd864a87bc0deae004031,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1026468722488620198, guid: 23cdfbe79f2cd864a87bc0deae004031,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1236250648498408625, guid: 23cdfbe79f2cd864a87bc0deae004031,
+        type: 3}
+      propertyPath: m_Name
+      value: WaterfullFog
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 23cdfbe79f2cd864a87bc0deae004031, type: 3}
 --- !u!1001 &1523128835
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21961,6 +22029,7 @@ SceneRoots:
   - {fileID: 48259136}
   - {fileID: 469600413}
   - {fileID: 342844229}
+  - {fileID: 1518536992}
   - {fileID: 977199067}
   - {fileID: 1485641397}
   - {fileID: 1857236884}
