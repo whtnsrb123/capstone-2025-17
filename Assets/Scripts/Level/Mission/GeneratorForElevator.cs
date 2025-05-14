@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
-public class GeneratorForElevator : MonoBehaviour
+public class GeneratorForElevator : MonoBehaviourPun
 {
     public Generator firstGenerator;
     public Generator secondGenerator;
@@ -13,17 +14,23 @@ public class GeneratorForElevator : MonoBehaviour
     {
         if(firstGenerator.isOn && secondGenerator.isOn)
         {
-            cutSceneCamera.PlayShortCutScene();
+            photonView.RPC(nameof(OnElevator), RpcTarget.All);
+        }
+    }
+    
+    [PunRPC]
+    void OnElevator()
+    {
+        cutSceneCamera.PlayShortCutScene();
 
 
-            firstGenerator.FinishGenerate();
-            secondGenerator.FinishGenerate();
+        firstGenerator.FinishGenerate();
+        secondGenerator.FinishGenerate();
 
-            elevator.gameObject.tag = "Interactable";
-            elevator.Interact();
+        elevator.gameObject.tag = "Interactable";
+        elevator.Interact();
 
             
-            Destroy(this);
-        }
+        Destroy(this);
     }
 }

@@ -46,11 +46,7 @@ public class GameTimerManager : MonoBehaviourPun, IManager
     //미션이 시작할 때 GameTimerManager.Instance.StartTimer(300f)호출 => 5분 타이머 시작
     public void StartTimer(float duration)
     {
-        if (!PhotonNetwork.IsMasterClient) // 방장만 타이머 설정 가능
-        {
-            return;
-        }
-        
+        if (GameStateManager.isServerTest && !PhotonNetwork.IsMasterClient) return; // 방장만 타이머 설정 가능
         //모든 플레이어가 타이머 시작을 동기화
         photonView.RPC(nameof(RPC_StartTimer), RpcTarget.All, duration);
     }
@@ -58,6 +54,8 @@ public class GameTimerManager : MonoBehaviourPun, IManager
     [PunRPC]
     private void RPC_StartTimer(float duration)
     {
+        timer = 0f;
+        isTimerRunning = false;
         // 이미 타이머 텍스트가 세팅되어 있으면 다시 만들지 않음
         if (timerText == null)
         {

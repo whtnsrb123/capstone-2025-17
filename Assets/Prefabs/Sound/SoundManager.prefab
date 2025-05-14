@@ -60,8 +60,44 @@ MonoBehaviour:
   clips:
     array:
     - Key: BGM
-      Value: {fileID: 8300000, guid: 3010d032c0178d04895dcc4c620b0189, type: 3}
-    - Key: SFX
-      Value: {fileID: 8300000, guid: 8a4272a0056857c4580178c57a365654, type: 3}
+      Value: {fileID: 8300000, guid: dc21a326834f30146b7439680fe12b04, type: 3}
+    - Key: generator
+      Value: {fileID: 8300000, guid: 41a9563f0ec51a54fae9b309775b2dfa, type: 3}
+    - Key: walking
+      Value: {fileID: 8300000, guid: 258e0f0f93388c542944960eea60c7c0, type: 3}
+    - Key: throw
+      Value: {fileID: 8300000, guid: 2016be0d344b49245b9a0f26d8afed5f, type: 3}
+    - Key: jump
+      Value: {fileID: 8300000, guid: b94e901bf459898438d7d374f494037c, type: 3}
+    - Key: elevator_button
+      Value: {fileID: 8300000, guid: bba3eefa5e0d20b4a9b49f5bef2222a4, type: 3}
+    - Key: elevator_move
+      Value: {fileID: 8300000, guid: a6518301871c0cc4387ef3cb28e5da86, type: 3}
+    - Key: waterfall
+      Value: {fileID: 8300000, guid: 0c1c046141bdbd748ba0a6674818ab3f, type: 3}
+    - Key: fan
+      Value: {fileID: 8300000, guid: 47a6b062a1f2b1f4484a8ddb67275e53, type: 3}
+    - Key: pipe
+      Value: {fileID: 8300000, guid: f35274db9d8ed5f47a9f47a6871bdcc1, type: 3}
+    - Key: 'spark_weak '
+      Value: {fileID: 8300000, guid: 5fa0e8b9d362a9048ab1d88cd55c8989, type: 3}
+    - Key: spark_strong
+      Value: {fileID: 8300000, guid: 25db13774645b3c469eecb8a76568775, type: 3}
+    - Key: factory_ambience
+      Value: {fileID: 8300000, guid: 9d9a4e261cf73af478343688ecabacdc, type: 3}
+    - Key: conveyorBelt
+      Value: {fileID: 8300000, guid: d993a55677f2efb4cae4a9fdec5d2ba3, type: 3}
+    - Key: metal_door5s
+      Value: {fileID: 8300000, guid: a0a3a5ef29eea4144a2c5f11b251d4e7, type: 3}
+    - Key: battery
+      Value: {fileID: 8300000, guid: 23198364e0be5f74fa58abd9b30973a3, type: 3}
+    - Key: walking2
+      Value: {fileID: 8300000, guid: 252a05c1e02c08146897b4b5ddfe27c7, type: 3}
+    - Key: walking1
+      Value: {fileID: 8300000, guid: f9e316482d7deff4091820ce9c24b152, type: 3}
+    - Key: 'radio '
+      Value: {fileID: 8300000, guid: 15c3aee1196167f4f882799d08b87fac, type: 3}
+    - Key: buttonClick
+      Value: {fileID: 8300000, guid: b7b78d852fcc5db4994a9cbbdd7a0f6e, type: 3}
   audioSourcePrefab: {fileID: 6396528262120614968, guid: 25904906e1d4e204aa013d2786422111,
     type: 3}

@@ -462,7 +462,7 @@ GameObject:
   - component: {fileID: 3865999153999927849}
   - component: {fileID: 887020640177147057}
   - component: {fileID: 7382862929885658808}
-  - component: {fileID: 8848560097324810999}
+  - component: {fileID: 2925625928783586150}
   m_Layer: 0
   m_Name: Player_0509
   m_TagString: Player
@@ -490,7 +490,6 @@ Transform:
   - {fileID: 5867993186289590325}
   - {fileID: 3608952908881905957}
   - {fileID: 2016750372871816806}
-  - {fileID: 1518496825911859719}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!136 &4780707557089632906
@@ -562,6 +561,8 @@ MonoBehaviour:
   animator: {fileID: 0}
   MoveType: 0
   jumpTriggerName: IsJump
+  fallTriggerName: IsFall
+  fallingImpactTriggerName: IsFallingImpact
 --- !u!114 &1385889436397186095
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -616,7 +617,6 @@ MonoBehaviour:
   detectionRange: 2
   pushUI: {fileID: 8575465511554801602}
   pushDelay: 1
-  animator: {fileID: 0}
 --- !u!114 &7217889996257957149
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -631,6 +631,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 0}
   throwTriggerName: IsThrow
+  PushTriggerName: IsPush
 --- !u!114 &4765485064288033584
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -816,6 +817,7 @@ MonoBehaviour:
   soundPlayer: {fileID: 1968624709043829588}
   walkingSound: walking
   throwSound: throw
+  jumpSound: jump
 --- !u!114 &1968624709043829588
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -829,7 +831,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   soundManager: {fileID: 6885794341226350006}
-  bgmName: 
 --- !u!114 &6885794341226350006
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -945,7 +946,7 @@ MonoBehaviour:
   m_SynchronizeLayers:
   - SynchronizeType: 1
     LayerIndex: 0
---- !u!114 &8848560097324810999
+--- !u!114 &2925625928783586150
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -954,7 +955,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 984485247083863301}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 126494ae2a10a34499272ed97a6c9f5d, type: 3}
+  m_Script: {fileID: 11500000, guid: bd953cc322d61c2429f69ddd1c996dfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1026141065467039876
@@ -1182,153 +1183,6 @@ Transform:
   - {fileID: 8895538936833365400}
   m_Father: {fileID: 6402510692230364165}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1760830540398020186
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1518496825911859719}
-  - component: {fileID: 2774838772273425746}
-  - component: {fileID: 4398109958206712587}
-  m_Layer: 0
-  m_Name: Speaker
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1518496825911859719
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1760830540398020186}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.6595738, y: -0.15846124, z: 0.5776536}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 6721797139563836706}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!82 &2774838772273425746
-AudioSource:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1760830540398020186}
-  m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
-  m_Volume: 1
-  m_Pitch: 1
-  Loop: 0
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
-  Pan2D: 0
-  rolloffMode: 0
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
---- !u!114 &4398109958206712587
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1760830540398020186}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd7fea91fe63f4e1b884ef1e16a975c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playDelayConfig:
-    Low: 200
-    High: 200
-    Max: 1000
-    SpeedUpPerc: 5
-  restartOnDeviceChange: 1
 --- !u!1 &1855421385420692313
 GameObject:
   m_ObjectHideFlags: 0
@@ -1948,7 +1802,6 @@ GameObject:
   - component: {fileID: 3184361188950647164}
   - component: {fileID: 2289562907432031086}
   - component: {fileID: 5227910973733861240}
-  - component: {fileID: 6118111455282328293}
   m_Layer: 5
   m_Name: PickUpText
   m_TagString: Untagged
@@ -2072,29 +1925,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &6118111455282328293
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3139396858403170618}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d732acaa1bf77426aa3cfa9baf61ed5a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  raycastPosition: {fileID: 0}
-  pickPosition: {fileID: 0}
-  heldObject: {fileID: 0}
-  detectedObject: {fileID: 0}
-  pickUpUI: {fileID: 0}
-  throwForce: 2
-  trajectoryLine: {fileID: 0}
-  dashLength: 0.1
-  dashGap: 0.05
-  holdFollowSpeed: 20
-  holdRotateSpeed: 10
 --- !u!1 &3309431092154226834
 GameObject:
   m_ObjectHideFlags: 0
@@ -2432,7 +2262,6 @@ GameObject:
   - component: {fileID: 636252831682226609}
   - component: {fileID: 24879048439712697}
   - component: {fileID: 8575465511554801602}
-  - component: {fileID: 7842891104537399623}
   m_Layer: 5
   m_Name: PushText
   m_TagString: Untagged
@@ -2556,29 +2385,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &7842891104537399623
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3953231247588195659}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d732acaa1bf77426aa3cfa9baf61ed5a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  raycastPosition: {fileID: 0}
-  pickPosition: {fileID: 0}
-  heldObject: {fileID: 0}
-  detectedObject: {fileID: 0}
-  pickUpUI: {fileID: 0}
-  throwForce: 2
-  trajectoryLine: {fileID: 0}
-  dashLength: 0.1
-  dashGap: 0.05
-  holdFollowSpeed: 20
-  holdRotateSpeed: 10
 --- !u!1 &3975978042845909634
 GameObject:
   m_ObjectHideFlags: 0

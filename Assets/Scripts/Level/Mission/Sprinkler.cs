@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
-public class Sprinkler : MonoBehaviour
+public class Sprinkler : MonoBehaviourPun
 {
     public int count = 3;
     public GameObject waterFall;
@@ -13,6 +14,12 @@ public class Sprinkler : MonoBehaviour
     }
 
     private void OnCollisionEnter(Collision other) {
+        photonView.RPC(nameof(RPC_OnCollisionEnter), RpcTarget.All, other);
+    }
+
+    [PunRPC]
+    private void RPC_OnCollisionEnter(Collision other)
+    {
         if(other.gameObject.CompareTag("Pickable")) {
             StartCoroutine(RotateAndScale());
             count--;

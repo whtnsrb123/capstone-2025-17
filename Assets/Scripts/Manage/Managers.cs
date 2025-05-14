@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
+using UnityEngine.SceneManagement;
+
 [DefaultExecutionOrder(-100)] // 가능한 한 빨리 실행되게
 public class Managers : MonoBehaviour
 {
@@ -52,6 +54,11 @@ public class Managers : MonoBehaviour
 
     void CreateManagers(GameObject parent)
     {
+        if (GameStateManager.isServerTest && !PhotonNetwork.IsMasterClient)
+        {
+            return;
+        }
+
         _gameState = CreateManager<GameStateManager>(parent, "GameStateManager");
         _gameTimer = CreateManager<GameTimerManager>(parent, "GameTimerManager");
         _missionManager = CreateManager<MissionManager>(parent, "MissionManager");
@@ -65,6 +72,7 @@ public class Managers : MonoBehaviour
         foreach (var m in _managerList)
             m.Init();
     }
+
 
     T CreateManager<T>(GameObject parent, string name) where T : MonoBehaviour, IManager
     {
@@ -107,6 +115,18 @@ public class Managers : MonoBehaviour
             go.name = name;
             go.transform.SetParent(parent.transform);
         }
+        else if (typeof(T) == typeof(GameStateManager))
+        {
+            GameObject prefab = Resources.Load<GameObject>("GameStateManager");
+            if (prefab == null)
+            {
+                Debug.LogError("GameStateManager 프리팹을 찾을 수 없습니다! Resources/GameStateManager 위치 확인");
+                return null;
+            }
+            go = PhotonNetwork.Instantiate(prefab.name, prefab.transform.position, prefab.transform.rotation);
+            go.name = name;
+            go.transform.SetParent(parent.transform);
+        }
         else
         {
             go = new GameObject(name);
@@ -116,6 +136,34 @@ public class Managers : MonoBehaviour
         return go.GetComponent<T>();
     }
     
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name.StartsWith("Mission"))
+        {
+            // 기존 타이머 제거
+            if (_gameTimer != null)
+            {
+                PhotonNetwork.Destroy(_gameTimer.gameObject);
+                _gameTimer = null;
+                Debug.Log("GameTimerManager 파괴");
+            }
+
+            // 다시 생성
+            _gameTimer = CreateManager<GameTimerManager>(gameObject, "GameTimerManager");
+            _gameTimer.Init();
+            Debug.Log("GameTimerManager 재생성 완료");
+        }
+    }
     
 
 

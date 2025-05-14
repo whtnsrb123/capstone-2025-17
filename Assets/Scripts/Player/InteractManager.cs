@@ -15,6 +15,7 @@ public class InteractManager : MonoBehaviourPun
     private bool isPickable;
 
     private GameObject detectedObject;
+    private GameObject previousDetectedObject;
     private GameObject heldObject;
 
     private PickUpController pickUpController;
@@ -51,66 +52,72 @@ public class InteractManager : MonoBehaviourPun
     }
     private void DetectObject()
     {
-        detectedObject = null;
         RaycastHit hit;
+        GameObject hitObject = null;
 
         if (raycastPosition == null)
             return;
 
         if (Physics.Raycast(raycastPosition.position, raycastPosition.forward, out hit, detectionRange))
         {
-            GameObject hitObject = hit.collider.gameObject;
+            hitObject = hit.collider.gameObject;
 
-            if (hitObject.CompareTag("Pickable"))
+            if (hitObject.CompareTag("Pickable") && heldObject == null)
             {
-                if (heldObject == null)
-                {
-                    detectedObject = hitObject;
-                    pickUpController.detectedObject = detectedObject;
-                    isPickable = true;
+                detectedObject = hitObject;
+                pickUpController.detectedObject = detectedObject;
+                isPickable = true;
 
-                    if (descriptionText != null)
-                    {
-                        descriptionText.enabled = true;
-                        descriptionText.text = "Press F to Pick Up";
-                    }
-                }
+                SetDescription("Press F to Pick Up");
             }
             else if (hitObject.CompareTag("Interactable"))
             {
                 detectedObject = hitObject;
                 isPickable = false;
 
-                if (descriptionText != null)
-                {
-                    descriptionText.enabled = true;
-                    descriptionText.text = "Press F to Interact";
-                }
+                SetDescription("Press F to Interact");
+            }
+            else
+            {
+                detectedObject = null;
+                isPickable = false;
+                pickUpController.detectedObject = null;
             }
         }
         else
         {
             detectedObject = null;
-            pickUpController.detectedObject = null;
             isPickable = false;
-
-            if (descriptionText != null && heldObject == null)
-            {
-                descriptionText.enabled = false;
-                descriptionText.text = "";
-            }
-
-            Debug.Log("감지 X : 상태 초기화 완료");
+            pickUpController.detectedObject = null;
         }
-        if (detectedObject == null && heldObject == null)
+
+        if (previousDetectedObject != detectedObject)
         {
-            if (descriptionText != null)
+            if (previousDetectedObject != null)
             {
-                descriptionText.enabled = false;
-                descriptionText.text = "";
+                Outline prevOutline = previousDetectedObject.GetComponent<Outline>();
+                if (prevOutline != null)
+                    prevOutline.enabled = false;
             }
+
+            if (detectedObject != null)
+            {
+                Outline newOutline = detectedObject.GetComponent<Outline>();
+                if (newOutline != null)
+                    newOutline.enabled = true;
+            }
+
+            previousDetectedObject = detectedObject;
+        }
+
+        // 텍스트 비활성화 조건
+        if (detectedObject == null && heldObject == null && descriptionText != null)
+        {
+            descriptionText.enabled = false;
+            descriptionText.text = "";
         }
     }
+
 
     private void SetDescription(string text)
     {

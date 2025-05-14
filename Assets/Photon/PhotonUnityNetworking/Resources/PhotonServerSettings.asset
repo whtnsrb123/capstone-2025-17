@@ -71,6 +71,13 @@ MonoBehaviour:
   - StartGame
   - SyncGameState
   - TryDropPlayer
+  - RPC_ClearParent
+  - RPC_StartThrowWithDelay
+  - RPC_ResetHeldObject
+  - RPC_ReceivePush
+  - OnElevator
+  - OnGenerate
+  - RPC_OnCollisionEnter
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

@@ -5,12 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7ca77f44-c133-4a41-b675-4d0220a63863" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Assets/Arts/RendererTextures/Team1RenderTexture 2.renderTexture" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Arts/RendererTextures/Team1RenderTexture 2.renderTexture" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Arts/RendererTextures/Team1RenderTexture 3.renderTexture" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Arts/RendererTextures/Team1RenderTexture 3.renderTexture" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Arts/RendererTextures/Team1RenderTexture 4.renderTexture" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Arts/RendererTextures/Team1RenderTexture 4.renderTexture" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Environment/PlayerSpawner.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Environment/PlayerSpawner.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Player_0326.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Player_0326.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Ingame/Mission1.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Ingame/Mission1.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.capstone-2025-17/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.capstone-2025-17/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Manage/Managers.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Manage/Managers.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/build_info" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/build_info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -35,19 +31,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;bug/#22-입력이-다른-캐릭터에게-적용되는-현상&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "develop-test",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="Unity 에디터에 연결.Unity 에디터에 연결">
     <configuration name="유닛 테스트(배치 모드)" type="RunUnityExe" factoryName="Unity Executable">
       <option name="EXE_PATH" value="D:\2022.3.56f1\Editor\Unity.exe" />

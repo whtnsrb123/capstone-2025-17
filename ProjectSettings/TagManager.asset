@@ -12,13 +12,12 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - HeldObject
   - Water
   - UI
   - Character
   - MiniMap
-  - Player
-  - Obstruction
+  - 
   - 
   - 
   - 

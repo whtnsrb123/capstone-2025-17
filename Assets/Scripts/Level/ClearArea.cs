@@ -54,8 +54,15 @@ public class ClearArea : MonoBehaviour
 
         if(PhotonNetwork.IsMasterClient)
         {
-            // if(clearCount > 4) // 방 인원 수로 고쳐야 함
-            //    Managers.MissionManager.CompleteMission();
+            if (clearCount >= 4) // 방 인원 수로 고쳐야 함
+            {
+                int curMission = Managers.MissionManager.CurrentMission;
+                Managers.MissionManager.CompleteMission(curMission);
+                if (curMission < 3)
+                {
+                    Managers.MissionManager.GoNextMission();
+                }
+            }
         }
     }
 
