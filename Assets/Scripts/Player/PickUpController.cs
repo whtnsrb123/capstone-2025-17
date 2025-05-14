@@ -198,7 +198,7 @@ public class PickUpController : MonoBehaviourPun
         if (isPickingUp) return; // 이미 줍는 중이면 무시
         if (detectedObject == null) return; // 감지된 오브젝트 없으면 무시
     
-        StartCoroutine(PickUpWithDelay(0.8f));
+        StartCoroutine(PickUpWithDelay(0.5f));
     }
 
     private IEnumerator PickUpWithDelay(float delay)
@@ -269,24 +269,6 @@ public class PickUpController : MonoBehaviourPun
         objTransform.SetParent(null); // 부모 해제
     }
 
-
-
-    /*public void DropObject()
-    {
-        if (heldObject != null)
-        {
-            // 원래 물리 속성 복구
-            heldObjectRb.mass = defaultMass;
-            heldObjectRb.drag = defaultDrag;
-            heldObjectRb.angularDrag = defaultAngularDrag;
-
-            heldObjectRb.useGravity = true;
-            heldObjectRb.isKinematic = false;
-            heldObject.layer = LayerMask.NameToLayer("Default");
-        }
-        ResetHeldObject();
-    }
-*/
     private bool isDropping = false; // 중복 방지용
 
     public void DropObject()
@@ -307,7 +289,7 @@ public class PickUpController : MonoBehaviourPun
         if (isDropping) return;      // 이미 내려놓는 중이면 무시
         if (heldObject == null) return; // 들고 있는 물체 없으면 무시
         int objectViewID = heldObject.GetPhotonView().ViewID;
-        StartCoroutine(DropWithDelay(0.8f, objectViewID));
+        StartCoroutine(DropWithDelay(0.5f, objectViewID));
     }
 
     private IEnumerator DropWithDelay(float delay, int objectViewID)
@@ -351,7 +333,7 @@ public class PickUpController : MonoBehaviourPun
         }
         else
         {
-            StartCoroutine(ThrowWithDelay(0.7f, objectViewID, throwDirection));
+            StartCoroutine(ThrowWithDelay(0.5f, objectViewID, throwDirection));
         }
 
         recentlyThrownObject = heldObject;
@@ -362,7 +344,7 @@ public class PickUpController : MonoBehaviourPun
     [PunRPC]
     public void RPC_StartThrowWithDelay(int objectViewID, Vector3 throwDirection)
     {
-        StartCoroutine(ThrowWithDelay(0.7f, objectViewID, throwDirection));
+        StartCoroutine(ThrowWithDelay(0.5f, objectViewID, throwDirection));
     }
     
     private IEnumerator ThrowWithDelay(float delay, int objectViewID, Vector3 throwDirection)

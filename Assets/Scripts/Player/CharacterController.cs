@@ -114,8 +114,8 @@ public class CharacterController : MonoBehaviourPun
         // 공중에 떠있는 시간 계산
         float timeInAir = Time.time - airborneStartTime;
 
-        // 낙하 애니메이션 트리거 0.5초 이상 공중에 떠있으면 낙하모션
-        if (!isGrounded && timeInAir > 0.5f && rb.velocity.y < 0
+        // 낙하 애니메이션 트리거 1초 이상 공중에 떠있으면 낙하모션
+        if (!isGrounded && timeInAir > 1f && rb.velocity.y < 0
         && !isJumping && !isFallingAnimPlayed)
         {
             animator.SetTrigger(fallTriggerName);
