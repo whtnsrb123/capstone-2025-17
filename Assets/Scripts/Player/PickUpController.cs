@@ -2,13 +2,9 @@ using Photon.Pun;
 using UnityEngine;
 using TMPro;
 using System.Collections;
-using Photon.Pun;
 
 public class PickUpController : MonoBehaviourPun
 {
-    private float defaultMass; // 물체의 원래 질량
-    private float defaultDrag; // 물체의 원래 저항력
-    private float defaultAngularDrag;
 
     public Transform raycastPosition;
     public Transform pickPosition;
@@ -103,6 +99,7 @@ public class PickUpController : MonoBehaviourPun
     void FixedUpdate()
     {
         if (GameStateManager.isServerTest && !photonView.IsMine) return;
+
         // 궤적 그리기
         DisplayTrajectory();
 
@@ -112,7 +109,7 @@ public class PickUpController : MonoBehaviourPun
             // 위치 이동
             Vector3 targetPosition = pickPosition.position + pickPosition.forward * pickUpOffset;
             Vector3 moveDirection = (targetPosition - heldObjectRb.position);
-            heldObjectRb.MovePosition(heldObjectRb.position + moveDirection * holdFollowSpeed * Time.fixedDeltaTime);
+            heldObjectRb.velocity = moveDirection * holdFollowSpeed; // velocity로 이동
 
             // 충돌 감지
             Vector3 checkSize = heldObject.transform.localScale * 0.5f;
@@ -324,7 +321,8 @@ public class PickUpController : MonoBehaviourPun
     {
         if (heldObject == null || heldObjectRb == null) return;
 
-        Vector3 throwDirection = (pickPosition.forward + Vector3.up * 0.5f).normalized;
+        // 던질 방향 계산
+        Vector3 throwDirection = (pickPosition.forward + Vector3.up * 0.2f).normalized; // 위쪽 보정값 줄임
         int objectViewID = heldObject.GetPhotonView().ViewID;
 
         if (GameStateManager.isServerTest)
@@ -428,8 +426,8 @@ public class PickUpController : MonoBehaviourPun
 
         trajectoryLine.positionCount = trajectoryPoints;
 
-        Vector3 currentPosition = heldObject.transform.position;
-        Vector3 initialVelocity = (pickPosition.forward + Vector3.up * 0.5f).normalized * throwForce;
+        Vector3 currentPosition = pickPosition.position;
+        Vector3 initialVelocity = (pickPosition.forward + Vector3.up * 0.2f).normalized * throwForce; // 위쪽 보정값 줄임
 
         float totalLength = 0f;
         Vector3 previousPoint = currentPosition;

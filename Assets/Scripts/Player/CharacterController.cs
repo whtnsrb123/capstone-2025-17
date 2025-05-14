@@ -114,13 +114,21 @@ public class CharacterController : MonoBehaviourPun
         // 공중에 떠있는 시간 계산
         float timeInAir = Time.time - airborneStartTime;
 
-        // 낙하 애니메이션 트리거 1초 이상 공중에 떠있으면 낙하모션
-        if (!isGrounded && timeInAir > 1f && rb.velocity.y < 0
+        // 낙하 애니메이션 트리거 0.7초 이상 공중에 떠있으면 낙하모션
+        if (!isGrounded && timeInAir > 0.7f && rb.velocity.y < 0
         && !isJumping && !isFallingAnimPlayed)
         {
             animator.SetTrigger(fallTriggerName);
             isFallingAnimPlayed = true;
         }
+
+        // 중력에 의해 떨어지고 있지 않으면 낙하 애니메이션 종료
+        if (isFallingAnimPlayed && rb.velocity.y >= 0)
+        {
+            animator.ResetTrigger(fallTriggerName);
+            isFallingAnimPlayed = false;
+        }
+
         // 트리거 초기화
         if (isGrounded && !wasGroundedLastFrame)
         {
@@ -146,7 +154,6 @@ public class CharacterController : MonoBehaviourPun
         }
         MoveCharacter();  // 이동
         HandleJump();     // 점프
-
 
         // 물에 닿은 상태일 때 계속 효과가 적용되도록 유지
         if (isWet)
