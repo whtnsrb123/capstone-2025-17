@@ -38,13 +38,13 @@ public class RoomManager : MonoBehaviourPun
             // 플레이어 Ready State를 기록하는 배열이다 
             { ReadyStatesKey, new bool[] { false, false, false, false } },
             // 랜덤 매치인 방을 검색하거나, 생성하는 데 사용된다
-            { "MatchType", "Random"}
+            { "MatchTypeKey", "Random"}
         };
 
         // MatchType이 RandomMatch 인 방만 찾도록 한다
         Hashtable expectedCustomProperties = new Hashtable
         {
-            { "MatchType", "Random"}
+            { "MatchTypeKey", "Random"}
         };
 
         RoomOptions room = new RoomOptions
@@ -52,7 +52,7 @@ public class RoomManager : MonoBehaviourPun
             MaxPlayers = RequiredPlayerCount,
             PlayerTtl = playerTtl,
             CustomRoomProperties = customProperties,
-            CustomRoomPropertiesForLobby = new string[] { "MatchType" }, // 로비에서 검색할 방 속성 지정
+            CustomRoomPropertiesForLobby = new string[] { "MatchTypeKey" }, // 로비에서 검색할 방 속성 지정
             EmptyRoomTtl = roomTtl,
         };
 
@@ -85,7 +85,7 @@ public class RoomManager : MonoBehaviourPun
             { PlayerActorNumbersKey, new int[] {-1, -1, -1, -1} },
             { ReadyStatesKey, new bool[] { false, false, false, false } },
             // 랜덤 매치를 시도하는 클라이언트에게 제외되도록 한다
-            { "MatchType",  "Create"}
+            { "MatchTypeKey",  "Create"}
         };
 
         RoomOptions room = new RoomOptions
@@ -93,7 +93,7 @@ public class RoomManager : MonoBehaviourPun
             MaxPlayers = RequiredPlayerCount,
             PlayerTtl = playerTtl,
             CustomRoomProperties = customProperties,
-            CustomRoomPropertiesForLobby = new string[] { "MatchType" },
+            CustomRoomPropertiesForLobby = new string[] { "MatchTypeKey" },
             EmptyRoomTtl = roomTtl,
         };
 

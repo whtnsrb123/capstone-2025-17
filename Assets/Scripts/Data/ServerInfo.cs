@@ -8,6 +8,7 @@ public class ServerInfo : MonoBehaviour
 
     public const string PlayerActorNumbersKey = "PlayerActorNumbers";
     public const string ReadyStatesKey = "ReadyStates";
+    public const string MatchTypeKey = "MatchType";
     public const string IsGameStartKey = "GameStart";
 
     public static ObservableArray<int> PlayerActorNumbers { get; private set; } = new ObservableArray<int>(4, -1);
