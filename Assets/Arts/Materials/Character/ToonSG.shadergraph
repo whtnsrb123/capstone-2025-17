@@ -440,7 +440,7 @@
             },
             "m_InputSlot": {
                 "m_Node": {
-                    "m_Id": "84324859ce15495f8f040cc264a0a1be"
+                    "m_Id": "4b9c35af7645454cb93fc7a9e4c70f47"
                 },
                 "m_SlotId": 0
             }
@@ -723,20 +723,6 @@
                     "m_Id": "c784d34aad1e40efa109b4baa940d643"
                 },
                 "m_SlotId": 2
-            }
-        },
-        {
-            "m_OutputSlot": {
-                "m_Node": {
-                    "m_Id": "be3d6ae78013410c9e73c5cfb4c90283"
-                },
-                "m_SlotId": 2
-            },
-            "m_InputSlot": {
-                "m_Node": {
-                    "m_Id": "4b9c35af7645454cb93fc7a9e4c70f47"
-                },
-                "m_SlotId": 0
             }
         },
         {
@@ -4007,8 +3993,8 @@
     "m_ObjectId": "9599ac78562d4d2b8f1c4ec1ee914b94",
     "m_Title": "IsWet",
     "m_Position": {
-        "x": 26.999784469604493,
-        "y": 1278.9998779296875
+        "x": 27.0,
+        "y": 1279.0
     }
 }
 
@@ -4221,7 +4207,7 @@
     "m_Title": "Toon-Specular",
     "m_Position": {
         "x": -992.0,
-        "y": 74.99993896484375
+        "y": 75.0
     }
 }
 
@@ -4550,7 +4536,7 @@
     "m_Title": "Sub Light",
     "m_Position": {
         "x": 1030.0,
-        "y": 1253.9998779296875
+        "y": 1254.0
     }
 }
 
@@ -4591,7 +4577,7 @@
     "m_Title": "Shadow",
     "m_Position": {
         "x": -2336.0,
-        "y": 491.0000915527344
+        "y": 491.0
     }
 }
 
