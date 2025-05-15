@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "334807542292",
+    "project_id": "toyland-trials",
+    "storage_bucket": "toyland-trials.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:334807542292:android:d79949612d957d630f5501",
+        "android_client_info": {
+          "package_name": "com.DefaultCompany.toyland_trials"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASUcv5J4IdbjqJfUXp7DV25KhkcQV2Hn4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
