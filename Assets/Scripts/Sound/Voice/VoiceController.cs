@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.Audio;
+using System.Xml.Serialization;
 
 /// <summary>
 /// VoiceManager 의 컴포넌트로 부착해야 한다 
@@ -11,8 +13,7 @@ using UnityEngine.SceneManagement;
 public class VoiceController : MonoBehaviour
 {
     #region Inspector 
-    [SerializeField] private Toggle transmitVoice;
-    [SerializeField] private Toggle autoJoinVoice;
+    [SerializeField] private AudioMixerGroup chatGroup;
 
     [SerializeField] private List<Object> excludedSceneList;
 
@@ -21,9 +22,6 @@ public class VoiceController : MonoBehaviour
     private PunVoiceClient voiceClient;
     private Recorder recorder;
 
-    private const string RecordWhenJoin = "RecordWhenJoin";
-    private const string TransmitVoice = "TransmitVoice";
-    private const string SamplingRate = "SamplingRate";
 
     private void Awake()
     {
@@ -51,66 +49,9 @@ public class VoiceController : MonoBehaviour
                 return;
             }
         }
-
-        LoadSetting();
-/*        ConnectUI();
-*/    }
-
-
-
-    private void LoadSetting()
-    {
-        // pun2와 동일한 세팅 사용
-        voiceClient.UsePunAppSettings = true;
-        voiceClient.UsePunAuthValues = true;
-
-        // Load Setting 
-        // 방 입장 시 자동 참가 
-        if (PlayerPrefs.HasKey(RecordWhenJoin))
-        {
-            recorder.RecordWhenJoined = PlayerPrefs.GetInt(RecordWhenJoin) == 1 ? true : false;
-        }
-        else
-        {
-            recorder.RecordWhenJoined = true;
-        }
-
-        // 전송 여부 
-        if (PlayerPrefs.HasKey(TransmitVoice))
-        {
-            recorder.TransmitEnabled = PlayerPrefs.GetInt(TransmitVoice) == 1 ? true : false;
-        }
-        else
-        {
-            recorder.TransmitEnabled = true;
-        }
-
-
-        if (PlayerPrefs.HasKey(SamplingRate))
-        {
-            // recorder.SamplingRate = PlayerPrefs.GetInt(SamplingRate);
-        }
     }
 
-    private void ConnectUI()
-    {
-        transmitVoice.onValueChanged.AddListener(SetTransmitVoice);
-        autoJoinVoice.onValueChanged.AddListener(SetAutoJoinVoice);
-    }
 
-    private void SetTransmitVoice(bool isOn)
-    {
-        recorder.TransmitEnabled = isOn;
-
-        PlayerPrefs.SetInt(TransmitVoice, (isOn ? 1 : 0));
-    }
-
-    private void SetAutoJoinVoice(bool isOn)
-    {
-        recorder.RecordWhenJoined = isOn;
-
-        PlayerPrefs.SetInt(RecordWhenJoin, (isOn ? 1 : 0));
-    }
 
     #region Test
 

@@ -31,6 +31,7 @@ public enum ESoundType
 {
     BGM,
     SFX,
+    CHAT,
     END // 마지막을 표시하기 위해
 }
 
@@ -148,6 +149,14 @@ public class SoundManager : MonoBehaviour
         SFXMute.isOn = false;
     }
 
+    public void SetChatVolume(float volume)
+    {
+        audioMixer.SetFloat("Chat", Mathf.Log10(volume) * 20);
+        PlayerPrefs.SetFloat(chatVolumeStr, volume);
+
+        chatMute.isOn = false;
+    }
+
     public void SetMasterMute(bool isOn)
     {
         if(isOn)
@@ -187,6 +196,24 @@ public class SoundManager : MonoBehaviour
         PlayerPrefs.SetInt(SFXMuteStr, isOn ? 1 : 0);
     }
 
+    public void SetChatMute(bool isOn)
+    {
+        if (isOn)
+        {
+            audioMixer.SetFloat("Chat", Mathf.Log10(0.001f) * 20);
+        }
+        else
+        {
+            SetSFXVolume(chatSlider.value);
+        }
+        PlayerPrefs.SetInt(chatMuteStr, isOn ? 1 : 0);
+    }
+
+    public void SetVoiceMute(bool isOn)
+    {
+        PlayerPrefs.SetInt(voiceMuteStr, isOn ? 1 : 0);
+    }
+
     /// ------------------------------------- private --------------------------------
     // PoolSize는 플젝할 때 로그 남기면서 조절할 필요가 있을 듯
     private const int audioSourcePoolSize = 50;
@@ -198,14 +225,18 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private AudioMixerGroup masterAudioMixerGroup; // audioMixer.find 로 가져와도 되긴 하는데 바로 접근이 안되고 검색해서 가져오는 거 같아서 그냥 메모리에 저장하기로 함
     [SerializeField] private AudioMixerGroup bgmAudioMixerGroup;
     [SerializeField] private AudioMixerGroup sfxAudioMixerGroup;
+    [SerializeField] private AudioMixerGroup chatAudioMixerGroup;
 
     [Header("Audio UI 연결")]
     [SerializeField] private Slider masterSlider;
     [SerializeField] private Slider BGMSlider;
     [SerializeField] private Slider SFXSlider;
+    [SerializeField] private Slider chatSlider;
     [SerializeField] private Toggle masterMute;
     [SerializeField] private Toggle BGMMute;
     [SerializeField] private Toggle SFXMute;
+    [SerializeField] private Toggle chatMute;
+    [SerializeField] private Toggle voiceMute;
 
     [Header("Sound 관리")]
     // Sound 관리
@@ -218,9 +249,12 @@ public class SoundManager : MonoBehaviour
     private string masterVolumeStr = "MasterVolume";
     private string BGMVolumeStr = "BGMVolume";
     private string SFXVolumeStr = "SFXVolume";
+    private string chatVolumeStr = "ChatVolume";
     private string masterMuteStr = "MasterMute";
     private string BGMMuteStr = "BGMMute";
     private string SFXMuteStr = "SFXMute";
+    private string chatMuteStr = "ChatMute";
+    private string voiceMuteStr = "VoiceMute";
 
     // test용 - 3D 사운드 
     //Vector3 soundPlayPosition;
@@ -284,10 +318,13 @@ public class SoundManager : MonoBehaviour
         masterSlider.onValueChanged.AddListener(SetMasterVolume);
         BGMSlider.onValueChanged.AddListener(SetBGMVolume);
         SFXSlider.onValueChanged.AddListener(SetSFXVolume);
+        chatSlider.onValueChanged.AddListener (SetChatVolume);
 
         masterMute.onValueChanged.AddListener(SetMasterMute);
         BGMMute.onValueChanged.AddListener(SetBGMMute);
         SFXMute.onValueChanged.AddListener(SetSFXMute);
+        chatMute.onValueChanged.AddListener(SetChatMute);
+        voiceMute.onValueChanged.AddListener(SetVoiceMute);
     }
 
     private void LoadVolume()
@@ -317,6 +354,15 @@ public class SoundManager : MonoBehaviour
         {
             SFXSlider.value = 0.7f;
         }
+        if (PlayerPrefs.HasKey(chatVolumeStr))
+        {
+            chatSlider.value = PlayerPrefs.GetFloat(chatVolumeStr);
+        }
+        else
+        {
+            chatSlider.value = 0.7f;
+        }
+
         // Mute 불러오기
         if (PlayerPrefs.HasKey(masterMuteStr))
         {
@@ -341,6 +387,22 @@ public class SoundManager : MonoBehaviour
         else
         {
             SFXMute.isOn = false;
+        }
+        if (PlayerPrefs.HasKey(chatMuteStr))
+        {
+            chatMute.isOn = PlayerPrefs.GetFloat(chatMuteStr) == 1;
+        }
+        else
+        {
+            chatMute.isOn = false;
+        }
+        if (PlayerPrefs.HasKey(voiceMuteStr))
+        {
+            voiceMute.isOn = PlayerPrefs.GetFloat (voiceMuteStr) == 1;
+        }
+        else
+        {
+            voiceMute.isOn = false;
         }
     }
 

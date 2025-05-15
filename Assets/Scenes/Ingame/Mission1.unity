@@ -17765,7 +17765,6 @@ GameObject:
   - component: {fileID: 1527484681}
   - component: {fileID: 1527484680}
   - component: {fileID: 1527484679}
-  - component: {fileID: 1527484678}
   m_Layer: 0
   m_Name: VoiceManager
   m_TagString: Untagged
@@ -17773,21 +17772,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1527484678
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1527484677}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41ed01c0ebf5d184a90c3d0d0664a745, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  transmitVoice: {fileID: 0}
-  autoJoinVoice: {fileID: 0}
-  excludedSceneList: []
 --- !u!114 &1527484679
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17805,6 +17789,9 @@ MonoBehaviour:
   - {fileID: 1559141397}
   - {fileID: 989290246}
   - {fileID: 2099911729}
+  chatMixerGroup: {fileID: 275807709471087269, guid: 0a33f41bc91e9944a8eac3db7dea2f21,
+    type: 2}
+  speakers: []
 --- !u!114 &1527484680
 MonoBehaviour:
   m_ObjectHideFlags: 0

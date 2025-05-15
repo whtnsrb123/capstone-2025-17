@@ -1119,12 +1119,16 @@ MonoBehaviour:
   masterAudioMixerGroup: {fileID: 0}
   bgmAudioMixerGroup: {fileID: 0}
   sfxAudioMixerGroup: {fileID: 0}
+  chatAudioMixerGroup: {fileID: 0}
   masterSlider: {fileID: 0}
   BGMSlider: {fileID: 0}
   SFXSlider: {fileID: 0}
+  chatSlider: {fileID: 0}
   masterMute: {fileID: 0}
   BGMMute: {fileID: 0}
   SFXMute: {fileID: 0}
+  chatMute: {fileID: 0}
+  voiceMute: {fileID: 0}
   clips:
     array:
     - Key: walking
