@@ -92,12 +92,17 @@ public class CharacterController : MonoBehaviourPun
 
         // 애니메이터 컴포넌트 가져오기
         animator = GetComponent<Animator>();
+
+        lastYPosition = transform.position.y; // y값 초기화
     }
 
     private bool wasGroundedLastFrame = true;
     private bool isFallingAnimPlayed = false;
     private bool isJumping = false;
     private float airborneStartTime = 0f; // 공중에 떠있는 시작 시간 저장
+
+    private float lastYPosition = 0f; // 이전 프레임 y값 저장
+    private float yPositionThreshold = 0.01f; // y값 변화 허용 오차
 
     void Update()
     {
@@ -114,9 +119,13 @@ public class CharacterController : MonoBehaviourPun
         // 공중에 떠있는 시간 계산
         float timeInAir = Time.time - airborneStartTime;
 
-        // 낙하 애니메이션 트리거 0.7초 이상 공중에 떠있으면 낙하모션
+        // y값 변화량 계산
+        float deltaY = Mathf.Abs(transform.position.y - lastYPosition);
+
+        // 낙하 애니메이션 트리거 0.7초 이상 공중에 떠있고, y속도가 음수이며, y위치가 충분히 변할 때만 낙하모션
         if (!isGrounded && timeInAir > 0.7f && rb.velocity.y < 0
-        && !isJumping && !isFallingAnimPlayed)
+            && deltaY > yPositionThreshold
+            && !isJumping && !isFallingAnimPlayed)
         {
             animator.SetTrigger(fallTriggerName);
             isFallingAnimPlayed = true;
@@ -143,10 +152,11 @@ public class CharacterController : MonoBehaviourPun
         }
         wasGroundedLastFrame = isGrounded;
 
+        lastYPosition = transform.position.y; // y값 저장
+
         if (GameStateManager.isServerTest && !photonView.IsMine) return;
         if (animator.GetCurrentAnimatorStateInfo(0).IsName("lift")
         || animator.GetCurrentAnimatorStateInfo(0).IsName("lift Reverse")
-        || animator.GetCurrentAnimatorStateInfo(0).IsName("Falling")
         || animator.GetCurrentAnimatorStateInfo(0).IsName("Fall Impact")
         || animator.GetCurrentAnimatorStateInfo(0).IsName("Getting Up"))
         {
@@ -229,7 +239,6 @@ public class CharacterController : MonoBehaviourPun
             isGrounded = false; // 점프 후 공중 상태로 변경
             isJumping = true;
             jumpStartTime = Time.time; // 점프한 시간 기록
-
             bool isHolding = GetComponent<PickUpController>().IsHoldingObject();
             if (isHolding)
             {
@@ -304,7 +313,6 @@ public class CharacterController : MonoBehaviourPun
         jumpForce = originalJumpForce;
 
         isWet = false;
-
         Debug.Log("물에 젖은 효과 종료 - 속도와 점프력 복구");
     }
 
