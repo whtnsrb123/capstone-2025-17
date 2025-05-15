@@ -6496,10 +6496,20 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 636252831682226609, guid: fb047788441be42239eefcbe3e856fd0,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 300
+      objectReference: {fileID: 0}
     - target: {fileID: 984485247083863301, guid: fb047788441be42239eefcbe3e856fd0,
         type: 3}
       propertyPath: m_Name
       value: Player_0509
+      objectReference: {fileID: 0}
+    - target: {fileID: 3184361188950647164, guid: fb047788441be42239eefcbe3e856fd0,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 300
       objectReference: {fileID: 0}
     - target: {fileID: 6721797139563836706, guid: fb047788441be42239eefcbe3e856fd0,
         type: 3}
