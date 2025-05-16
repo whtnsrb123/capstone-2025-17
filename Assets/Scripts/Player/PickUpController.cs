@@ -202,8 +202,8 @@ public class PickUpController : MonoBehaviourPun
             {
                 if (heldCol.material == null)
                     heldCol.material = new PhysicMaterial();
-                heldCol.material.staticFriction = 0.9f;
-                heldCol.material.dynamicFriction = 0.8f;
+                heldCol.material.staticFriction = 1f;
+                heldCol.material.dynamicFriction = 1f;
                 heldCol.material.frictionCombine = PhysicMaterialCombine.Maximum;
             }
 
