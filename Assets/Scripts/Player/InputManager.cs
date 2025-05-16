@@ -41,7 +41,6 @@ public class InputManager : MonoBehaviourPun
         // 모든 회전 금지 상태 체크
         bool isRotationBlocked = state.IsName("lift")
                               || state.IsName("lift Reverse")
-                              || state.IsName("Falling")
                               || state.IsName("Fall Impact")
                               || state.IsName("Getting Up");
 
