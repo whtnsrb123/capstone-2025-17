@@ -3,6 +3,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Photon.Voice.PUN;
 
 public class InGameOptionUI : MonoBehaviourPunCallbacks
 {
@@ -54,6 +55,14 @@ public class InGameOptionUI : MonoBehaviourPunCallbacks
     {
         leavePopup.HideUI();
         popup.HideUI();
+
+        if (PunVoiceClient.Instance.Client != null &&
+            PunVoiceClient.Instance.Client.IsConnected)
+        {
+            PunVoiceClient.Instance.Client.Disconnect();
+        }
+
+
         PhotonNetwork.LeaveRoom();
     }
 
