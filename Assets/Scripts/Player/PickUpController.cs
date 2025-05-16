@@ -108,7 +108,7 @@ public class PickUpController : MonoBehaviourPun
             Vector3 upOffset = Vector3.zero;
             Vector3 targetPosition = pickPosition.position + pickPosition.forward * pickUpOffset + upOffset;
             Vector3 moveDirection = (targetPosition - heldObjectRb.position);
-            
+
             float maxSpeed = 10f;
             Vector3 desiredVelocity = moveDirection * holdFollowSpeed;
             if (desiredVelocity.magnitude > maxSpeed)
@@ -290,6 +290,9 @@ public class PickUpController : MonoBehaviourPun
             isDropping = false;
             yield break;
         }
+        heldObjectRb.mass = defaultMass;          
+        heldObjectRb.drag = defaultDrag;          
+        heldObjectRb.angularDrag = defaultAngularDrag;
 
         // 기존 DropObject 처리
         heldObjectRb.useGravity = true;
