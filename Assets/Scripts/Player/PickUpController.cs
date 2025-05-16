@@ -101,30 +101,26 @@ public class PickUpController : MonoBehaviourPun
     {
         if (GameStateManager.isServerTest && !photonView.IsMine) return;
 
-        // 궤적 그리기
         DisplayTrajectory();
 
-        // 들고 있는 물체 손 위치로 이동
         if (heldObject != null && heldObjectRb != null && pickPosition != null)
         {
-            // 위치 이동
-            Vector3 targetPosition = pickPosition.position + pickPosition.forward * pickUpOffset;
+            Vector3 upOffset = Vector3.zero;
+            Vector3 targetPosition = pickPosition.position + pickPosition.forward * pickUpOffset + upOffset;
             Vector3 moveDirection = (targetPosition - heldObjectRb.position);
-            heldObjectRb.velocity = moveDirection * holdFollowSpeed; // velocity로 이동
+            
+            float maxSpeed = 10f;
+            Vector3 desiredVelocity = moveDirection * holdFollowSpeed;
+            if (desiredVelocity.magnitude > maxSpeed)
+                desiredVelocity = desiredVelocity.normalized * maxSpeed;
+            heldObjectRb.velocity = desiredVelocity;
 
-            // 충돌 감지
-            Vector3 checkSize = heldObject.transform.localScale * 0.5f;
-            isTouching = Physics.CheckBox(heldObjectRb.position, checkSize, heldObjectRb.rotation, ~LayerMask.GetMask("HeldObject"));
-
-            // 회전: pickPosition의 회전에 R 키 누적 회전 추가
-            Quaternion targetRotation = isTouching
-                ? pickPosition.rotation * heldRotationOffset
-                : originalRotation * heldRotationOffset;
-
+            Quaternion targetRotation = pickPosition.rotation * heldRotationOffset;
             heldObjectRb.MoveRotation(Quaternion.Slerp(heldObjectRb.rotation, targetRotation, holdRotateSpeed * Time.fixedDeltaTime));
+
+            heldObjectRb.interpolation = RigidbodyInterpolation.Interpolate;
         }
     }
-
     void OnGUI()
     {
         float screenCenterX = Screen.width / 2;
@@ -189,15 +185,28 @@ public class PickUpController : MonoBehaviourPun
             defaultMass = heldObjectRb.mass;
             defaultDrag = heldObjectRb.drag;
             defaultAngularDrag = heldObjectRb.angularDrag;
-            // 들고 있을 때 약하게 보이도록 물리 속성 조정
+
             heldObjectRb.mass = 0.1f;          // 매우 가벼운 질량
             heldObjectRb.drag = 5f;            // 높은 이동 저항력
             heldObjectRb.angularDrag = 10f;    // 높은 회전 저항력
             heldObjectRb.isKinematic = false;
             heldObjectRb.useGravity = false;
+            heldObjectRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            heldObjectRb.interpolation = RigidbodyInterpolation.Interpolate;
 
             heldObject.layer = LayerMask.NameToLayer("HeldObject");
             originalRotation = heldObject.transform.rotation;
+            //  마찰력 높이기
+            Collider heldCol = heldObject.GetComponent<Collider>();
+            if (heldCol != null)
+            {
+                if (heldCol.material == null)
+                    heldCol.material = new PhysicMaterial();
+                heldCol.material.staticFriction = 0.9f;
+                heldCol.material.dynamicFriction = 0.8f;
+                heldCol.material.frictionCombine = PhysicMaterialCombine.Maximum;
+            }
+
             PhotonView objectView = detectedObject.GetComponent<PhotonView>();
             if (objectView != null && !objectView.IsMine)
             {
