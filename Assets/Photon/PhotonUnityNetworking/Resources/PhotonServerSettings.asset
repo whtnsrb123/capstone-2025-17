@@ -78,6 +78,8 @@ MonoBehaviour:
   - OnElevator
   - OnGenerate
   - RPC_OnCollisionEnter
+  - InteractWithElevator
+  - InteractRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
