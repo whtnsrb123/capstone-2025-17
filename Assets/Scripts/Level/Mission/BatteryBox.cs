@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class BatteryBox : MonoBehaviourPun, IInteractable
 {
-    public int batteryCount = 0;
+    public static int batteryCount = 0;
 
     public Transform[] batteryPositions;
     public GameObject[] lights;
@@ -84,5 +84,10 @@ public class BatteryBox : MonoBehaviourPun, IInteractable
     public void Interact()
     {
 
+    }
+
+    public static int GetBatteryCount()
+    {
+        return batteryCount;
     }
 }
