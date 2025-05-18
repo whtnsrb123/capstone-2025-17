@@ -739,7 +739,6 @@ GameObject:
   - component: {fileID: 5346911232402732052}
   - component: {fileID: 5314531603418249096}
   - component: {fileID: 1968624709043829588}
-  - component: {fileID: 6885794341226350006}
   - component: {fileID: 3865999153999927849}
   - component: {fileID: 887020640177147057}
   - component: {fileID: 7382862929885658808}
@@ -1115,41 +1114,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6069e5efbb9b5a743bfa373c9d60dc9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  soundManager: {fileID: 6885794341226350006}
---- !u!114 &6885794341226350006
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 984485247083863301}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7e98024157f30b541b41ca9c289be56e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  audioMixer: {fileID: 0}
-  masterAudioMixerGroup: {fileID: 0}
-  bgmAudioMixerGroup: {fileID: 0}
-  sfxAudioMixerGroup: {fileID: 0}
-  chatAudioMixerGroup: {fileID: 0}
-  masterSlider: {fileID: 0}
-  BGMSlider: {fileID: 0}
-  SFXSlider: {fileID: 0}
-  chatSlider: {fileID: 0}
-  masterMute: {fileID: 0}
-  BGMMute: {fileID: 0}
-  SFXMute: {fileID: 0}
-  chatMute: {fileID: 0}
-  voiceMute: {fileID: 0}
-  clips:
-    array:
-    - Key: walking
-      Value: {fileID: 8300000, guid: 258e0f0f93388c542944960eea60c7c0, type: 3}
-    - Key: throw
-      Value: {fileID: 8300000, guid: 2016be0d344b49245b9a0f26d8afed5f, type: 3}
-  audioSourcePrefab: {fileID: 6396528262120614968, guid: 25904906e1d4e204aa013d2786422111,
-    type: 3}
+  soundManager: {fileID: 0}
 --- !u!114 &3865999153999927849
 MonoBehaviour:
   m_ObjectHideFlags: 0
