@@ -16,20 +16,20 @@ public class RoboticArmHead : MonoBehaviourPun
         {
             if (GameStateManager.isServerTest)
             {
-                photonView.RPC(nameof(PickPlayer), RpcTarget.All, other.transform);
+                photonView.RPC(nameof(PickPlayer), RpcTarget.All, other.GetComponent<PhotonView>().ViewID);
             }
-            else
-            {
-                PickPlayer(other.transform);
-            }
+            // else
+            // {
+            //     PickPlayer(other.transform);
+            // }
         }
         
     }
     
     [PunRPC]
-    private void PickPlayer(Transform targetPlayer)
+    private void PickPlayer(int viewID)
     {
-        target = targetPlayer;
+        target = PhotonView.Find(viewID).transform;
         target.GetComponent<CharacterController>().enabled = false;
         target.GetComponent<Rigidbody>().useGravity = false;
         target.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;

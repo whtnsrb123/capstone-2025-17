@@ -80,6 +80,7 @@ MonoBehaviour:
   - RPC_OnCollisionEnter
   - InteractWithElevator
   - InteractRPC
+  - SetRandomTime
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
