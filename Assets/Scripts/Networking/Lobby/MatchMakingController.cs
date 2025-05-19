@@ -2,6 +2,7 @@ using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class MatchMakingController : MonoBehaviourPunCallbacks
@@ -11,9 +12,11 @@ public class MatchMakingController : MonoBehaviourPunCallbacks
     // 접속이 끊긴 플레이어를 룸에 유지할 시간
     // TODO : 테스트 용도로 0으로 설정한다
     private int playerTtl = 0;
-
     // 아무도 없는 룸을 유지할 시간 
     private int roomTtl = 0;
+
+    private const string randomMatch = "random";
+    private const string createMatch = "create";
 
     public void JoinRandomRoom(string roomName)
     {
@@ -25,7 +28,15 @@ public class MatchMakingController : MonoBehaviourPunCallbacks
             { ServerInfo.PlayerActorNumbersKey, ServerInfo.PlayerActorNumbers.ToArray()},
             // 플레이어 Ready State를 기록하는 배열이다 
             { ServerInfo.ReadyStatesKey, ServerInfo.ReadyStates.ToArray()},
+            // 매치 타입 기억
+            { ServerInfo.MatchTypeKey, randomMatch}, 
             // 게임이 시작됐는지 확인하는 변수 
+            { ServerInfo.IsGameStartKey, false },
+        };
+
+        Hashtable expectedRoomProps = new Hashtable
+        {
+            { ServerInfo.MatchTypeKey, randomMatch },
             { ServerInfo.IsGameStartKey, false },
         };
 
@@ -34,12 +45,13 @@ public class MatchMakingController : MonoBehaviourPunCallbacks
             MaxPlayers = ServerInfo.RequiredPlayerCount,
             PlayerTtl = playerTtl,
             CustomRoomProperties = customProperties,
+            CustomRoomPropertiesForLobby = new string[] { ServerInfo.MatchTypeKey, ServerInfo.IsGameStartKey },
             EmptyRoomTtl = roomTtl,
         };
 
         bool sent = PhotonNetwork.JoinRandomOrCreateRoom
         (
-            null, // 검색 조건
+            expectedRoomProps, // 검색 조건
             ServerInfo.RequiredPlayerCount, // 최대 플레이어 수
             MatchmakingMode.FillRoom, // 많은 방부터 우선 채우기
             TypedLobby.Default, //  기본 로비만 사용
@@ -68,7 +80,15 @@ public class MatchMakingController : MonoBehaviourPunCallbacks
             { ServerInfo.PlayerActorNumbersKey, ServerInfo.PlayerActorNumbers.ToArray()},
             // 플레이어 Ready State를 기록하는 배열이다 
             { ServerInfo.ReadyStatesKey, ServerInfo.ReadyStates.ToArray()},
+            // 매치 타입 기억
+            { ServerInfo.MatchTypeKey, createMatch}, 
             // 게임이 시작됐는지 확인하는 변수
+            { ServerInfo.IsGameStartKey, false },
+        };
+
+        Hashtable expectedRoomProps = new Hashtable
+        {
+            { ServerInfo.MatchTypeKey, createMatch },
             { ServerInfo.IsGameStartKey, false },
         };
 
@@ -77,6 +97,7 @@ public class MatchMakingController : MonoBehaviourPunCallbacks
             MaxPlayers = ServerInfo.RequiredPlayerCount,
             PlayerTtl = playerTtl,
             CustomRoomProperties = customProperties,
+            CustomRoomPropertiesForLobby = new string[] { ServerInfo.MatchTypeKey, ServerInfo.IsGameStartKey },
             EmptyRoomTtl = roomTtl,
         };
 

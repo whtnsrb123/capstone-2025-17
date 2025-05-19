@@ -16,7 +16,7 @@ MonoBehaviour:
     AppIdRealtime: 93618e2b-05e4-4b14-b6c8-b83c0782a202
     AppIdFusion: 
     AppIdChat: 
-    AppIdVoice: 
+    AppIdVoice: 93618e2b-05e4-4b14-b6c8-b83c0782a202
     AppVersion: 
     UseNameServer: 1
     FixedRegion: kr
@@ -34,46 +34,42 @@ MonoBehaviour:
   RunInBackground: 1
   StartInOfflineMode: 0
   RpcList:
+  - CantHearYou
+  - ChangeColour
   - ClickRpc
   - DestroyRpc
+  - HeresWhy
+  - ActivateGimmickRPC
   - DestroySpaceship
-  - Fire
-  - RespawnSpaceship
   - EndGame
-  - StartGame
-  - SyncGameState
-  - MissionComplete
+  - Fire
   - GameClear
   - GameOver
-  - RPC_OnTimeUp
-  - RPC_StartTimer
-  - RequestUpdatePlayerEscaped
-  - RequestUpdatePlayerState
-  - RpcUpdatePlayerEscaped
-  - RpcUpdatePlayerState
-  - RPC_NextMission
-  - RPC_SetUIVisibility
-  - SetUIVisibility
-  - ClientSceneLoaded
-  - SetLoaded
-  - ActivateGimmickRPC
-  - InteractRPC
-  - RegisterPlayerGoal
-  - RPC_DropObject
-  - RPC_SetParent
-  - RPC_ThrowObject
-  - UnRegisterPlayerGoal
-  - UpElevatorRPC
-  - RPC_OnInput
-  - RPC_PushPlayer
-  - RPC_RotateHeldObject
-  - RPC_TryPickUp
   - HandleAttack
   - HandleChase
   - HandleReturn
   - HandleWander
+  - MissionComplete
   - PickPlayer
+  - RequestUpdatePlayerEscaped
+  - RequestUpdatePlayerState
+  - RespawnSpaceship
+  - RPC_DropObject
+  - RPC_OnInput
+  - RPC_OnTimeUp
+  - RPC_PushPlayer
+  - RPC_RotateHeldObject
+  - RPC_SetParent
+  - RPC_StartTimer
+  - RPC_ThrowObject
+  - RPC_TryPickUp
+  - RpcUpdatePlayerEscaped
+  - RpcUpdatePlayerState
   - RunArmRPC
+  - SetLoaded
+  - SetUIVisibility
+  - StartGame
+  - SyncGameState
   - TryDropPlayer
   - RPC_ClearParent
   - RPC_StartThrowWithDelay
@@ -82,6 +78,9 @@ MonoBehaviour:
   - OnElevator
   - OnGenerate
   - RPC_OnCollisionEnter
+  - InteractWithElevator
+  - InteractRPC
+  - SetRandomTime
   DisableAutoOpenWizard: 1
   ShowSettings: 1
-  DevRegionSetOnce: 1
+  DevRegionSetOnce: 0

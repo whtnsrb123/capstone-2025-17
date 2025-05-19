@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
-public class Elevator : MonoBehaviour, IInteractable
+public class Elevator : MonoBehaviourPun, IInteractable
 {
     public bool isMoving = false;
     public bool isDown = true;
@@ -16,6 +17,12 @@ public class Elevator : MonoBehaviour, IInteractable
     }
 
     public void Interact()
+    {
+        photonView.RPC(nameof(InteractWithElevator), RpcTarget.All);
+    }
+
+    [PunRPC]
+    public void InteractWithElevator()
     {
         if (isMoving) return;
 

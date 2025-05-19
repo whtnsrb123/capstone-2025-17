@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
-public class BatteryBox : MonoBehaviour, IInteractable
+public class BatteryBox : MonoBehaviourPun, IInteractable
 {
-    public int batteryCount = 0;
+    public static int batteryCount = 0;
 
     public Transform[] batteryPositions;
     public GameObject[] lights;
@@ -22,22 +23,58 @@ public class BatteryBox : MonoBehaviour, IInteractable
 
     public void Interact(GameObject player)
     {
-        if(player.GetComponent<PickUpController>().heldObject.GetComponent<Battery>() == null)
+        PhotonView view = player.GetComponent<PhotonView>();
+        photonView.RPC(nameof(InteractRPC), RpcTarget.All, view.ViewID);
+    }
+    
+    [PunRPC]
+    public void InteractRPC(int viewID)
+    {
+        Debug.Log("InteractRPC 호출됨!");
+
+        PhotonView view = PhotonView.Find(viewID);
+        if (view == null)
+        {
+            Debug.LogError($"[BatteryBox] viewID {viewID}에 해당하는 PhotonView를 찾을 수 없습니다.");
             return;
-        
-        GameObject targetBattery = player.GetComponent<PickUpController>().heldObject;
-        player.GetComponent<PickUpController>().DropObject();
-        targetBattery.tag = "Untagged";
-        targetBattery.GetComponent<Rigidbody>().useGravity = false;
-        targetBattery.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
-        targetBattery.transform.position = batteryPositions[batteryCount].position;
-        targetBattery.transform.eulerAngles = new Vector3(-90f, 90f, 0f);
+        }
+
+        GameObject player = view.gameObject;
+        PickUpController pickUpController = player.GetComponent<PickUpController>();
+        GameObject pickUp = player.transform.Find("pickPosition").GetChild(0).gameObject;
+
+        if (pickUp == null)
+        {
+            Debug.LogError($"[BatteryBox] PickUpController가 {player.name}에 존재하지 않습니다.");
+            return;
+        }
+
+        Battery battery = pickUp.GetComponent<Battery>();
+        if (battery == null)
+        {
+            Debug.LogWarning($"[BatteryBox] heldObject '{pickUp.name}'에 Battery 컴포넌트가 없습니다.");
+            return;
+        }
+
+        pickUpController.DropObject();
+        pickUp.tag = "Untagged";
+        Rigidbody rb = pickUp.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.useGravity = false;
+            rb.constraints = RigidbodyConstraints.FreezeAll;
+        }
+
+        pickUp.transform.position = batteryPositions[batteryCount].position;
+        pickUp.transform.eulerAngles = new Vector3(-90f, 90f, 0f);
 
         lights[batteryCount].GetComponent<MeshRenderer>().material = greenLightMaterial;
         lights[batteryCount].GetComponent<Light>().color = greenLightColor;
-        batteryCount++;
 
-        if(batteryCount == 4)
+        batteryCount++;
+        Debug.Log($"batteryCount++! : {batteryCount}");
+
+        if (batteryCount == 4)
         {
             door.OpenDoor();
             cutScene.PlayShortCutScene();
@@ -47,5 +84,10 @@ public class BatteryBox : MonoBehaviour, IInteractable
     public void Interact()
     {
 
+    }
+
+    public static int GetBatteryCount()
+    {
+        return batteryCount;
     }
 }

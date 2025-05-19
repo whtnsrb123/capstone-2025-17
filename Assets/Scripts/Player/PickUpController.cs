@@ -5,7 +5,6 @@ using System.Collections;
 
 public class PickUpController : MonoBehaviourPun
 {
-
     public Transform raycastPosition;
     public Transform pickPosition;
     public GameObject heldObject;
@@ -18,22 +17,25 @@ public class PickUpController : MonoBehaviourPun
     [SerializeField] private float throwForce = 10f;
 
     [SerializeField] private LineRenderer trajectoryLine;
-    private int trajectoryPoints = 50;       
-    private float timeBetweenPoints = 0.03f; 
+    private int trajectoryPoints = 50;
+    private float timeBetweenPoints = 0.03f;
     [SerializeField] private float dashLength = 0.1f; // 점 길이
-    [SerializeField] private float dashGap = 0.05f; 
+    [SerializeField] private float dashGap = 0.05f;
     private float crosshairSize = 50f;        // 에임 크기
 
-    [SerializeField] private float holdFollowSpeed = 60f; 
-    [SerializeField] private float holdRotateSpeed = 10f; 
-
+    [SerializeField] private float holdFollowSpeed = 20f; // 손을 따라오는 힘(낮게 설정)
+    [SerializeField] private float holdRotateSpeed = 10f;
     private Quaternion originalRotation; // 처음 잡았던 회전값 저장
     private bool isTouching = false;
     private Quaternion heldRotationOffset = Quaternion.identity; // R키로 회전한 상태 누적 저장
-    
+
     private GameObject recentlyThrownObject;
     private float throwCooldownTime = 1.0f;
     private float throwTimer = 0f;
+
+    private float defaultMass;
+    private float defaultDrag;
+    private float defaultAngularDrag;
 
     void Start()
     {
@@ -44,6 +46,7 @@ public class PickUpController : MonoBehaviourPun
 
         InitializeTrajectoryLine();
     }
+
     private void InitializeTrajectoryLine() // 궤적
     {
         trajectoryLine = GetComponent<LineRenderer>();
@@ -54,7 +57,6 @@ public class PickUpController : MonoBehaviourPun
         trajectoryLine.numCornerVertices = 5;
         trajectoryLine.numCapVertices = 0;
         trajectoryLine.textureMode = LineTextureMode.Tile;
-
         trajectoryLine.material = new Material(Shader.Find("Sprites/Default"))
         {
             mainTexture = CreateDashedTexture()
@@ -76,7 +78,6 @@ public class PickUpController : MonoBehaviourPun
 
     void Update()
     {
-
         if (GameStateManager.isServerTest && !photonView.IsMine) return;
         if (throwTimer > 0f)
             throwTimer -= Time.deltaTime;
@@ -100,30 +101,26 @@ public class PickUpController : MonoBehaviourPun
     {
         if (GameStateManager.isServerTest && !photonView.IsMine) return;
 
-        // 궤적 그리기
         DisplayTrajectory();
 
-        // 들고 있는 물체 손 위치로 이동
         if (heldObject != null && heldObjectRb != null && pickPosition != null)
         {
-            // 위치 이동
-            Vector3 targetPosition = pickPosition.position + pickPosition.forward * pickUpOffset;
+            Vector3 upOffset = Vector3.zero;
+            Vector3 targetPosition = pickPosition.position + pickPosition.forward * pickUpOffset + upOffset;
             Vector3 moveDirection = (targetPosition - heldObjectRb.position);
-            heldObjectRb.velocity = moveDirection * holdFollowSpeed; // velocity로 이동
 
-            // 충돌 감지
-            Vector3 checkSize = heldObject.transform.localScale * 0.5f;
-            isTouching = Physics.CheckBox(heldObjectRb.position, checkSize, heldObjectRb.rotation, ~LayerMask.GetMask("HeldObject"));
+            float maxSpeed = 10f;
+            Vector3 desiredVelocity = moveDirection * holdFollowSpeed;
+            if (desiredVelocity.magnitude > maxSpeed)
+                desiredVelocity = desiredVelocity.normalized * maxSpeed;
+            heldObjectRb.velocity = desiredVelocity;
 
-            // 회전: pickPosition의 회전에 R 키 누적 회전 추가
-            Quaternion targetRotation = isTouching
-                ? pickPosition.rotation * heldRotationOffset
-                : originalRotation * heldRotationOffset;
-
+            Quaternion targetRotation = pickPosition.rotation * heldRotationOffset;
             heldObjectRb.MoveRotation(Quaternion.Slerp(heldObjectRb.rotation, targetRotation, holdRotateSpeed * Time.fixedDeltaTime));
+
+            heldObjectRb.interpolation = RigidbodyInterpolation.Interpolate;
         }
     }
-
     void OnGUI()
     {
         float screenCenterX = Screen.width / 2;
@@ -146,36 +143,7 @@ public class PickUpController : MonoBehaviourPun
             DropObject(); // 놓기
         }
     }
-    /*private void TryPickUp()
-    {
-        if (detectedObject == null) return;
-        if (detectedObject == recentlyThrownObject && throwTimer > 0f)
-        {
-            Debug.Log("감지 금지 : 최근 던진 오브젝트");
-            return;
-        }
 
-        heldObject = detectedObject;
-        heldObjectRb = heldObject.GetComponent<Rigidbody>();
-        if (heldObjectRb != null)
-        {
-            // 원래 물리 속성 저장
-            defaultMass = heldObjectRb.mass;
-            defaultDrag = heldObjectRb.drag;
-            defaultAngularDrag = heldObjectRb.angularDrag;
-
-            // 들고 있을 때 가벼운 속성 적용
-            heldObjectRb.mass = 0.1f; // 매우 가벼운 질량
-            heldObjectRb.drag = 5f;   // 높은 저항력
-            heldObjectRb.angularDrag = 10f; // 높은 회전 저항력
-
-            heldObjectRb.isKinematic = false;
-            heldObjectRb.useGravity = false;
-            heldObject.layer = LayerMask.NameToLayer("HeldObject");
-            originalRotation = heldObject.transform.rotation;
-        }
-    }
-*/
     private bool isPickingUp = false; // 중복 줍기 방지용
 
     public void TryPickUp()
@@ -189,12 +157,13 @@ public class PickUpController : MonoBehaviourPun
             RPC_TryPickUp();
         }
     }
+
     [PunRPC]
     public void RPC_TryPickUp()
     {
         if (isPickingUp) return; // 이미 줍는 중이면 무시
         if (detectedObject == null) return; // 감지된 오브젝트 없으면 무시
-    
+
         StartCoroutine(PickUpWithDelay(0.5f));
     }
 
@@ -213,11 +182,31 @@ public class PickUpController : MonoBehaviourPun
         heldObjectRb = heldObject.GetComponent<Rigidbody>();
         if (heldObjectRb != null)
         {
+            defaultMass = heldObjectRb.mass;
+            defaultDrag = heldObjectRb.drag;
+            defaultAngularDrag = heldObjectRb.angularDrag;
+
+            heldObjectRb.mass = 0.1f;          // 매우 가벼운 질량
+            heldObjectRb.drag = 5f;            // 높은 이동 저항력
+            heldObjectRb.angularDrag = 10f;    // 높은 회전 저항력
             heldObjectRb.isKinematic = false;
             heldObjectRb.useGravity = false;
+            heldObjectRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            heldObjectRb.interpolation = RigidbodyInterpolation.Interpolate;
 
             heldObject.layer = LayerMask.NameToLayer("HeldObject");
             originalRotation = heldObject.transform.rotation;
+            //  마찰력 높이기
+            Collider heldCol = heldObject.GetComponent<Collider>();
+            if (heldCol != null)
+            {
+                if (heldCol.material == null)
+                    heldCol.material = new PhysicMaterial();
+                heldCol.material.staticFriction = 1f;
+                heldCol.material.dynamicFriction = 1f;
+                heldCol.material.frictionCombine = PhysicMaterialCombine.Maximum;
+            }
+
             PhotonView objectView = detectedObject.GetComponent<PhotonView>();
             if (objectView != null && !objectView.IsMine)
             {
@@ -235,7 +224,7 @@ public class PickUpController : MonoBehaviourPun
         }
         isPickingUp = false;
     }
-    
+
     [PunRPC]
     void RPC_SetParent(int objectViewID, int playerViewID)
     {
@@ -245,16 +234,15 @@ public class PickUpController : MonoBehaviourPun
         if (objView == null || playerView == null) return;
 
         Transform pickPos = playerView.transform.Find("pickPosition");
-        
+
         if (pickPos != null)
         {
             objView.transform.SetParent(pickPos);
             objView.transform.localPosition = Vector3.forward * pickUpOffset;
             objView.transform.localRotation = Quaternion.identity;
         }
-
     }
-    
+
     [PunRPC]
     void RPC_ClearParent(int objectViewID)
     {
@@ -292,7 +280,7 @@ public class PickUpController : MonoBehaviourPun
     private IEnumerator DropWithDelay(float delay, int objectViewID)
     {
         PhotonView objView = PhotonView.Find(objectViewID);
-        
+
         isDropping = true;
         yield return new WaitForSeconds(delay);
 
@@ -302,6 +290,9 @@ public class PickUpController : MonoBehaviourPun
             isDropping = false;
             yield break;
         }
+        heldObjectRb.mass = defaultMass;          
+        heldObjectRb.drag = defaultDrag;          
+        heldObjectRb.angularDrag = defaultAngularDrag;
 
         // 기존 DropObject 처리
         heldObjectRb.useGravity = true;
@@ -310,7 +301,6 @@ public class PickUpController : MonoBehaviourPun
         heldObject.layer = LayerMask.NameToLayer("Default");
         Debug.Log("물체 놓기: " + heldObject.name);
         photonView.RPC(nameof(RPC_ClearParent), RpcTarget.All, objectViewID);
-        //heldObject.transform.parent = null;
         heldObject = null;
         heldObjectRb = null;
 
@@ -333,18 +323,17 @@ public class PickUpController : MonoBehaviourPun
         {
             StartCoroutine(ThrowWithDelay(0.5f, objectViewID, throwDirection));
         }
-
         recentlyThrownObject = heldObject;
         throwTimer = throwCooldownTime;
         ResetHeldObject(); // 로컬 heldObject는 즉시 null 처리
     }
-    
+
     [PunRPC]
     public void RPC_StartThrowWithDelay(int objectViewID, Vector3 throwDirection)
     {
         StartCoroutine(ThrowWithDelay(0.5f, objectViewID, throwDirection));
     }
-    
+
     private IEnumerator ThrowWithDelay(float delay, int objectViewID, Vector3 throwDirection)
     {
         yield return new WaitForSeconds(delay);
@@ -358,9 +347,15 @@ public class PickUpController : MonoBehaviourPun
 
         if (rb != null)
         {
+            // 던지기 직전에 원래 값 복구
+            rb.mass = defaultMass;
+            rb.drag = defaultDrag;
+            rb.angularDrag = defaultAngularDrag;
             rb.useGravity = true;
             rb.isKinematic = false;
             rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+
+            // 이제 힘을 가함 (궤적 계산과 동일하게)
             rb.AddForce(throwDirection * throwForce, ForceMode.VelocityChange);
         }
 
@@ -372,6 +367,7 @@ public class PickUpController : MonoBehaviourPun
 
         Debug.Log("ThrowWithDelay 던지기 완료");
     }
+
 
     private void ResetHeldObject()
     {
@@ -391,33 +387,32 @@ public class PickUpController : MonoBehaviourPun
             interact.ResetDetection();
     }
 
-
     [PunRPC]
     void RPC_ThrowObject(int objectViewID, Vector3 throwDirection)
     {
-       PhotonView objView = PhotonView.Find(objectViewID);
-       if (objView == null) return;
-       
-       Transform objTransform = objView.transform;
-       Rigidbody rb = objTransform.GetComponent<Rigidbody>();
-       Collider col = objTransform.GetComponent<Collider>();
-       Collider heldObjectCollider = objView.gameObject.GetComponent<Collider>();
+        PhotonView objView = PhotonView.Find(objectViewID);
+        if (objView == null) return;
 
-       if (col != null)
-       {
-           col.isTrigger = false;
-       }
-       
-       if (rb != null)
-       {
-           rb.isKinematic = false;
-           rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-           rb.AddForce(throwDirection * throwForce, ForceMode.VelocityChange);
-       }
-       objTransform.parent = null;
-       objTransform.position += Vector3.up * 0.1f;
+        Transform objTransform = objView.transform;
+        Rigidbody rb = objTransform.GetComponent<Rigidbody>();
+        Collider col = objTransform.GetComponent<Collider>();
+        Collider heldObjectCollider = objView.gameObject.GetComponent<Collider>();
 
-       Debug.Log("RPC 던지기 완료");
+        if (col != null)
+        {
+            col.isTrigger = false;
+        }
+
+        if (rb != null)
+        {
+            rb.isKinematic = false;
+            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            rb.AddForce(throwDirection * throwForce, ForceMode.VelocityChange);
+        }
+        objTransform.parent = null;
+        objTransform.position += Vector3.up * 0.1f;
+
+        Debug.Log("RPC 던지기 완료");
     }
 
     private void DisplayTrajectory()
@@ -483,6 +478,7 @@ public class PickUpController : MonoBehaviourPun
             RPC_RotateHeldObject();
         }
     }
+
     [PunRPC]
     public void RPC_RotateHeldObject()
     {

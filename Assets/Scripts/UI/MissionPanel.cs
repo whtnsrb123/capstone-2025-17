@@ -32,6 +32,10 @@ public class MissionPanel : MonoBehaviour
         {
             OnHintButton();
         }
+        if (curSceneName == "Mission2")
+        {
+            missionContentText.text = $"배터리를 찾아서 문을 열자. 넣은 배터리:{BatteryBox.GetBatteryCount()}";
+        }
     }
 
     public void OnHintButton()

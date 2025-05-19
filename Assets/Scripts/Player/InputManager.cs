@@ -36,16 +36,24 @@ public class InputManager : MonoBehaviourPun
     void Update()
     {
         if (GameStateManager.isServerTest && !photonView.IsMine) return;
-        if (animator.GetCurrentAnimatorStateInfo(0).IsName("lift")
-        || animator.GetCurrentAnimatorStateInfo(0).IsName("lift Reverse")
-        || animator.GetCurrentAnimatorStateInfo(0).IsName("Falling")
-        || animator.GetCurrentAnimatorStateInfo(0).IsName("Fall Impact")
-        || animator.GetCurrentAnimatorStateInfo(0).IsName("Getting Up"))
+        var state = animator.GetCurrentAnimatorStateInfo(0);
+
+        // 모든 회전 금지 상태 체크
+        bool isRotationBlocked = state.IsName("lift")
+                              || state.IsName("lift Reverse")
+                              || state.IsName("Fall Impact")
+                              || state.IsName("Getting Up");
+
+        if (isRotationBlocked)
         {
             return;
         }
+
+        
         UpdateRotate();
-        if (Input.GetKeyDown(KeyCode.F)) interactManager.OnInput();
+
+        if (Input.GetKeyDown(KeyCode.F))
+            interactManager.OnInput();
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -57,23 +65,17 @@ public class InputManager : MonoBehaviourPun
             else if (pushController.CanPush())
             {
                 pushController.PushPlayer();
-                animator.SetTrigger(PushTriggerName); 
+                animator.SetTrigger(PushTriggerName);
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.R)) pickUpController.RotateHeldObject();
+        if (Input.GetKeyDown(KeyCode.R))
+            pickUpController.RotateHeldObject();
 
-        // Tab 키 : 미니맵 On Off
+        // Tab 키 : 미니맵 On/Off
         if (Input.GetKeyDown(KeyCode.Tab))
         {
-            if (MiniMap.activeSelf)
-            {
-                MiniMap.SetActive(false);
-            }
-            else
-            {
-                MiniMap.SetActive(true);
-            }
+            MiniMap.SetActive(!MiniMap.activeSelf);
         }
     }
 

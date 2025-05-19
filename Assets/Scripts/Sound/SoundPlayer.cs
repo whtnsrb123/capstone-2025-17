@@ -5,6 +5,14 @@ using UnityEngine;
 public class SoundPlayer : MonoBehaviour
 {
     [SerializeField] private SoundManager soundManager;
+    void Awake()
+    {
+        if (soundManager == null)
+        {
+            soundManager = FindObjectOfType<SoundManager>();
+        }
+    }
+
 
     public void PlayBGM(string bgmName)
     {
