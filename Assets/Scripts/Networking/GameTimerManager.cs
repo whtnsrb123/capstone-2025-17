@@ -10,11 +10,13 @@ public class GameTimerManager : MonoBehaviourPun, IManager
     public TMP_Text timerText;  // UI 타이머 표시
     private float timer = 0f;
     private bool isTimerRunning = false;
-    
+
     // 초 변경 감지를 위한 변수
     private int currentSeconds = 0;
     private int lastSeconds = 0;
-    
+
+    private float totalPlayTime = 0f;
+
     // 싱글톤을 유지하면 방을 나갔다가 들어가도 기존 인스턴스를 유지하는 문제가 생김.
     // 따라서 싱글톤을 제거하고, 방마다 새로운 GameTimerManager가 생성되도록 해야 함.
     private void Start()
@@ -24,7 +26,7 @@ public class GameTimerManager : MonoBehaviourPun, IManager
             Destroy(gameObject);
         }
     }
-    
+
     public void Init()
     {
         // photonView는 MonoBehaviourPun이 자동으로 연결해줌
@@ -34,6 +36,7 @@ public class GameTimerManager : MonoBehaviourPun, IManager
         }
         else
         {
+            totalPlayTime = 0f;
             Debug.Log("GameTimerManager 초기화 완료");
         }
     }
@@ -42,15 +45,17 @@ public class GameTimerManager : MonoBehaviourPun, IManager
     {
         Debug.Log("GameTimerManager 클리어");
     }
-    
+
     //미션이 시작할 때 GameTimerManager.Instance.StartTimer(300f)호출 => 5분 타이머 시작
     public void StartTimer(float duration)
     {
         if (GameStateManager.isServerTest && !PhotonNetwork.IsMasterClient) return; // 방장만 타이머 설정 가능
         //모든 플레이어가 타이머 시작을 동기화
         photonView.RPC(nameof(RPC_StartTimer), RpcTarget.All, duration);
+
+        totalPlayTime = duration;
     }
-    
+
     [PunRPC]
     private void RPC_StartTimer(float duration)
     {
@@ -103,21 +108,21 @@ public class GameTimerManager : MonoBehaviourPun, IManager
         timer = duration;
         isTimerRunning = true;
     }
-    
+
     private void Update()
     {
         if (!isTimerRunning) return;
-        
+
         timer -= Time.deltaTime;
-        
+
         currentSeconds = Mathf.FloorToInt(timer);
         if (currentSeconds != lastSeconds) // 초가 변경될 때만 UI 업데이트
         {
             lastSeconds = currentSeconds;
             UpdateTimerUI();
         }
-        
-        
+
+
         if (timer <= 0f)
         {
             isTimerRunning = false;
@@ -159,4 +164,11 @@ public class GameTimerManager : MonoBehaviourPun, IManager
     {
         return timer <= 0f;
     }
+
+    public float GetClearTime()
+    {
+        return totalPlayTime - timer;
+    }
+
+
 }
