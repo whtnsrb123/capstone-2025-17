@@ -58,9 +58,6 @@ public class PlayerInRoomUIController : MonoBehaviour
             }
             else
             {
-                // ========================================================
-                // 테스트 용이하게 하기 위해 버튼을 언제나 활성화시켜둔다. 제대로 동작하기는 함
-                // ========================================================
                 // 시작하기 버튼을 비활성화 한다 
                 readyOrStartButtonTMP.text = "대기 중 ...";
                 roomView.readyOrStartBtn.enabled = false;
@@ -111,30 +108,27 @@ public class PlayerInRoomUIController : MonoBehaviour
 
     public void ActivateStartButton(int trash1 = 0, bool trash2 = false)
     {
-        // ========================================================
-        // 테스트 용이하게 하기 위해 버튼을 언제나 활성화시켜둔다. 제대로 동작하기는 함
-        // ========================================================
+        if (!PhotonNetwork.IsMasterClient) return;
+
         // 필요 인원 충족 시 start button 활성화 
-        if (PhotonNetwork.IsMasterClient)
+        for (int i = 0; i < ServerInfo.ReadyStates.Length; i++)
         {
-            for (int i = 0; i < ServerInfo.ReadyStates.Length; i++)
+            if ((ServerInfo.PlayerActorNumbers[i] != -1 && !ServerInfo.ReadyStates[i]) && GameStateManager.isServerTest)
             {
-                
-                if (!ServerInfo.ReadyStates[i] && GameStateManager.isServerTest)
-                {
-                    roomView.readyOrStartBtn.enabled = false;
-                    readyOrStartButtonTMP.text = "대기 중...";
-                    return;
-                }
+                roomView.readyOrStartBtn.enabled = false;
+                readyOrStartButtonTMP.text = "대기 중...";
+                return;
             }
-            readyOrStartButtonTMP.text = "게임 시작";
-            roomView.readyOrStartBtn.enabled = true;
+            Debug.Log(ServerInfo.PlayerActorNumbers[i] +"번째 플레이어의 레디 상태  : " + ServerInfo.ReadyStates[i]);
         }
+        readyOrStartButtonTMP.text = "게임 시작";
+        roomView.readyOrStartBtn.enabled = true;
     }
 
     public void UpdatePlayers(int index, int value)
     {
         roomView.UpdatePlayer(index, value);
+        ActivateStartButton();
     }
 
     public void UpdateReadyStates(int index, bool ready)
@@ -144,10 +138,8 @@ public class PlayerInRoomUIController : MonoBehaviour
 
     public void UpdateMasterClient(int actorNumber)
     {
-        // Debug.Log($"Master Client Actor Number : {actorNumber}");
         for (int i = 0; i < ServerInfo.PlayerActorNumbers.Length; i++)
         {
-            // Debug.Log($"playerActorNumber[{i}] = {ServerInfo.PlayerActorNumbers[i]}");
             if (ServerInfo.PlayerActorNumbers[i] == actorNumber)
             {
                 roomView.masterClientCrown[i].gameObject.SetActive(true);
