@@ -39,8 +39,6 @@ public class PlayerInRoomUIController : MonoBehaviour
 
     public void OnEnteredRoom()
     {
-        Debug.Log("방 입장");
-
         // 룸 접속 성공 시 메소드 호출
         roomPanel.SetActive(true);
 
@@ -49,7 +47,6 @@ public class PlayerInRoomUIController : MonoBehaviour
 
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
-            Debug.Log("나는 마스터");
             // MasterClient일 때, OnPlayerEntered()가 호출되지 않으므로 나의 ActorNumber를 스스로 전송한다 
             network.DetectEnteredPlayer(PhotonNetwork.LocalPlayer.ActorNumber);
             network.ChangeReadyState();

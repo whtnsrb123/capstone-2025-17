@@ -81,6 +81,8 @@ MonoBehaviour:
   - InteractWithElevator
   - InteractRPC
   - SetRandomTime
+  - RPC_DisableLeftPlayer
+  - RPC_EnableRejoinedPlayer
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

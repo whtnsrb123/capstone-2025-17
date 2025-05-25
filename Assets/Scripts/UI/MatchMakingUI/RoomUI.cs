@@ -94,7 +94,6 @@ public class RoomUI : MonoBehaviour
     {
         for (int i = 0; i < ServerInfo.PlayerActorNumbers.Length; i++)
         {
-            Debug.Log($"{i} 번째에  {ServerInfo.PlayerActorNumbers[i]} 표시");
             UpdatePlayer(i, ServerInfo.PlayerActorNumbers[i]);
         }
     }

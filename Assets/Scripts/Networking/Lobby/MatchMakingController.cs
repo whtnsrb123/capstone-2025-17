@@ -10,8 +10,7 @@ public class MatchMakingController : MonoBehaviourPunCallbacks
     [SerializeField] MatchMakingUIController ui;
 
     // 접속이 끊긴 플레이어를 룸에 유지할 시간
-    // TODO : 테스트 용도로 0으로 설정한다
-    private int playerTtl = 0;
+    private int playerTtl = 10000;     // 1ms = 0.001sec
     // 아무도 없는 룸을 유지할 시간 
     private int roomTtl = 0;
 
@@ -20,7 +19,6 @@ public class MatchMakingController : MonoBehaviourPunCallbacks
 
     public void JoinRandomRoom(string roomName)
     {
-        Debug.Log("랜덤 시도");
         // 방 기본 속성
         Hashtable customProperties = new Hashtable
         {
@@ -47,6 +45,7 @@ public class MatchMakingController : MonoBehaviourPunCallbacks
             CustomRoomProperties = customProperties,
             CustomRoomPropertiesForLobby = new string[] { ServerInfo.MatchTypeKey, ServerInfo.IsGameStartKey },
             EmptyRoomTtl = roomTtl,
+            CleanupCacheOnLeave = false,
         };
 
         bool sent = PhotonNetwork.JoinRandomOrCreateRoom
@@ -99,6 +98,7 @@ public class MatchMakingController : MonoBehaviourPunCallbacks
             CustomRoomProperties = customProperties,
             CustomRoomPropertiesForLobby = new string[] { ServerInfo.MatchTypeKey, ServerInfo.IsGameStartKey },
             EmptyRoomTtl = roomTtl,
+            CleanupCacheOnLeave = false,
         };
 
         bool sent = PhotonNetwork.CreateRoom

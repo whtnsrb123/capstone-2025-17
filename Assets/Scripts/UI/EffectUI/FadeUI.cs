@@ -42,7 +42,6 @@ public class FadeUI : MonoBehaviour
     }
     public IEnumerator FadeIn()
     {
-        Debug.Log(group.alpha);
         while (group.alpha > FadeInAlpha)
         {
             float now = group.alpha;

@@ -5,12 +5,15 @@ using Photon.Realtime;
 using ExitGames.Client.Photon;
 using System.Collections;
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 
 public class ServerConnector : MonoBehaviourPunCallbacks
 {
+
     public static ServerConnector Instance { get; private set; }
 
     public static Action OnConnectedToLobby; // 마스터 서버에 접속했을 때
+
 
     // 플레이어의 연결 상태
 
@@ -48,17 +51,21 @@ public class ServerConnector : MonoBehaviourPunCallbacks
         else
         {
             // 이외 접속이 끊긴 뒤 재접속인 경우
-            // StartCoroutine(TryReconnectToMasterServer());
+            StartCoroutine(TryReconnectToMasterServer());
         }
     }
 
     public void ConnectToMasterServer()
     {
-        if (!PhotonNetwork.IsConnected)
+        if (!PhotonNetwork.IsConnectedAndReady)
         {
             // 씬 동기화
             PhotonNetwork.AutomaticallySyncScene = true;
             PhotonNetwork.GameVersion = _gameVersion;
+
+            // PhotonNetwork.ReconnectAndRejoin()을 이용하기 위해 필요 
+            PhotonNetwork.AuthValues = new AuthenticationValues();
+            PhotonNetwork.AuthValues.UserId = Guid.NewGuid().ToString();
 
             // 접속 시도
             PhotonNetwork.ConnectUsingSettings();
@@ -88,13 +95,15 @@ public class ServerConnector : MonoBehaviourPunCallbacks
         for (int r = 0; r < retry; r++)
         {
             // 2초마다 호출
-            Invoke(nameof(this.ConnectToMasterServer), 0f);
+            ConnectToMasterServer();
 
-            if (PhotonNetwork.IsConnected)
+            yield return new WaitForSeconds(1f);
+
+
+            if (PhotonNetwork.IsConnectedAndReady)
             {
                 yield break;
             }
-            yield return new WaitForSeconds(2f);
         }
 
     }

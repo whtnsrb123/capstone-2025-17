@@ -210,8 +210,6 @@ public class PlayerInRoomController : MonoBehaviourPunCallbacks
 
         if (props.ContainsKey(ServerInfo.IsGameStartKey))
         {
-            Debug.Log("key detected");
-
            return (bool)props[ServerInfo.IsGameStartKey];
         }
         return false;
@@ -235,7 +233,6 @@ public class PlayerInRoomController : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
-        Debug.Log("룸 입장 성공");
         // 룸에 조인 성공
         ClientInfo.sCurrentState = ConnectState.Room;
 

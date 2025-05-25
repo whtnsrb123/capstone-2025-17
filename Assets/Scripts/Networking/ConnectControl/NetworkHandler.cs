@@ -3,6 +3,7 @@ using Photon.Realtime;
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class NetworkHandler : MonoBehaviourPunCallbacks
@@ -16,6 +17,10 @@ public class NetworkHandler : MonoBehaviourPunCallbacks
     Button confirmButton; // 확인 버튼
 
     string errorText = "ERROR";
+
+    Transform dontDestroyCanvas; // UI Object가 표시될 전용 캔버스 
+    RectTransform dontDestroyRect;
+
 
     #region 사용자정의 에러 코드
     public const int RequestNotSent = 0; // 접속이 끊겨, 요청이 전송되지 않은 경우
@@ -166,11 +171,17 @@ public class NetworkHandler : MonoBehaviourPunCallbacks
     void ShowExceptionPanel(string type, string message, Action action)
     {
         // 패널을 띄울 캔버스를 찾는다
-        Canvas canvas = FindObjectOfType<Canvas>();
+        dontDestroyCanvas = GameObject.Find("DontDestroyCanvas").transform;
+        Debug.Assert(dontDestroyCanvas != null, "DontDestroyCanvas null");
 
         // 패널을 프리팹으로 생성한다
-        currentErrorPanel = Instantiate(errorPanelPrefab, canvas.transform, false);
-        Debug.Assert(canvas != null, "핸들러 프리팹을 찾지 못함");
+        currentErrorPanel = Instantiate(errorPanelPrefab, dontDestroyCanvas.transform, false);
+        Debug.Assert(currentErrorPanel != null, "cannot find error panel!");
+
+        dontDestroyRect = currentErrorPanel.GetComponent<RectTransform>();
+        Debug.Assert(currentErrorPanel != null, "rect transform is null!");
+        dontDestroyRect.SetAsLastSibling();
+
 
         // 패널의 자식들 중 사용할 UI 요소 찾아 변수에 할당한다
         TextMeshProUGUI[] allTMPsChildren = currentErrorPanel.GetComponentsInChildren<TextMeshProUGUI>();
@@ -199,12 +210,15 @@ public class NetworkHandler : MonoBehaviourPunCallbacks
 
         // case에 따라 추가 로직이 필요한 경우 등록 
         if (action != null) { confirmButton.onClick.AddListener(() => action()); }
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     // 네트워크 재연결이 필요한 경우, 첫 화면에서 재접속 시도 
     void BackToStartScene()
     {
-        PhotonNetwork.LoadLevel("StartScene");
+        SceneManager.LoadScene("StartScene");
     }
 
     void ReconnectAndRejoin()
