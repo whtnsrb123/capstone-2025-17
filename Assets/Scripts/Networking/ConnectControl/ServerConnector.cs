@@ -6,6 +6,7 @@ using ExitGames.Client.Photon;
 using System.Collections;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
+using UnityEngine.SceneManagement;
 
 public class ServerConnector : MonoBehaviourPunCallbacks
 {

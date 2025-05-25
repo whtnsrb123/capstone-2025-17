@@ -43,6 +43,10 @@ public class StartSceneUI : MonoBehaviour
     public void OnClickConnectButton()
     {
         FadeUI.Fade?.Invoke(false);
+        if (LoadingPanel.Instance != null)
+        {
+            LoadingPanel.Instance.BeforeLoadedLobbyScene();
+        }
         PhotonNetwork.LoadLevel("LobbyScene");
     }
 
