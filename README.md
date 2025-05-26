@@ -33,46 +33,6 @@
 
 ---
 
-## 👥 팀 소개
-
-<table>
-    <thead>
-        <tr>
-            <th colspan="6"> 17팀 대성각 </th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td align='center'><a href="https://github.com/gugyeoj1n"><img src="https://github.com/user-attachments/assets/91ce4407-553a-455f-a68c-b6b599f8e36b" width="100" height="100"></a></td>
-            <td align='center'><a href="https://github.com/17637p"><img src="https://github.com/user-attachments/assets/5649bd7d-cbbe-4b92-b9cc-32a457841c88" width="100" height="100"></a></td>
-            <td align='center'><a href="https://github.com/whtnsrb123"><img src="https://github.com/user-attachments/assets/ad1f4506-7aac-4ceb-a0fc-b41be2a0893c" width="100" height="100"></a></td>
-            <td align='center'><a href="https://github.com/ForestMS1"><img src="https://github.com/user-attachments/assets/efb604dd-bf5c-4b30-946e-ee5c3bcb001d" width="100" height="100"></a></td>
-            <td align='center'><a href="https://github.com/JiyeonJeong01"><img src="https://github.com/user-attachments/assets/1010e12f-2014-4981-8618-a5201f4474b9" width="100" height="100"></a></td>
-        </tr>
-        <tr>
-            <td align='center'>20203026</td>
-            <td align='center'>20203045</td>
-            <td align='center'>20203144</td>
-            <td align='center'>20203033</td>
-            <td align='center'>20200592</td>
-        </tr>
-        <tr>
-            <td align='center'>곽우진</td>
-            <td align='center'>김유진</td>
-            <td align='center'>조순규</td>
-            <td align='center'>김대성</td>
-            <td align='center'>정지연</td>
-        </tr>
-        <tr>
-            <td align='center'>클라이언트</td>
-            <td align='center'>클라이언트</td>
-            <td align='center'>클라이언트</td>
-            <td align='center'>서버</td>
-            <td align='center'>서버</td>
-        </tr>
-    </tbody>
-</table>
-
 ## 🛠 주요 기능
 
 ### 🕹 3인칭 조작 시스템
