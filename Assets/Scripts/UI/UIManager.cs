@@ -85,6 +85,9 @@ public class UIManager : MonoBehaviour
         {
             if (activatedPopups.Count > 0)
             {
+
+                if (activatedPopups.Peek().type == UIType.Ending) return;
+
                 activatedPopups.Peek()?.HideUI();
                 if (activatedPopups.Count == 0)
                 {

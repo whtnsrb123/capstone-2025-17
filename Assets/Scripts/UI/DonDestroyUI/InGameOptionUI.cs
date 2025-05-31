@@ -75,7 +75,8 @@ public class InGameOptionUI : MonoBehaviourPunCallbacks
     {
         if (SceneManager.GetActiveScene().name != "LobbyScene")
         {
-            LoadingPanel.Instance.BeforeLoadedLobbyScene();
+            Debug.Log("option panel");
+            LoadingPanel.Instance?.BeforeLoadedLobbyScene();
             SceneManager.LoadScene("LobbyScene");
         }
     }

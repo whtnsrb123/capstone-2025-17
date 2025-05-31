@@ -57,7 +57,7 @@ public class ResolutionEnforcer : MonoBehaviour
                 height = Mathf.RoundToInt(width / targetAspect);
             }
 
-            Screen.SetResolution(width, height, false);
+            Screen.SetResolution(width, height, Screen.fullScreen);
         }
     }
 }

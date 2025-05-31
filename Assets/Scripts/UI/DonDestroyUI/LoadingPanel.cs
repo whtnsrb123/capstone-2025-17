@@ -112,7 +112,12 @@ public class LoadingPanel : MonoBehaviourPun
 
     public void BeforeLoadedLobbyScene()
     {
-        Destroy(gameObject);
+        if (LoadingPanel.Instance != null)
+        {
+            Debug.Log("중복된 로딩 패널 삭제");
+            LoadingPanel.Instance = null;
+            Destroy(gameObject);
+        }
     }
 
 }

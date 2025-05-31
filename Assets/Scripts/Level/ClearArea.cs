@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using UnityEngine.SceneManagement;
 
 public class ClearArea : MonoBehaviour
 {
@@ -61,7 +62,14 @@ public class ClearArea : MonoBehaviour
                 if (curMission < 3)
                 {
                     Managers.MissionManager.GoNextMission();
+                    Managers.GameStateManager.PlusTotalPlayTime(Managers.GameTimerManager.GetNowTime());
                 }
+                #region 정보 전송
+                if (curMission == 3 || SceneManager.GetActiveScene().name == "Mission3")
+                {
+                    HandleGameEnding();
+                }
+                #endregion
             }
         }
     }
@@ -70,5 +78,24 @@ public class ClearArea : MonoBehaviour
     {
         if(other.CompareTag("Player"))
             clearCount--;
+    }
+
+    private void HandleGameEnding()
+    {
+        Debug.Log($"HandleGameEnding() Excuted");
+
+        Managers.GameStateManager.SetClearGame(true);
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            ScoreSaver saver = FindAnyObjectByType<ScoreSaver>();
+            saver.ShouldSendScore();
+        }
+
+        UIManager.Instance.GetUI(UIType.Ending).ShowUI();
+        Time.timeScale = 0.25f;
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 }

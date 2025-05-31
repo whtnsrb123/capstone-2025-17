@@ -160,7 +160,7 @@ public class ChatManager : MonoBehaviourPun
     {
         for (int i = 0; i < speakers.Length; i++)
         {
-            if (speakers[i].RemoteVoice == null) { continue; } // local speaker does't have RemoteVoice
+            if (speakers[i] == null || speakers[i].RemoteVoice == null) { continue; } // local speaker does't have RemoteVoice
 
             bool isPlaying = speakers[i].IsPlaying;
 
@@ -198,13 +198,14 @@ public class ChatManager : MonoBehaviourPun
 
     private void SetLocalSpeakerUI(int playerId, bool visibility)
     {
+
         if (visibility && recorder.TransmitEnabled)
         {
             playerIdToPanelsMap[myPlayerId].SetActive(visibility);
         }
         else
         {
-            playerIdToPanelsMap[myPlayerId].SetActive(visibility);
+            playerIdToPanelsMap[myPlayerId].SetActive(false);
         }
 
         Debug.Log($"local client " + (visibility ? " starts speaking" : " stops speaking"));

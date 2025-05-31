@@ -7,6 +7,7 @@ public class ButtonScaler : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     [SerializeField] private float hoverScale = 1.1f;
     [SerializeField] private float clickScale = 0.9f;
     [SerializeField] private float duration = 0.2f;
+    [SerializeField] public bool disabledBtn {  get; set; }
 
     private Vector3 originalScale;
     private Tweener currentTween;
@@ -14,6 +15,11 @@ public class ButtonScaler : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     private void Awake()
     {
         originalScale = transform.localScale;
+    }
+
+    private void Start()
+    {
+        disabledBtn = false;
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -39,6 +45,8 @@ public class ButtonScaler : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     private void AnimateScale(Vector3 targetScale)
     {
+        if (disabledBtn) { return; }
+
         if (currentTween != null && currentTween.IsActive())
         {
             currentTween.Kill();

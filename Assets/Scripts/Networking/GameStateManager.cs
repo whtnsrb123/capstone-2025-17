@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Photon.Pun;
+using Photon.Voice.PUN;
 using UnityEngine;
 
 public class GameStateManager : MonoBehaviourPun, IManager
@@ -13,9 +14,12 @@ public class GameStateManager : MonoBehaviourPun, IManager
 
     private bool isGameClear = false;
 
+    private float totalPlayTime = 0f;
+
     public void Init()
     {
         Debug.Log("GameStateManager 초기화 완료");
+        totalPlayTime = 0f;
         isGameStarted = false;
     }
 
@@ -76,12 +80,29 @@ public class GameStateManager : MonoBehaviourPun, IManager
         return isGameClear && !isGameStarted;
     }
 
+    public void SetClearGame(bool clear)
+    {
+        isGameClear = clear;
+    }
+
 
     //멀티/1인 on/off버튼
     public void ServerTestOnOff()
     {
         isServerTest = !isServerTest;
     }
+
+    public void PlusTotalPlayTime(float missionTime)
+    {
+        totalPlayTime += missionTime;
+        Debug.Log(totalPlayTime);
+    }
+
+    public float GetTotalPlayTime()
+    {
+        return totalPlayTime;
+    }
+
 
     [PunRPC]
     private void GameClear()
@@ -93,5 +114,27 @@ public class GameStateManager : MonoBehaviourPun, IManager
     private void GameOver()
     {
         PhotonNetwork.LoadLevel("GameOverScene");
+    }
+
+    public void RPC_LeaveRoomAllPlayer()
+    {
+        if (!PhotonNetwork.IsMasterClient) return;
+
+        Debug.Log("make player leave this room!");
+        photonView.RPC("LeaveRoomAllPlayer", RpcTarget.All);
+    }
+
+    [PunRPC]
+    private void LeaveRoomAllPlayer()
+    {
+        if (PunVoiceClient.Instance.Client != null &&
+            PunVoiceClient.Instance.Client.IsConnected)
+        {
+            PunVoiceClient.Instance.Client.Disconnect();
+        }
+
+        bool isSent = PhotonNetwork.LeaveRoom();
+
+        Debug.Log(isSent ? "방 퇴장 요청 전송" : "방 퇴장 요청 전송 실패");
     }
 }

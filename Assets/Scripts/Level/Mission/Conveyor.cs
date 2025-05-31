@@ -1,18 +1,32 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
-public class Conveyor : MonoBehaviour
+public class Conveyor : MonoBehaviourPun
 {
     public bool isOn = false;
     [SerializeField]
     private float speed;
     private Vector3 pos;
-    private Rigidbody rigidbody;
+    private List<PhotonView> targets;
 
     private void Start()
     {
-        rigidbody = GetComponent<Rigidbody>();
+        targets = new List<PhotonView>();
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        if(other.transform.CompareTag("Player"))
+            targets.Add(other.transform.GetComponent<PhotonView>());
+    }
+
+    private void OnCollisionExit(Collision other)
+    {
+        if(other.transform.CompareTag("Player"))
+            targets.Remove(other.transform.GetComponent<PhotonView>());
     }
 
     public void On()
@@ -23,7 +37,7 @@ public class Conveyor : MonoBehaviour
     private IEnumerator OnConveyor()
     {
         isOn = true;
-        float time = Random.Range(5f, 10f);
+        float time = ConveyorController.time;
         yield return new WaitForSeconds(time);
         isOn = false;
     }
@@ -32,9 +46,22 @@ public class Conveyor : MonoBehaviour
     {
         if(!isOn)
             return;
+        
+        if (targets.Count != 0)
+        {
+            foreach (PhotonView pv in targets)
+            {
+                photonView.RPC(nameof(RPC_ReceivePush), pv.Owner, pv.ViewID);
+            }
+        }
+    }
 
-        pos = rigidbody.position;
-        rigidbody.position += (transform.forward * -1) * speed * Time.fixedDeltaTime;
-        rigidbody.MovePosition(pos);
+    [PunRPC]
+    public void RPC_ReceivePush(int viewID)
+    {
+        PhotonView view = PhotonView.Find(viewID);
+        Rigidbody rb = view.GetComponent<Rigidbody>();
+        Vector3 move = (transform.forward * -1) * speed * Time.fixedDeltaTime;
+        rb.MovePosition(rb.position + move);
     }
 }

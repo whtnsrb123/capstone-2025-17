@@ -11,6 +11,7 @@ public enum UIType
     IngameOption,
     LoadingPanel,
     TextInfo, // 텍스트 정보 
+    Ending,
 }
 
 [RequireComponent(typeof(CanvasGroup))]

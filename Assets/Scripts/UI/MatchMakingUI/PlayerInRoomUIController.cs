@@ -116,13 +116,14 @@ public class PlayerInRoomUIController : MonoBehaviour
             if ((ServerInfo.PlayerActorNumbers[i] != -1 && !ServerInfo.ReadyStates[i]) && GameStateManager.isServerTest)
             {
                 roomView.readyOrStartBtn.enabled = false;
+                roomView.readyOrStartBtn.GetComponent<ButtonScaler>().disabledBtn = true;
                 readyOrStartButtonTMP.text = "대기 중...";
                 return;
             }
-            Debug.Log(ServerInfo.PlayerActorNumbers[i] +"번째 플레이어의 레디 상태  : " + ServerInfo.ReadyStates[i]);
         }
-        readyOrStartButtonTMP.text = "게임 시작";
         roomView.readyOrStartBtn.enabled = true;
+        roomView.readyOrStartBtn.GetComponent<ButtonScaler>().disabledBtn = false;
+        readyOrStartButtonTMP.text = "게임 시작";
     }
 
     public void UpdatePlayers(int index, int value)

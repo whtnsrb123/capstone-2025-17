@@ -52,9 +52,7 @@ public class LeaderboardManager : MonoBehaviour
 
     void Start()
     {
-#if UNITY_EDITOR
         InitializeFirebase();
-#endif
     }
 
     private async void InitializeFirebase()
@@ -150,6 +148,34 @@ public class LeaderboardManager : MonoBehaviour
             Debug.LogError($"리더보드 데이터 조회 실패: {e.Message}");
             return new List<Dictionary<string, object>>();
         }
+    }
+
+    public async Task DeleteAllLeaderboardData()
+    {
+        if (!isInitialized)
+        {
+            Debug.LogError("Firebase가 초기화되지 않았습니다.");
+            return;
+        }
+
+        try
+        {
+            QuerySnapshot querySnapshot =
+                await db.Collection(COLLECTION_NAME).GetSnapshotAsync();
+
+            int docCnt = 0;
+            foreach (DocumentSnapshot document in querySnapshot.Documents)
+            {
+                await db.Collection(COLLECTION_NAME).Document(document.Id).DeleteAsync();
+                docCnt++;
+            }
+            Debug.Log($"{docCnt}개 파일 삭제됨");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"삭제 실패 : {e.Message}");
+        }
+
     }
 
     #region Test Code

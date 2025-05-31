@@ -842,7 +842,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 2
   sprintSpeed: 5
-  jumpForce: 3
+  jumpForce: 4
   waterEffect: {fileID: 0}
   animator: {fileID: 0}
   MoveType: 0

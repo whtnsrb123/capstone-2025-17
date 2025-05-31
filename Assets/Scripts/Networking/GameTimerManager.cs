@@ -165,9 +165,9 @@ public class GameTimerManager : MonoBehaviourPun, IManager
         return timer <= 0f;
     }
 
-    public float GetClearTime()
+    public float GetNowTime()
     {
-        return totalPlayTime - timer;
+        return timer;
     }
 
 
