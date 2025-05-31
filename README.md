@@ -1,4 +1,4 @@
-# 🧸 팀 17 대성각 - Toyland Trials
+# 🧸 Toyland Trials
 
 ---
 ![Image](https://github.com/user-attachments/assets/103869d7-a533-4996-8a28-d840709cd4c1)
